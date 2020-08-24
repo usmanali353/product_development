@@ -19,6 +19,7 @@ import '../Dashboard.dart';
        pd.hide();
        SharedPreferences.getInstance().then((prefs){
          prefs.setString("token", response.data["result"]);
+         prefs.setString("email", email);
        });
        Utils.showSuccess(context, "Login Successful");
        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Dashboard()));
