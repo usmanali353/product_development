@@ -14,6 +14,7 @@ class _AssumptionsState extends ResumableState<Assumptions> {
   TextEditingController event,client,other;
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey();
   bool marketDropdownVisible=false;
+  int marketId;
   List<Dropdown> markets=[];
   List<String> marketNames=[];
   List<String> clientList=['Client 1','Client 2','Client 3','Other'];
@@ -86,6 +87,7 @@ class _AssumptionsState extends ResumableState<Assumptions> {
                         onChanged: (value){
                           setState(() {
                             this.selectedMarket=value;
+                            this.marketId=markets[marketNames.indexOf(value)].id;
                           });
                         },
                       ),
@@ -191,7 +193,7 @@ class _AssumptionsState extends ResumableState<Assumptions> {
                     color: Color(0xFF004c4c),
                     onPressed: (){
                       if(_fbKey.currentState.validate()){
-                        push(context, MaterialPageRoute(builder: (context)=>Specifications(selectedMarket,selectedClient=="Other"?client.text:clientId,event.text,other.text)));
+                        push(context, MaterialPageRoute(builder: (context)=>Specifications(marketId,selectedClient=="Other"?client.text:clientId,event.text,other.text)));
                       }
                     },
                   ),

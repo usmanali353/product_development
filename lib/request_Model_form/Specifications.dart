@@ -36,6 +36,7 @@ class _SpecificationsState extends ResumableState<Specifications> {
   void onResume() {
     if(resume.data.toString()=='Close') {
       Navigator.pop(context, 'Close');
+      Navigator.pop(context, 'Close');
     }
     super.onResume();
   }
@@ -75,7 +76,7 @@ class _SpecificationsState extends ResumableState<Specifications> {
              sizes.add(
                {
                  "display":s.name,
-                  "value": s.id
+                  "value": s.id.toString()
                }
              );
            }
@@ -94,7 +95,7 @@ class _SpecificationsState extends ResumableState<Specifications> {
              colors.add(
                  {
                    "display":s.name,
-                   "value": s.id
+                   "value": s.id.toString()
                  }
              );
            }

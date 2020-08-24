@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 
 class Suitability extends StatefulWidget{
+
   var market,client,event,other,size,surface,thickness,classification,color,technologyId,structureId, edge,range,material;
   List<dynamic> designTopologies=[],sizesList=[],colorsList=[];
   Suitability(
@@ -40,6 +41,7 @@ class Suitability extends StatefulWidget{
 class _Suitability_State extends ResumableState<Suitability> {
   List _myActivities;
   String _myActivitiesResult;
+  var base64EncodedImage;
   final formKey = new GlobalKey<FormState>();
   final fbKey = new GlobalKey<FormBuilderState>();
   List<Dropdown> suitibility=[];
@@ -61,7 +63,7 @@ class _Suitability_State extends ResumableState<Suitability> {
            suitibilitys.add(
                {
                  "display": s.name,
-                 "value": s.id
+                 "value": s.id.toString()
                }
            );
          }
@@ -184,6 +186,10 @@ class _Suitability_State extends ResumableState<Suitability> {
                                     setState(() {
                                       this.picked_image=image;
                                       _image = File(image_file.path);
+                                      _image.readAsBytes().then((bytes){
+                                        this.base64EncodedImage= base64.encode(bytes);
+                                      });
+
                                     });
                                   }
                                 });
@@ -212,7 +218,7 @@ class _Suitability_State extends ResumableState<Suitability> {
 //                                  _myActivitiesResult = _myActivities.toString();
 //                                });
                                 SharedPreferences.getInstance().then((prefs){
-                                  Network_Operations.SaveRequest(context,prefs.getString("token") ,0, market, event, technical_consideration.text,"0f7faddf-9100-4e4b-85b8-c976a0709795" , 1, double.parse(thickness), surface, classification, range, technologyId, structureId, edge, "base64Encode(bytes)", colorsList,sizesList, designTopologies, suitibilitys);
+                                  Network_Operations.SaveRequest(context,prefs.getString("token") ,0, market, event, technical_consideration.text , 1, double.parse(thickness), surface, classification, range, technologyId, structureId, edge,base64EncodedImage!=null?base64EncodedImage:"", colorsList,sizesList, designTopologies, _myActivities,surface);
                                 });
 
                               }

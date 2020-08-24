@@ -39,4 +39,11 @@ class Utils{
       backgroundColor: Colors.green,
     ).show(context);
   }
+  static dynamic myEncode(dynamic item) {
+    if(item is DateTime) {
+      return item.toIso8601String();
+    }
+    return item;
+  }
+
 }

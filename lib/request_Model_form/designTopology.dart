@@ -59,7 +59,7 @@ int range_id, material_id,technology_id, structure_id, edge_id;
             designTopologies.add(
                 {
                   "display": s.name,
-                  "value": s.id
+                  "value": s.id.toString()
                 }
             );
           }
