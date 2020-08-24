@@ -104,4 +104,20 @@ import '../Dashboard.dart';
      // Utils.showError(context, e.toString());
     }
   }
+
+  static Future<List<dynamic>> getRequest(BuildContext context,String token)async{
+    try{
+      var response=await Dio().get(Utils.getBaseUrl()+"Request/GetAllRequests",options:Options(headers:{"Authorization":"Bearer "+token}));
+      if(response.statusCode==200){
+        return response.data;
+        print(response.data);
+
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+
 }

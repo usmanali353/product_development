@@ -11,7 +11,10 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends ResumableState<Dashboard> {
 
- @override
+
+  List<dynamic> newRequest=[],rejectedbyCustomer=[],rejectedbyGM=[],rejectedTrial=[],sampleScheduled=[],approvedForTrial=[],customerApproved=[],approvebyGM=[];
+
+  @override
   void onResume() {
 
     super.onResume();
@@ -22,7 +25,43 @@ class _DashboardState extends ResumableState<Dashboard> {
       print(prefs.getString("token"));
       Network_Operations.getDropDowns(context,prefs.getString("token"),"Markets");
       Network_Operations.getDropDowns(context,prefs.getString("token"),"Classifications");
+
+      Network_Operations.getRequest(context, prefs.getString("token")).then((result){
+       print(result);
+       for(int i=0; i<result.length;i++ ) {
+         if (result[i]['statusName'] =="New Request"){
+          newRequest.add(result[i]);
+         }
+         if (result[i]['statusName'] =="Approved By GM"){
+           approvebyGM.add(result[i]);
+         }
+         if (result[i]['statusName'] =="Approved By Customer"){
+           customerApproved.add(result[i]);
+         }
+         if (result[i]['statusName'] =="Approved Trial"){
+           approvedForTrial.add(result[i]);
+         }
+         if (result[i]['statusName'] =="Rejected By Customer"){
+           rejectedbyCustomer.add(result[i]);
+         }
+         if (result[i]['statusName'] =="Rejected By GM"){
+           rejectedbyGM.add(result[i]);
+         }
+         if (result[i]['statusName'] =="Rejected Trial"){
+           rejectedTrial.add(result[i]);
+         }
+         if (result[i]['statusName'] =="Sample Scheduled"){
+           sampleScheduled.add(result[i]);
+         }
+
+       }
+       print(newRequest.toString());
+      });
+
+
     });
+
+    print("approvebyGM.toString()");
     super.initState();
   }
   @override
@@ -82,7 +121,7 @@ class _DashboardState extends ResumableState<Dashboard> {
             children: <Widget>[
               InkWell(
                 onTap:(){
-                  //push(context, MaterialPageRoute(builder: (context)=>ModelRequests(user,newRequests,newRequestId)));
+                 // push(context, MaterialPageRoute(builder: (context)=>ModelRequests(user,newRequests,newRequestId)));
                 },
                 child: Card(
                   elevation: 10,
@@ -117,7 +156,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text('', style: TextStyle(color:Color(0xFF004c4c),
+                              child: Text(newRequest!=null?newRequest.length.toString():'0', style: TextStyle(color:Color(0xFF004c4c),
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold
                               ),
@@ -172,7 +211,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text('',
+                              child: Text(approvebyGM!=null?approvebyGM.length.toString():'0',
                                 style: TextStyle(
                                     color:Colors.teal.shade800,
                                     //Color(0xFF004c4c),
@@ -238,7 +277,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           color: Color(0xFF004c4c),
                         ),
                         child: Container(margin: EdgeInsets.only(left: 10,top: 5),
-                          child: Text('',
+                          child: Text(sampleScheduled!=null?sampleScheduled.length.toString():'0',
                             style: TextStyle(
                                 color:Colors.white,
                                 //Color(0xFF004c4c),
@@ -356,7 +395,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text('',
+                              child: Text(approvedForTrial!=null?approvedForTrial.length.toString():'0',
                                 style: TextStyle(
                                     color:Colors.teal.shade800,
                                     //Color(0xFF004c4c),
@@ -479,7 +518,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text('', style: TextStyle(color:Color(0xFF004c4c),
+                              child: Text(customerApproved!=null?customerApproved.length.toString():'0', style: TextStyle(color:Color(0xFF004c4c),
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold
                               ),
