@@ -42,7 +42,7 @@ dependencies:
   data_connection_checker: ^0.3.4
   flushbar: ^1.10.4
   dio: ^3.0.10
-
+  http:
 
 dev_dependencies:
   flutter_test:

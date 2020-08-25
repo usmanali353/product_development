@@ -1,10 +1,13 @@
 
+import 'dart:convert';
+
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:need_resume/need_resume.dart';
+import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -12,29 +15,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ModelRequests extends StatefulWidget {
 
   List<dynamic> products;
-  List<String> productId;
 
-  ModelRequests(this.products, this.productId);
+  ModelRequests(this.products);
 
   @override
-  _ModelReState createState() => _ModelReState(products,productId);
+  _ModelReState createState() => _ModelReState(products);
 }
 
 class _ModelReState extends ResumableState<ModelRequests>{
   List<dynamic> products=[];
-  List<String> productId=[],status=['All','New Request','Approved by ACMC','Rejected by ACMC','Scheduled for Samples Production','Samples Produced','Approved for Trial','Rejected for Trial','Scheduled for Trial','Approved by Customer','Rejected by Customer','Scheduled for Production'];
+  //List<String> status=['All','New Request','Approved by ACMC','Rejected by ACMC','Scheduled for Samples Production','Samples Produced','Approved for Trial','Rejected for Trial','Scheduled for Trial','Approved by Customer','Rejected by Customer','Scheduled for Production'];
   GlobalKey<RefreshIndicatorState> refreshIndicatorKey=GlobalKey();
-  bool isDataEntryOperator=false;
-  bool isCustomer=false;
-  bool canScheduleProduction=false;
-  bool canApproveAcmc=false;
-  bool canApproveforTrial=false;
   var selectedPreference,selectedStatus;
-
-  _ModelReState(this.products,this.productId);
+  _ModelReState(this.products);
  bool isGm=false;
  bool isSaleManager= false;
-  String userId;
+ bool isClient=false;
+  String token;
   @override
   void onResume() {
     print(resume.data.toString());
@@ -44,20 +41,25 @@ class _ModelReState extends ResumableState<ModelRequests>{
   }
   @override
   void initState() {
-
+    print(products.toString());
     SharedPreferences.getInstance().then((prefs){
+      setState(() {
+        token=prefs.getString("token");
+      });
     if(prefs.getString('email')== "tahir@mailinator.com"){
       setState(() {
-        isGm == true;
+        isGm = true;
       });
     }
    else if(prefs.getString('email')== "basit@mailinator.com"){
       setState(() {
-        isSaleManager == true;
+        isSaleManager = true;
       });
     }
    else{
-
+    setState(() {
+      isClient=true;
+    });
     }
     });
     super.initState();
@@ -75,7 +77,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
             IconButton(
               icon: Icon(Icons.search),
               onPressed: (){
-                showStatusAlertDialog(context);
+                //showStatusAlertDialog(context);
               },
             )
           ],
@@ -85,95 +87,35 @@ class _ModelReState extends ResumableState<ModelRequests>{
           {
             return InkWell(
               onTap: (){
-                if(canApproveAcmc&&products[index].status=="New Request"){
-                  showAlertDialog(context,products[index],productId[index]);
-                }else if(canScheduleProduction&&products[index].status=="Approved by ACMC"){
+                if(isGm&&products[index]['statusName']=="New Request"){
+                  showAlertDialog(context,products[index]);
+                }else if(isGm&&products[index]['statusName']=="Approved by ACMC"){
                   showDatePicker(helpText:"Select Date for Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((selectedDate){
                     if(selectedDate!=null){
-                      Map<String,dynamic> map=Map();
-                      map.putIfAbsent("status", () => "Scheduled for Samples Production");
-                      map.putIfAbsent("closeing_date", () => DateFormat("yyyy-MM-dd").format(selectedDate));
-                      ProgressDialog pd=ProgressDialog(context);
-                      pd.show();
-                      Firestore.instance.collection("model_requests").document(productId[index]).updateData(map).then((value) {
-                        pd.hide();
-                        Navigator.pop(context,'Refresh');
-                        Flushbar(
-                          message: "Request Scheduled",
-                          backgroundColor: Colors.green,
-                          duration: Duration(seconds: 5),
-                        )..show(context);
-                      }).catchError((onError){
-                        pd.hide();
-                        Flushbar(
-                          message: onError.toString(),
-                          backgroundColor: Colors.red,
-                          duration: Duration(seconds: 5),
-                        )..show(context);
-                      });
+
                     }
                   });
-                }else if(canScheduleProduction&&products[index].status=="Scheduled for Samples Production"){
-                  showAlertChangeStatus(context, productId[index], products[index]);
-                }else if(canApproveforTrial&&products[index].status=="Samples Produced"){
-                  // showCustomerApprovalDialog(context, products[index], productId[index]);
-                  showTrialApprovalDialog(context,products[index],productId[index]);
-                }else if(canApproveforTrial&&(products[index].status=="Approved for Trial")){
+                }else if(isGm&&products[index]['statusName']=="Scheduled for Samples Production"){
+                  showAlertChangeStatus(context);
+                }else if(isGm&&products[index]['statusName']=="Samples Produced"){
+                   showCustomerApprovalDialog(context);
+                  showTrialApprovalDialog(context);
+                }else if(isGm&&(products[index]['statusName']=="Approved for Trial")){
                   showDatePicker(helpText:"Select Date for Produced Sample Trial",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((selectedDate){
                     if(selectedDate!=null){
-                      Map<String,dynamic> map=Map();
-                      map.putIfAbsent("trial_date", () => DateFormat("yyyy-MM-dd").format(selectedDate));
-                      map.putIfAbsent("status", () =>"Scheduled for Trial");
-                      ProgressDialog pd=ProgressDialog(context);
-                      pd.show();
-                      //Firestore.instance.collection("model_requests").document(productId[index]).updateData(map).then((updatedTrialDate){
-                        pd.hide();
-                        Navigator.pop(context,'Refresh');
-                        Flushbar(
-                          message: "Trial Scheduled",
-                          backgroundColor: Colors.green,
-                          duration: Duration(seconds: 5),
-                        )..show(context);
-                      }).catchError((onError){
-                        pd.hide();
-                        Flushbar(
-                          message: onError.toString(),
-                          backgroundColor: Colors.red,
-                          duration: Duration(seconds: 5),
-                        )..show(context);
-                      });
+
                     }
                   });
-                }else if(isCustomer&&products[index].status=='Scheduled for Trial'){
-                  showCustomerApprovalDialog(context, products[index], productId[index]);
-                }else if(canScheduleProduction&&products[index].status=='Approved by Customer'){
+                }else if(isClient&&products[index]['statusName']=='Scheduled for Trial'){
+                  showCustomerApprovalDialog(context);
+                }else if(isGm&&products[index]['statusName']=='Approved by Customer'){
                   showDatePicker(helpText:"Select Date for Production for Customer",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 120))).then((selectedDate){
                     if(selectedDate!=null){
-                      Map<String,dynamic> map=Map();
-                      map.putIfAbsent("production_date", () => DateFormat("yyyy-MM-dd").format(selectedDate));
-                      map.putIfAbsent("status", () =>"Scheduled for Production");
-                      ProgressDialog pd=ProgressDialog(context);
-                      pd.show();
-                      Firestore.instance.collection("model_requests").document(productId[index]).updateData(map).then((updatedTrialDate){
-                        pd.hide();
-                        Navigator.pop(context,'Refresh');
-                        Flushbar(
-                          message: "Production for Customer Scheduled",
-                          backgroundColor: Colors.green,
-                          duration: Duration(seconds: 5),
-                        )..show(context);
-                      }).catchError((onError){
-                        pd.hide();
-                        Flushbar(
-                          message: onError.toString(),
-                          backgroundColor: Colors.red,
-                          duration: Duration(seconds: 5),
-                        )..show(context);
-                      });
+
                     }
                   });
                 }else{
-                 Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(products[index],productId[index])));
+                 //Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(products[index],productId[index])));
                 }
               },
               child: Card(
@@ -197,16 +139,19 @@ class _ModelReState extends ResumableState<ModelRequests>{
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           //crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Container(
-                              //color: Color(0xFF004c4c),
-                              height: 90,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  image: DecorationImage(
-                                    image: NetworkImage(products[index].image),
-                                    fit: BoxFit.cover,
-                                  )
+                            Visibility(
+                              visible: products[index]['image']!=null?true:false,
+                              child: Container(
+                                //color: Color(0xFF004c4c),
+                                height: 90,
+                                width: 90,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: DecorationImage(
+                                      image: MemoryImage(base64Decode(products[index]['image'])),
+                                      fit: BoxFit.cover,
+                                    )
+                                ),
                               ),
                             ),
                             //Padding(padding: EdgeInsets.only(top:2),),
@@ -284,7 +229,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                             children: <Widget>[
                               Padding(
                                 padding: const EdgeInsets.only(left: 6, top: 8),
-                                child: Text(products[index].modelName!=null?products[index].modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                                child: Text('', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
                               ),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -300,7 +245,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                       Padding(
                                         padding: EdgeInsets.only(left: 2, right: 2),
                                       ),
-                                      Text(products[index].surface!=null?products[index].surface:'')
+                                      Text(products[index]['surfaceName']!=null?products[index]['surfaceName']:'')
                                     ],
                                   ),
                                   Padding(
@@ -315,7 +260,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                       Padding(
                                         padding: EdgeInsets.only(left: 2, right: 2),
                                       ),
-                                      Text("60x60, 30x30")
+                                      Text(products[index]['multipleSizes'].toString()),
                                     ],
 
 
@@ -335,7 +280,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                       Padding(
                                         padding: EdgeInsets.only(left: 2, right: 2),
                                       ),
-                                      Text(products[index].requestDate!=null?products[index].requestDate:'')
+                                      Text(products[index]['date']!=null?products[index]['date']:'')
                                     ],
 
                                   ),
@@ -358,7 +303,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                     Padding(
                                       padding: EdgeInsets.only(left: 3, right: 3),
                                     ),
-                                    Text(products[index].status!=null?products[index].status:'')
+                                    Text(products[index]['statusName']!=null?products[index]['statusName']:'')
                                   ],
 
 
@@ -374,12 +319,11 @@ class _ModelReState extends ResumableState<ModelRequests>{
                 ),
               ),
             );
-          }),
-
+          })
     );
 
   }
-  showCustomerApprovalDialog(BuildContext context,Product product,String productId){
+  showCustomerApprovalDialog(BuildContext context){
     Widget cancelButton = FlatButton(
       child: Text("Cancel"),
       onPressed: () {
@@ -390,14 +334,14 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
+      //  Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
       },
     );
     Widget approveRejectButton = FlatButton(
       child: Text("Set"),
       onPressed: () {
         Navigator.pop(context);
-        push(context, MaterialPageRoute(builder: (context)=>Observations(selectedPreference,productId)));
+        //push(context, MaterialPageRoute(builder: (context)=>Observations(selectedPreference,productId)));
       },
     );
     AlertDialog alert = AlertDialog(
@@ -446,7 +390,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       },
     );
   }
-  showTrialApprovalDialog(BuildContext context,Product product,String productId){
+  showTrialApprovalDialog(BuildContext context){
     Widget cancelButton = FlatButton(
       child: Text("Cancel"),
       onPressed: () {
@@ -457,55 +401,18 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
+       // Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
       },
     );
     Widget approveRejectButton = FlatButton(
       child: Text("Set"),
       onPressed: () {
         Navigator.pop(context);
-        ProgressDialog pd=ProgressDialog(context);
-        pd.show();
         if(selectedPreference=="Approve"){
-          Map<String,dynamic> map=Map();
-          map.putIfAbsent("status", () => "Approved for Trial");
-          Firestore.instance.collection("model_requests").document(productId).updateData(map).then((value){
-            pd.hide();
-           Navigator.pop(context,'Refresh');
-            Flushbar(
-              message: "Request Approved for Trial",
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 5),
-            )..show(context);
-          }).catchError((onError){
-            pd.hide();
-            Flushbar(
-              message: onError.toString(),
-              backgroundColor: Colors.red,
-              duration: Duration(seconds: 5),
-            )..show(context);
-          });
-        }else if(selectedPreference=="Reject"){
-          Map<String,dynamic> map=Map();
-          map.putIfAbsent("status", () => "Rejected for Trial");
-          Firestore.instance.collection("model_requests").document(productId).updateData(map).then((value){
-            pd.hide();
-            Navigator.pop(context,'Refresh');
-            Flushbar(
-              message: "Status of Request Changed",
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 5),
-            )..show(context);
-          }).catchError((onError){
-            pd.hide();
-            Flushbar(
-              message: onError.toString(),
-              backgroundColor: Colors.red,
-              duration: Duration(seconds: 5),
-            )..show(context);
-          });
-        }
 
+        }else if(selectedPreference=="Reject"){
+
+        }
       },
     );
     AlertDialog alert = AlertDialog(
@@ -554,7 +461,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       },
     );
   }
-  showAlertChangeStatus(BuildContext context,String productId,Product product){
+  showAlertChangeStatus(BuildContext context){
     Widget cancelButton = FlatButton(
       child: Text("Cancel"),
       onPressed: () {
@@ -565,14 +472,14 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
+        //Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
       },
     );
     Widget changeStatus = FlatButton(
       child: Text("Change Status"),
       onPressed: () {
         Navigator.pop(context);
-        push(context, MaterialPageRoute(builder: (context)=>productionCompleted(productId)));
+       // push(context, MaterialPageRoute(builder: (context)=>productionCompleted(productId)));
       },
     );
     AlertDialog alert = AlertDialog(
@@ -594,7 +501,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
     );
 
   }
-  showAlertDialog(BuildContext context,Product product,String productId) {
+  showAlertDialog(BuildContext context,dynamic request) {
     // set up the buttons
     Widget cancelButton = FlatButton(
       child: Text("Cancel"),
@@ -606,7 +513,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
+        //Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
       },
     );
     Widget approveRejectButton = FlatButton(
@@ -614,11 +521,14 @@ class _ModelReState extends ResumableState<ModelRequests>{
       onPressed: () {
         if(selectedPreference=="Approve"){
           Navigator.pop(context);
-          push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,productId,users.name,userId)));
+          Network_Operations.changeStatusOfRequest(context, token, request['requestId'], 2);
+          //push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,productId,users.name,userId)));
 
         }else if(selectedPreference=="Reject"){
           Navigator.pop(context);
-          push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,productId,users.name,userId)));
+          print(request['requestId']);
+          Network_Operations.changeStatusOfRequest(context, token, request['requestId'], 3);
+          //push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,productId,users.name,userId)));
         }
       },
     );
@@ -669,93 +579,72 @@ class _ModelReState extends ResumableState<ModelRequests>{
       },
     );
   }
-  showStatusAlertDialog(BuildContext context) {
-    // set up the buttons
-    Widget searchBtn = FlatButton(
-      child: Text("Search"),
-      onPressed:  () {
-        Navigator.pop(context);
-        if(selectedStatus=='All'){
-          WidgetsBinding.instance
-              .addPostFrameCallback((_) => refreshIndicatorKey.currentState.show());
-        }else{
-          Firestore.instance.collection("model_requests").where("status",isEqualTo:selectedStatus).getDocuments().then((querySnapshot){
-            if(querySnapshot.documents.length>0){
-              setState(() {
-                if(products.length>0){
-                  products.clear();
-                }
-                if(productId.length>0){
-                  productId.clear();
-                }
-                products.addAll(querySnapshot.documents.map((e) => Product.fromMap(e.data)).toList());
-                for(int i=0;i<querySnapshot.documents.length;i++){
-                  productId.add(querySnapshot.documents[i].documentID);
-                }
-              });
-            }else{
-              Flushbar(
-                message: "No Request Found According to the Status",
-                backgroundColor: Colors.red,
-                duration: Duration(seconds: 5),
-              )..show(context);
-            }
-          });
-        }
-
-      },
-    );
-    Widget cancelBtn = FlatButton(
-      child: Text("Cancel"),
-      onPressed:  () {
-        Navigator.pop(context);
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("Filter by Status"),
-      content:FormBuilder(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              FormBuilderDropdown(
-                attribute: "Select Status",
-                hint: Text("Select Status"),
-                items: status!=null?status.map((plans)=>DropdownMenuItem(
-                  child: Text(plans),
-                  value: plans,
-                )).toList():[""].map((name) => DropdownMenuItem(
-                    value: name, child: Text("$name")))
-                    .toList(),
-                onChanged: (value){
-                  setState(() {
-                    this.selectedStatus=value;
-                  });
-                },
-                style: Theme.of(context).textTheme.bodyText1.merge(TextStyle(fontSize: 11)),
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.all(16),
-                ),
-
-              ),
-            ],
-          )
-      ),
-      actions: [
-        cancelBtn,
-        searchBtn,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
+//  showStatusAlertDialog(BuildContext context) {
+//    // set up the buttons
+//    Widget searchBtn = FlatButton(
+//      child: Text("Search"),
+//      onPressed:  () {
+//        Navigator.pop(context);
+//        if(selectedStatus=='All'){
+//          WidgetsBinding.instance
+//              .addPostFrameCallback((_) => refreshIndicatorKey.currentState.show());
+//        }else{
+//
+//        }
+//
+//      },
+//    );
+//    Widget cancelBtn = FlatButton(
+//      child: Text("Cancel"),
+//      onPressed:  () {
+//        Navigator.pop(context);
+//      },
+//    );
+//
+//    // set up the AlertDialog
+//    AlertDialog alert = AlertDialog(
+//      title: Text("Filter by Status"),
+//      content:FormBuilder(
+//          child: Column(
+//            mainAxisSize: MainAxisSize.min,
+//            children: <Widget>[
+//              FormBuilderDropdown(
+//                attribute: "Select Status",
+//                hint: Text("Select Status"),
+//                items: status!=null?status.map((plans)=>DropdownMenuItem(
+//                  child: Text(plans),
+//                  value: plans,
+//                )).toList():[""].map((name) => DropdownMenuItem(
+//                    value: name, child: Text("$name")))
+//                    .toList(),
+//                onChanged: (value){
+//                  setState(() {
+//                    this.selectedStatus=value;
+//                  });
+//                },
+//                style: Theme.of(context).textTheme.bodyText1.merge(TextStyle(fontSize: 11)),
+//                decoration: InputDecoration(
+//                  contentPadding: EdgeInsets.all(16),
+//                ),
+//
+//              ),
+//            ],
+//          )
+//      ),
+//      actions: [
+//        cancelBtn,
+//        searchBtn,
+//      ],
+//    );
+//
+//    // show the dialog
+//    showDialog(
+//      context: context,
+//      builder: (BuildContext context) {
+//        return alert;
+//      },
+//    );
+//  }
 
 
 }

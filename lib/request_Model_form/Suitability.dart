@@ -185,11 +185,8 @@ class _Suitability_State extends ResumableState<Suitability> {
                                   if(image!=null){
                                     setState(() {
                                       this.picked_image=image;
+                                      base64EncodedImage=base64.encode(picked_image);
                                       _image = File(image_file.path);
-                                      _image.readAsBytes().then((bytes){
-                                        this.base64EncodedImage= base64.encode(bytes);
-                                      });
-
                                     });
                                   }
                                 });
@@ -218,7 +215,7 @@ class _Suitability_State extends ResumableState<Suitability> {
 //                                  _myActivitiesResult = _myActivities.toString();
 //                                });
                                 SharedPreferences.getInstance().then((prefs){
-                                  Network_Operations.SaveRequest(context,prefs.getString("token") ,0, market, event, technical_consideration.text , 1, double.parse(thickness), surface, classification, range, technologyId, structureId, edge,base64EncodedImage!=null?base64EncodedImage:"", colorsList,sizesList, designTopologies, _myActivities,surface);
+                                  Network_Operations.SaveRequest(context,prefs.getString("token") ,0, market, event, technical_consideration.text , 1, double.parse(thickness), surface, classification, range, technologyId, structureId, edge,base64EncodedImage, colorsList,sizesList, designTopologies, _myActivities,surface);
                                 });
 
                               }

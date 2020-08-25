@@ -1,5 +1,6 @@
 import 'dart:convert';
-
+import 'dart:typed_data';
+import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
@@ -13,16 +14,19 @@ import '../Dashboard.dart';
   static void signIn(BuildContext context,String email,String password) async {
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
+    var body=jsonEncode({"email":email,"password":password});
     try{
-    var response=await Dio().post(Utils.getBaseUrl()+"Account/Login",data:{"email":email,"password":password});
+    var response=await http.post(Utils.getBaseUrl()+"Account/Login",body:body,headers: {"Content-type":"application/json"});
      if(response.statusCode==200){
        pd.hide();
        SharedPreferences.getInstance().then((prefs){
-         prefs.setString("token", response.data["result"]);
+         prefs.setString("token", jsonDecode(response.body)['result']);
          prefs.setString("email", email);
        });
        Utils.showSuccess(context, "Login Successful");
        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Dashboard()));
+     }else{
+       pd.hide();
      }
     }catch(e) {
       pd.hide();
@@ -32,10 +36,13 @@ import '../Dashboard.dart';
   static void register(BuildContext context,String email,String password,String name) async{
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
+    var body=jsonEncode({"email":email,"password":password,"firstname":name,"confirmPassword":password});
     try{
-      var response=await Dio().post(Utils.getBaseUrl()+"account/Register",data: {"firstname":name,"email":email,"password":password,"confirmPassword":password});
+      var response=await http.post(Utils.getBaseUrl()+"account/Register",body:body,headers: {"Content-type":"application/json"});
       if(response.statusCode==200){
         Utils.showSuccess(context, "User Registration successful");
+      }else{
+        Utils.showError(context, response.body.toString());
       }
     }catch(e){
       pd.hide();
@@ -44,14 +51,15 @@ import '../Dashboard.dart';
   }
   static Future<List<Dropdown>> getDropDowns(BuildContext context,String token,String endpoint)async{
     try{
-      var response=await Dio().get(Utils.getBaseUrl()+"Configuration/"+endpoint+"Dropdown",options:Options(headers:{"Authorization":"Bearer "+token}));
+      var response=await http.get(Utils.getBaseUrl()+"Configuration/"+endpoint+"Dropdown",headers:{"Authorization":"Bearer "+token});
+      var data= jsonDecode(response.body);
       if(response.statusCode==200){
         List<Dropdown> list=List();
         list.clear();
-        for(int i=0;i<response.data.length;i++){
-          list.add(Dropdown(response.data[i]["id"],response.data[i]["name"]));
+        for(int i=0;i<data.length;i++){
+          list.add(Dropdown(data[i]["id"],data[i]["name"]));
         }
-        print(response.data);
+        print(data.toString());
         return list;
       }
     }catch(e){
@@ -85,17 +93,14 @@ import '../Dashboard.dart';
         "thickness":thickness,
         "surfaceId":surfaceID
       },toEncodable: Utils.myEncode);
-      debugPrint(body.toString());
-      var response=await Dio().post(Utils.getBaseUrl()+"Request/RequestSave",
-       data: body
-      ,options:Options(headers:{"Authorization":"Bearer "+token}));
-      print(body.toString());
-      DioError(response: response,type: DioErrorType.RESPONSE).message;
+
+      var response=await http.post(Utils.getBaseUrl()+"Request/RequestSave",body: body,headers:{"Content-type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
         Navigator.pop(context);
         Navigator.pop(context);
-        Utils.showSuccess(context, "Saved Successfully");
-
+        Utils.showSuccess(context, "Request Saved Successfully");
+      }else{
+        print(response.body.toString());
       }
     }catch(e) {
      // pd.hide();
@@ -120,5 +125,21 @@ import '../Dashboard.dart';
     }
     return null;
   }
-
+  static void changeStatusOfRequest(BuildContext context,String token,int requestId,int status) async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try {
+      var response = await http.get(Utils.getBaseUrl() +
+          "Request/ChangeStatusOfRequest/$requestId?StatusId=$status", headers: {"Authorization": "Bearer " + token});
+      if (response.statusCode == 200) {
+        pd.hide();
+        Navigator.pop(context,"Refresh");
+         Utils.showSuccess(context, "Status Changed");
+      }
+    }catch(e){
+      pd.hide();
+      print(e);
+      Utils.showError(context, "Status not Changed");
+    }
+  }
 }

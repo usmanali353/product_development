@@ -3,6 +3,7 @@ import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/request_Model_form/Assumptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'ModelRequests.dart';
 import 'Network_Operations/Network_Operations.dart';
 class Dashboard extends StatefulWidget {
   @override
@@ -16,6 +17,64 @@ class _DashboardState extends ResumableState<Dashboard> {
 
   @override
   void onResume() {
+    if(resume.data.toString()=="Refresh"){
+      SharedPreferences.getInstance().then((prefs){
+        print(prefs.getString("token"));
+
+        Network_Operations.getRequest(context, prefs.getString("token")).then((result){
+          debugPrint(result.toString());
+          for(int i=0; i<result.length;i++ ) {
+            print(result[i]['statusName']);
+            if (result[i]['statusName'] =="New Request"){
+              setState(() {
+                newRequest.add(result[i]);
+              });
+            }
+            if (result[i]['statusName'] =="Approved By GM"){
+              setState(() {
+                approvebyGM.add(result[i]);
+              });
+            }
+            if (result[i]['statusName'] =="Approved By Customer"){
+              setState(() {
+                customerApproved.add(result[i]);
+              });
+            }
+            if (result[i]['statusName'] =="Approved Trial"){
+              setState(() {
+                approvedForTrial.add(result[i]);
+              });
+            }
+            if (result[i]['statusName'] =="Rejected By Customer"){
+              setState(() {
+                rejectedbyCustomer.add(result[i]);
+              });
+            }
+            if (result[i]['statusName'] =="Rejected By GM"){
+              setState(() {
+                rejectedbyGM.add(result[i]);
+              });
+            }
+            if (result[i]['statusName'] =="Rejected Trial"){
+              setState(() {
+                rejectedTrial.add(result[i]);
+              });
+
+            }
+            if (result[i]['statusName'] =="Sample Scheduled"){
+              setState(() {
+                sampleScheduled.add(result[i]);
+              });
+
+            }
+
+          }
+          print(newRequest.toString());
+        });
+
+
+      });
+    }
 
     super.onResume();
   }
@@ -23,35 +82,52 @@ class _DashboardState extends ResumableState<Dashboard> {
   void initState() {
     SharedPreferences.getInstance().then((prefs){
       print(prefs.getString("token"));
-      Network_Operations.getDropDowns(context,prefs.getString("token"),"Markets");
-      Network_Operations.getDropDowns(context,prefs.getString("token"),"Classifications");
 
       Network_Operations.getRequest(context, prefs.getString("token")).then((result){
-       print(result);
+       debugPrint(result.toString());
        for(int i=0; i<result.length;i++ ) {
+         print(result[i]['statusName']);
          if (result[i]['statusName'] =="New Request"){
-          newRequest.add(result[i]);
+           setState(() {
+             newRequest.add(result[i]);
+           });
          }
          if (result[i]['statusName'] =="Approved By GM"){
-           approvebyGM.add(result[i]);
+           setState(() {
+             approvebyGM.add(result[i]);
+           });
          }
          if (result[i]['statusName'] =="Approved By Customer"){
-           customerApproved.add(result[i]);
+           setState(() {
+             customerApproved.add(result[i]);
+           });
          }
          if (result[i]['statusName'] =="Approved Trial"){
-           approvedForTrial.add(result[i]);
+           setState(() {
+             approvedForTrial.add(result[i]);
+           });
          }
          if (result[i]['statusName'] =="Rejected By Customer"){
-           rejectedbyCustomer.add(result[i]);
+           setState(() {
+             rejectedbyCustomer.add(result[i]);
+           });
          }
          if (result[i]['statusName'] =="Rejected By GM"){
-           rejectedbyGM.add(result[i]);
+           setState(() {
+             rejectedbyGM.add(result[i]);
+           });
          }
          if (result[i]['statusName'] =="Rejected Trial"){
-           rejectedTrial.add(result[i]);
+           setState(() {
+             rejectedTrial.add(result[i]);
+           });
+
          }
          if (result[i]['statusName'] =="Sample Scheduled"){
-           sampleScheduled.add(result[i]);
+           setState(() {
+             sampleScheduled.add(result[i]);
+           });
+
          }
 
        }
@@ -121,7 +197,7 @@ class _DashboardState extends ResumableState<Dashboard> {
             children: <Widget>[
               InkWell(
                 onTap:(){
-                 // push(context, MaterialPageRoute(builder: (context)=>ModelRequests(user,newRequests,newRequestId)));
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(newRequest)));
                 },
                 child: Card(
                   elevation: 10,
@@ -173,7 +249,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                  //push(context, MaterialPageRoute(builder: (context)=>ModelRequests(user,acmcApproved,acmcApprovedId)));
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(approvebyGM)));
                 },
                 child: Card(
                   elevation: 10,
@@ -418,7 +494,7 @@ class _DashboardState extends ResumableState<Dashboard> {
           ),
           InkWell(
             onTap: (){
-             // push(context, MaterialPageRoute(builder: (context)=>ModelRequests(user,scheduledTrial,scheduledTrialId)));
+             // push(context, MaterialPageRoute(builder: (context)=>ModelRequests(trial)));
               // Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestList(null,null,customerId)));
             },
             child: Padding(
