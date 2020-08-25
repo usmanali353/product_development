@@ -7,14 +7,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:need_resume/need_resume.dart';
+import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'Observations.dart';
+import 'acmcapproval.dart';
+import 'productionCompleted.dart';
+
 
 class ModelRequests extends StatefulWidget {
 
-  List<dynamic> products;
+  List<Request> products;
 
   ModelRequests(this.products);
 
@@ -23,7 +28,7 @@ class ModelRequests extends StatefulWidget {
 }
 
 class _ModelReState extends ResumableState<ModelRequests>{
-  List<dynamic> products=[];
+  List<Request> products=[];
   //List<String> status=['All','New Request','Approved by ACMC','Rejected by ACMC','Scheduled for Samples Production','Samples Produced','Approved for Trial','Rejected for Trial','Scheduled for Trial','Approved by Customer','Rejected by Customer','Scheduled for Production'];
   GlobalKey<RefreshIndicatorState> refreshIndicatorKey=GlobalKey();
   var selectedPreference,selectedStatus;
@@ -87,28 +92,19 @@ class _ModelReState extends ResumableState<ModelRequests>{
           {
             return InkWell(
               onTap: (){
-                if(isGm&&products[index]['statusName']=="New Request"){
+                if(isGm&&products[index].statusName=="New Request"){
                   showAlertDialog(context,products[index]);
-                }else if(isGm&&products[index]['statusName']=="Approved by ACMC"){
+                } if(isGm&&products[index].statusName=="Approved By GM"){
                   showDatePicker(helpText:"Select Date for Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((selectedDate){
                     if(selectedDate!=null){
-
+                       Network_Operations.changeStatusOfRequest(context, token, products[index].requestId, 4);
                     }
                   });
-                }else if(isGm&&products[index]['statusName']=="Scheduled for Samples Production"){
-                  showAlertChangeStatus(context);
-                }else if(isGm&&products[index]['statusName']=="Samples Produced"){
-                   showCustomerApprovalDialog(context);
-                  showTrialApprovalDialog(context);
-                }else if(isGm&&(products[index]['statusName']=="Approved for Trial")){
-                  showDatePicker(helpText:"Select Date for Produced Sample Trial",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((selectedDate){
-                    if(selectedDate!=null){
-
-                    }
-                  });
-                }else if(isClient&&products[index]['statusName']=='Scheduled for Trial'){
-                  showCustomerApprovalDialog(context);
-                }else if(isGm&&products[index]['statusName']=='Approved by Customer'){
+                } if(isGm&&products[index].statusName=="Samples Scheduled"){
+                  showAlertChangeStatus(context,products[index]);
+                }  if(isGm&&(products[index].statusName=="Approved Trial")){
+                  showCustomerApprovalDialog(context,products[index]);
+                } if(isGm&&products[index].statusName=='Approved by Customer'){
                   showDatePicker(helpText:"Select Date for Production for Customer",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 120))).then((selectedDate){
                     if(selectedDate!=null){
 
@@ -139,19 +135,16 @@ class _ModelReState extends ResumableState<ModelRequests>{
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           //crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Visibility(
-                              visible: products[index]['image']!=null?true:false,
-                              child: Container(
-                                //color: Color(0xFF004c4c),
-                                height: 90,
-                                width: 90,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: DecorationImage(
-                                      image: MemoryImage(base64Decode(products[index]['image'])),
-                                      fit: BoxFit.cover,
-                                    )
-                                ),
+                            Container(
+                              //color: Color(0xFF004c4c),
+                              height: 90,
+                              width: 90,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  image: DecorationImage(
+                                    image: AssetImage("Assets/img/AC.png"), //MemoryImage(base64Decode(products[index]['image'])),
+                                    fit: BoxFit.cover,
+                                  )
                               ),
                             ),
                             //Padding(padding: EdgeInsets.only(top:2),),
@@ -245,7 +238,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                       Padding(
                                         padding: EdgeInsets.only(left: 2, right: 2),
                                       ),
-                                      Text(products[index]['surfaceName']!=null?products[index]['surfaceName']:'')
+                                      Text(products[index].surfaceName!=null?products[index].surfaceName:'')
                                     ],
                                   ),
                                   Padding(
@@ -260,7 +253,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                       Padding(
                                         padding: EdgeInsets.only(left: 2, right: 2),
                                       ),
-                                      Text(products[index]['multipleSizes'].toString()),
+                                      Text(products[index].multipleSizes.toString()),
                                     ],
 
 
@@ -280,7 +273,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                       Padding(
                                         padding: EdgeInsets.only(left: 2, right: 2),
                                       ),
-                                      Text(products[index]['date']!=null?products[index]['date']:'')
+                                      Text(products[index].date!=null?products[index].date:'')
                                     ],
 
                                   ),
@@ -303,7 +296,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                     Padding(
                                       padding: EdgeInsets.only(left: 3, right: 3),
                                     ),
-                                    Text(products[index]['statusName']!=null?products[index]['statusName']:'')
+                                    Text(products[index].statusName!=null?products[index].statusName:'')
                                   ],
 
 
@@ -323,7 +316,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
     );
 
   }
-  showCustomerApprovalDialog(BuildContext context){
+  showCustomerApprovalDialog(BuildContext context,Request request){
     Widget cancelButton = FlatButton(
       child: Text("Cancel"),
       onPressed: () {
@@ -341,7 +334,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Set"),
       onPressed: () {
         Navigator.pop(context);
-        //push(context, MaterialPageRoute(builder: (context)=>Observations(selectedPreference,productId)));
+        push(context, MaterialPageRoute(builder: (context)=>Observations(selectedPreference,request)));
       },
     );
     AlertDialog alert = AlertDialog(
@@ -461,47 +454,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       },
     );
   }
-  showAlertChangeStatus(BuildContext context){
-    Widget cancelButton = FlatButton(
-      child: Text("Cancel"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    Widget detailsPage = FlatButton(
-      child: Text("Go to Details"),
-      onPressed: () {
-        Navigator.pop(context);
-        //Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
-      },
-    );
-    Widget changeStatus = FlatButton(
-      child: Text("Change Status"),
-      onPressed: () {
-        Navigator.pop(context);
-       // push(context, MaterialPageRoute(builder: (context)=>productionCompleted(productId)));
-      },
-    );
-    AlertDialog alert = AlertDialog(
-      title: Text("Change Status of Request"),
-      content: Text("are you sure you want to change status to request to Produced?"),
-      actions: [
-        cancelButton,
-        detailsPage,
-        changeStatus,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-
-  }
-  showAlertDialog(BuildContext context,dynamic request) {
+  showAlertChangeStatus(BuildContext context,Request request){
     // set up the buttons
     Widget cancelButton = FlatButton(
       child: Text("Cancel"),
@@ -521,14 +474,84 @@ class _ModelReState extends ResumableState<ModelRequests>{
       onPressed: () {
         if(selectedPreference=="Approve"){
           Navigator.pop(context);
-          Network_Operations.changeStatusOfRequest(context, token, request['requestId'], 2);
-          //push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,productId,users.name,userId)));
-
+          push(context, MaterialPageRoute(builder: (context)=>productionCompleted(selectedPreference,request)));
         }else if(selectedPreference=="Reject"){
           Navigator.pop(context);
-          print(request['requestId']);
-          Network_Operations.changeStatusOfRequest(context, token, request['requestId'], 3);
-          //push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,productId,users.name,userId)));
+          push(context, MaterialPageRoute(builder: (context)=>productionCompleted(selectedPreference,request)));
+        }
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Approve/Reject Model for Trial"),
+      content: StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              RadioListTile(
+                title: Text("Approve"),
+                value: 'Approve',
+                groupValue: selectedPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("Reject"),
+                value: 'Reject',
+                groupValue: selectedPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedPreference = choice;
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      ),
+      actions: [
+        cancelButton,
+        detailsPage,
+        approveRejectButton
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+  showAlertDialog(BuildContext context,Request request) {
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget detailsPage = FlatButton(
+      child: Text("Go to Details"),
+      onPressed: () {
+        Navigator.pop(context);
+        //Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
+      },
+    );
+    Widget approveRejectButton = FlatButton(
+      child: Text("Set"),
+      onPressed: () {
+        if(selectedPreference=="Approve"){
+          Navigator.pop(context);
+          push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,request)));
+        }else if(selectedPreference=="Reject"){
+          Navigator.pop(context);
+          push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,request)));
         }
       },
     );
@@ -579,73 +602,5 @@ class _ModelReState extends ResumableState<ModelRequests>{
       },
     );
   }
-//  showStatusAlertDialog(BuildContext context) {
-//    // set up the buttons
-//    Widget searchBtn = FlatButton(
-//      child: Text("Search"),
-//      onPressed:  () {
-//        Navigator.pop(context);
-//        if(selectedStatus=='All'){
-//          WidgetsBinding.instance
-//              .addPostFrameCallback((_) => refreshIndicatorKey.currentState.show());
-//        }else{
-//
-//        }
-//
-//      },
-//    );
-//    Widget cancelBtn = FlatButton(
-//      child: Text("Cancel"),
-//      onPressed:  () {
-//        Navigator.pop(context);
-//      },
-//    );
-//
-//    // set up the AlertDialog
-//    AlertDialog alert = AlertDialog(
-//      title: Text("Filter by Status"),
-//      content:FormBuilder(
-//          child: Column(
-//            mainAxisSize: MainAxisSize.min,
-//            children: <Widget>[
-//              FormBuilderDropdown(
-//                attribute: "Select Status",
-//                hint: Text("Select Status"),
-//                items: status!=null?status.map((plans)=>DropdownMenuItem(
-//                  child: Text(plans),
-//                  value: plans,
-//                )).toList():[""].map((name) => DropdownMenuItem(
-//                    value: name, child: Text("$name")))
-//                    .toList(),
-//                onChanged: (value){
-//                  setState(() {
-//                    this.selectedStatus=value;
-//                  });
-//                },
-//                style: Theme.of(context).textTheme.bodyText1.merge(TextStyle(fontSize: 11)),
-//                decoration: InputDecoration(
-//                  contentPadding: EdgeInsets.all(16),
-//                ),
-//
-//              ),
-//            ],
-//          )
-//      ),
-//      actions: [
-//        cancelBtn,
-//        searchBtn,
-//      ],
-//    );
-//
-//    // show the dialog
-//    showDialog(
-//      context: context,
-//      builder: (BuildContext context) {
-//        return alert;
-//      },
-//    );
-//  }
-
-
 }
 

@@ -1,0 +1,83 @@
+class Request {
+  int requestId, marketId, statusId, classificationId, rangeId, technologyId,
+      structureId, edgeId, surfaceId;
+  String technicalConcentration, event, image,statusName,surfaceName,date,designerObservation,customerObservation,ModelName,ModelCode;
+  double thickness;
+  DateTime dateTime;
+  List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners;
+  Request({
+    this.requestId,
+    this.marketId,
+    this.statusId,
+    this.classificationId,
+    this.rangeId,
+    this.technologyId,
+    this.structureId,
+    this.edgeId,
+    this.surfaceId,
+    this.technicalConcentration,
+    this.event,
+    this.image,
+    this.thickness,
+    this.multipleColors,
+    this.multipleSizes,
+    this.multipleDesignTopoligies,
+    this.multipleSuitability,
+    this.multipleDesigners,
+    this.designerObservation,
+    this.customerObservation,
+  });
+  Map<String, dynamic> toJson() {
+    var map = new Map<String, dynamic>();
+    map["requestId"] = requestId;
+    map["marketId"]=marketId;
+    map["statusId"]=statusId;
+    map["classificationId"]=classificationId;
+    map["rangeId"]=rangeId;
+    map["technologyId"]=technologyId;
+    map["structureId"]=structureId;
+    map["edgeId"]=edgeId;
+    map["surfaceId"]=surfaceId;
+    map["technicalConcentration"]=technicalConcentration;
+    map["event"]=event;
+    map["image"]=image;
+    map["thickness"]=thickness;
+    map["multipleColors"]=multipleColors;
+    map["multipleSizes"]=multipleSizes;
+    map["multipleDesignTopoligies"]=multipleDesignTopoligies;
+    map["multipleSuitability"]=multipleSuitability;
+    map["multipleDesigners"]=multipleDesigners;
+    map["statusName"]=statusName;
+    map["surfaceName"]=surfaceName;
+    map["date"]=date;
+    map["designerObservation"]=designerObservation;
+    map["customerObservation"]=customerObservation;
+    return map;
+  }
+  Request.fromMap(Map<String,dynamic> data){
+    requestId=data['requestId'];
+    marketId=data["marketId"];
+    statusId=data["statusId"];
+    classificationId=data["classificationId"];
+    rangeId=data["rangeId"];
+    technologyId=data["technologyId"];
+    structureId=data["structureId"];
+    edgeId=data["edgeId"];
+    surfaceId=data["surfaceId"];
+    technicalConcentration=data["technicalConcentration"];
+    event=data["event"];
+    image=data["image"];
+    thickness=data["thickness"];
+    multipleColors=data["multipleColors"];
+    multipleSizes=data["multipleSizes"];
+    multipleDesignTopoligies=data["multipleDesignTopoligies"];
+    multipleSuitability=data["multipleSuitability"];
+    statusName=data["statusName"];
+    surfaceName=data["surfaceName"];
+    date=data["date"];
+    multipleDesigners=data["multipleDesigners"];
+    designerObservation=data["designerObservation"];
+    customerObservation=data["customerObservation"];
+  }
+
+}

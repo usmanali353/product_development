@@ -6,6 +6,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
+import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -215,7 +216,25 @@ class _Suitability_State extends ResumableState<Suitability> {
 //                                  _myActivitiesResult = _myActivities.toString();
 //                                });
                                 SharedPreferences.getInstance().then((prefs){
-                                  Network_Operations.SaveRequest(context,prefs.getString("token") ,0, market, event, technical_consideration.text , 1, double.parse(thickness), surface, classification, range, technologyId, structureId, edge,base64EncodedImage, colorsList,sizesList, designTopologies, _myActivities,surface);
+                                  Network_Operations.saveRequest(context,prefs.getString("token") ,Request(
+                                    requestId: 0,
+                                    marketId: market,
+                                    event: event,
+                                    technicalConcentration: technical_consideration.text,
+                                    statusId: 1,
+                                    thickness: double.parse(thickness),
+                                    surfaceId: surface,
+                                    classificationId: classification,
+                                    rangeId: range,
+                                    technologyId: technologyId,
+                                    structureId: structureId,
+                                    edgeId: edge,
+                                    image: base64EncodedImage,
+                                    multipleColors: colorsList,
+                                    multipleSizes: sizesList,
+                                    multipleDesignTopoligies: designTopologies,
+                                    multipleSuitability: _myActivities,
+                                  ));
                                 });
 
                               }

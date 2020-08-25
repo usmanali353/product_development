@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:need_resume/need_resume.dart';
+import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/request_Model_form/Assumptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -13,59 +14,57 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends ResumableState<Dashboard> {
 
 
-  List<dynamic> newRequest=[],rejectedbyCustomer=[],rejectedbyGM=[],rejectedTrial=[],sampleScheduled=[],approvedForTrial=[],customerApproved=[],approvebyGM=[];
+  List<Request> newRequest=[],rejectedbyCustomer=[],rejectedbyGM=[],rejectedTrial=[],sampleScheduled=[],approvedForTrial=[],customerApproved=[],approvebyGM=[];
 
   @override
   void onResume() {
     if(resume.data.toString()=="Refresh"){
       SharedPreferences.getInstance().then((prefs){
         print(prefs.getString("token"));
-
+        newRequest.clear();rejectedbyCustomer.clear();rejectedbyGM.clear();rejectedTrial.clear();sampleScheduled.clear();approvedForTrial.clear();customerApproved.clear();approvebyGM.clear();
         Network_Operations.getRequest(context, prefs.getString("token")).then((result){
           debugPrint(result.toString());
           for(int i=0; i<result.length;i++ ) {
-            print(result[i]['statusName']);
-            if (result[i]['statusName'] =="New Request"){
+            if (result[i].statusName =="New Request"){
               setState(() {
                 newRequest.add(result[i]);
               });
             }
-            if (result[i]['statusName'] =="Approved By GM"){
+            if (result[i].statusName =="Approved By GM"){
               setState(() {
                 approvebyGM.add(result[i]);
               });
             }
-            if (result[i]['statusName'] =="Approved By Customer"){
+            if (result[i].statusName =="Approved By Customer"){
               setState(() {
                 customerApproved.add(result[i]);
               });
             }
-            if (result[i]['statusName'] =="Approved Trial"){
+            if (result[i].statusName =="Approved Trial"){
               setState(() {
                 approvedForTrial.add(result[i]);
               });
             }
-            if (result[i]['statusName'] =="Rejected By Customer"){
+            if (result[i].statusName =="Rejected By Customer"){
               setState(() {
                 rejectedbyCustomer.add(result[i]);
               });
             }
-            if (result[i]['statusName'] =="Rejected By GM"){
+            if (result[i].statusName =="Rejected By GM"){
               setState(() {
                 rejectedbyGM.add(result[i]);
               });
             }
-            if (result[i]['statusName'] =="Rejected Trial"){
+            if (result[i].statusName =="Rejected Trial"){
               setState(() {
                 rejectedTrial.add(result[i]);
               });
 
             }
-            if (result[i]['statusName'] =="Sample Scheduled"){
+            if (result[i].statusName =="Samples Scheduled"){
               setState(() {
                 sampleScheduled.add(result[i]);
               });
-
             }
 
           }
@@ -86,58 +85,52 @@ class _DashboardState extends ResumableState<Dashboard> {
       Network_Operations.getRequest(context, prefs.getString("token")).then((result){
        debugPrint(result.toString());
        for(int i=0; i<result.length;i++ ) {
-         print(result[i]['statusName']);
-         if (result[i]['statusName'] =="New Request"){
+         if (result[i].statusName =="New Request"){
            setState(() {
              newRequest.add(result[i]);
            });
          }
-         if (result[i]['statusName'] =="Approved By GM"){
+         if (result[i].statusName =="Approved By GM"){
            setState(() {
              approvebyGM.add(result[i]);
            });
          }
-         if (result[i]['statusName'] =="Approved By Customer"){
+         if (result[i].statusName =="Approved By Customer"){
            setState(() {
              customerApproved.add(result[i]);
            });
          }
-         if (result[i]['statusName'] =="Approved Trial"){
+         if (result[i].statusName =="Approved Trial"){
            setState(() {
              approvedForTrial.add(result[i]);
            });
          }
-         if (result[i]['statusName'] =="Rejected By Customer"){
+         if (result[i].statusName =="Rejected By Customer"){
            setState(() {
              rejectedbyCustomer.add(result[i]);
            });
          }
-         if (result[i]['statusName'] =="Rejected By GM"){
+         if (result[i].statusName =="Rejected By GM"){
            setState(() {
              rejectedbyGM.add(result[i]);
            });
          }
-         if (result[i]['statusName'] =="Rejected Trial"){
+         if (result[i].statusName =="Rejected Trial"){
            setState(() {
              rejectedTrial.add(result[i]);
            });
-
          }
-         if (result[i]['statusName'] =="Sample Scheduled"){
+         if (result[i].statusName =="Samples Scheduled"){
            setState(() {
              sampleScheduled.add(result[i]);
            });
-
          }
 
        }
-       print(newRequest.toString());
       });
 
 
     });
-
-    print("approvebyGM.toString()");
     super.initState();
   }
   @override
@@ -313,7 +306,7 @@ class _DashboardState extends ResumableState<Dashboard> {
           ),
           InkWell(
             onTap: (){
-             // push(context, MaterialPageRoute(builder: (context)=>ModelRequests(user,sampleProductionScheduled,sampleProductionScheduledId)));
+             push(context, MaterialPageRoute(builder: (context)=>ModelRequests(sampleScheduled)));
              // Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestList(null,null,customerId)));
             },
             child: Padding(
@@ -433,7 +426,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                 // push(context, MaterialPageRoute(builder: (context)=>ModelRequests(user,approvedForTrial,approvedForTrialID)));
+                 push(context, MaterialPageRoute(builder: (context)=>ModelRequests(approvedForTrial)));
                   // Navigator.push(context, MaterialPageRoute(builder: (context)=>SalesOrdersList(DateFormat("yyyy-MM-dd").format(DateTime.now()),DateFormat("yyyy-MM-dd").format(DateTime.now().add(Duration(days: 30))),customerId,DateFormat.MMMM().format(DateTime.now()).toString()+' Deliveries')));
                 },
                 child: Card(
@@ -494,7 +487,7 @@ class _DashboardState extends ResumableState<Dashboard> {
           ),
           InkWell(
             onTap: (){
-             // push(context, MaterialPageRoute(builder: (context)=>ModelRequests(trial)));
+             push(context, MaterialPageRoute(builder: (context)=>ModelRequests(approvedForTrial)));
               // Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestList(null,null,customerId)));
             },
             child: Padding(
@@ -558,7 +551,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               //Today Deliveries
               InkWell(
                 onTap:(){
-                 // push(context, MaterialPageRoute(builder: (context)=>ModelRequests(user,customerApproved,customerApprovedId)));
+                 push(context, MaterialPageRoute(builder: (context)=>ModelRequests(customerApproved)));
                   // Navigator.push(context, MaterialPageRoute(builder: (context)=>DeliveryList((DateFormat("yyyy-MM-dd").format(DateTime.now())),customerId)));
                 },
                 child: Card(

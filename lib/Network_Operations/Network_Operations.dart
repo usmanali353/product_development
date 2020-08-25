@@ -1,13 +1,11 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:http/http.dart' as http;
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
+import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../Dashboard.dart';
 
  class Network_Operations{
@@ -24,7 +22,7 @@ import '../Dashboard.dart';
          prefs.setString("email", email);
        });
        Utils.showSuccess(context, "Login Successful");
-       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Dashboard()));
+       Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
      }else{
        pd.hide();
      }
@@ -68,56 +66,15 @@ import '../Dashboard.dart';
     }
     return null;
   }
-  static void SaveRequest(BuildContext context,String token,int requestID, marketID, String Event, String TechConcentration,
-      int statusID, double thickness, surfaceID, int classificationID, int rangeID, int technologyID, int structureID,
-      int edgeID, String image, List multipleColors, List multipleSize, List multipleDesignTopology, List multipleSuitability,int surafaceId ) async {
+  static Future<List<Request>> getRequest(BuildContext context,String token)async{
     try{
-      final body = jsonEncode({
-        "requestId":requestID,
-        "date":DateTime.now(),
-        "marketId":marketID,
-        "event": Event,
-        "technicalConcentration": TechConcentration,
-        //"userId": userID,
-        "statusId": statusID,
-        "classificationId": classificationID,
-        "rangeId": rangeID,
-        "technologyId": technologyID,
-        "structureId": structureID,
-        "edgeId": edgeID,
-        "image": image,
-        "multipleColors": multipleColors,
-        "multipleSizes": multipleSize,
-        "multipleDesignTopoligies": multipleDesignTopology,
-        "multipleSuitability": multipleSuitability,
-        "thickness":thickness,
-        "surfaceId":surfaceID
-      },toEncodable: Utils.myEncode);
-
-      var response=await http.post(Utils.getBaseUrl()+"Request/RequestSave",body: body,headers:{"Content-type":"application/json","Authorization":"Bearer "+token});
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequests",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        Navigator.pop(context);
-        Navigator.pop(context);
-        Utils.showSuccess(context, "Request Saved Successfully");
-      }else{
-        print(response.body.toString());
-      }
-    }catch(e) {
-     // pd.hide();
-      Utils.showError(context, "Not Svaed");
-      print(e);
-
-     // Utils.showError(context, e.toString());
-    }
-  }
-
-  static Future<List<dynamic>> getRequest(BuildContext context,String token)async{
-    try{
-      var response=await Dio().get(Utils.getBaseUrl()+"Request/GetAllRequests",options:Options(headers:{"Authorization":"Bearer "+token}));
-      if(response.statusCode==200){
-        return response.data;
-        print(response.data);
-
+        List<Request> requests=[];
+        for(int i=0;i<jsonDecode(response.body).length;i++){
+          requests.add(Request.fromMap(jsonDecode(response.body)[i]));
+        }
+        return requests;
       }
     }catch(e){
       print(e);
@@ -129,8 +86,7 @@ import '../Dashboard.dart';
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try {
-      var response = await http.get(Utils.getBaseUrl() +
-          "Request/ChangeStatusOfRequest/$requestId?StatusId=$status", headers: {"Authorization": "Bearer " + token});
+      var response = await http.get(Utils.getBaseUrl() + "Request/ChangeStatusOfRequest/$requestId?StatusId=$status", headers: {"Authorization": "Bearer " + token});
       if (response.statusCode == 200) {
         pd.hide();
         Navigator.pop(context,"Refresh");
@@ -140,6 +96,65 @@ import '../Dashboard.dart';
       pd.hide();
       print(e);
       Utils.showError(context, "Status not Changed");
+    }
+  }
+  static void saveRequest(BuildContext context,String token,Request request) async {
+
+    try{
+      final body = jsonEncode({
+        "requestId":request.requestId,
+        "date":DateTime.now(),
+        "marketId":request.marketId,
+        "event": request.event,
+        "technicalConcentration": request.technicalConcentration,
+        "statusId": request.statusId,
+        "classificationId": request.classificationId,
+        "rangeId": request.rangeId,
+        "technologyId": request.technologyId,
+        "structureId": request.structureId,
+        "edgeId": request.edgeId,
+        "image": request.image,
+        "multipleColors": request.multipleColors,
+        "multipleSizes": request.multipleSizes,
+        "multipleDesignTopoligies": request.multipleDesignTopoligies,
+        "multipleSuitability": request.multipleSuitability,
+        "thickness":request.thickness,
+        "surfaceId":request.surfaceId,
+        "multipleDesigners":request.multipleDesigners,
+        "designerObservation":request.designerObservation,
+        "customerObservation":request.customerObservation
+      },toEncodable: Utils.myEncode);
+      print(body);
+      var response=await http.post(Utils.getBaseUrl()+"Request/RequestSave",body: body,headers:{"Content-type":"application/json","Authorization":"Bearer "+token});
+      print(response.statusCode.toString());
+      if(response.statusCode==200){
+        Navigator.pop(context);
+        Navigator.pop(context);
+        Utils.showSuccess(context, "Request Saved Successfully");
+      }else{
+        print(response.body.toString());
+      }
+    }catch(e) {
+      // pd.hide();
+      Utils.showError(context, "Not Svaed");
+      print(e);
+      // Utils.showError(context, e.toString());
+    }
+  }
+  static void approveRequestClient(BuildContext context,String token,int requestId,int approved) async {
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response = await http.get(Utils.getBaseUrl() + "Request/ChangeStatusOfTrialRequest/$requestId?Approved=$approved", headers: {"Authorization": "Bearer " + token});
+      if (response.statusCode == 200) {
+        pd.hide();
+        Navigator.pop(context,"Refresh");
+        Utils.showSuccess(context, "Request Approved");
+      }
+    }catch(e){
+      pd.hide();
+      print(e);
+      Utils.showError(context, e.toString());
     }
   }
 }
