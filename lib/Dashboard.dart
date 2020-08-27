@@ -306,7 +306,7 @@ class _DashboardState extends ResumableState<Dashboard> {
           ),
           InkWell(
             onTap: (){
-             push(context, MaterialPageRoute(builder: (context)=>ModelRequests(sampleScheduled)));
+             push(context, MaterialPageRoute(builder: (context)=>ModelRequests(rejectedbyGM)));
              // Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestList(null,null,customerId)));
             },
             child: Padding(
@@ -326,7 +326,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                     children: <Widget>[
                       Container(
                         margin: EdgeInsets.only(left: 12),
-                        child: Text("Scheduled Sample Production",
+                        child: Text("ACMC Rejected",
                           style: TextStyle(
                               fontWeight: FontWeight.bold
                           ),
@@ -346,7 +346,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           color: Color(0xFF004c4c),
                         ),
                         child: Container(margin: EdgeInsets.only(left: 10,top: 5),
-                          child: Text(sampleScheduled!=null?sampleScheduled.length.toString():'0',
+                          child: Text(rejectedbyGM!=null?rejectedbyGM.length.toString():'0',
                             style: TextStyle(
                                 color:Colors.white,
                                 //Color(0xFF004c4c),
@@ -373,7 +373,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               //Today Deliveries
               InkWell(
                 onTap:(){
-                 // push(context, MaterialPageRoute(builder: (context)=>ModelRequests(user,sampleProduced,sampleProducedId)));
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(sampleScheduled)));
                   // Navigator.push(context, MaterialPageRoute(builder: (context)=>DeliveryList((DateFormat("yyyy-MM-dd").format(DateTime.now())),customerId)));
                 },
                 child: Card(
@@ -391,7 +391,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                       children: <Widget>[
                         Container(
                           //margin: EdgeInsets.only(left: 12),
-                          child: Text("Sample Produced",
+                          child: Text("Samples Scheduled",
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold
@@ -409,7 +409,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text('', style: TextStyle(color:Color(0xFF004c4c),
+                              child: Text(sampleScheduled!=null?sampleScheduled.length.toString():'0', style: TextStyle(color:Color(0xFF004c4c),
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold
                               ),
@@ -487,7 +487,7 @@ class _DashboardState extends ResumableState<Dashboard> {
           ),
           InkWell(
             onTap: (){
-             push(context, MaterialPageRoute(builder: (context)=>ModelRequests(approvedForTrial)));
+             push(context, MaterialPageRoute(builder: (context)=>ModelRequests(rejectedTrial)));
               // Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestList(null,null,customerId)));
             },
             child: Padding(
@@ -506,7 +506,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                     children: <Widget>[
                       Container(
                         margin: EdgeInsets.only(left: 12),
-                        child: Text("Scheduled for Trial",
+                        child: Text("Rejected for Trial",
                           style: TextStyle(
                               fontWeight: FontWeight.bold
                           ),
@@ -526,7 +526,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           color: Color(0xFF004c4c),
                         ),
                         child: Container(margin: EdgeInsets.only(left: 10,top: 5),
-                          child: Text('',
+                          child: Text(rejectedTrial!=null?rejectedTrial.length.toString():'0',
                             style: TextStyle(
                                 color:Colors.white,
                                 //Color(0xFF004c4c),
@@ -623,7 +623,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                       children: <Widget>[
                         Container(
                           //margin: EdgeInsets.only(left: 12),
-                          child: Text('Scheduled for Production',
+                          child: Text('Customer Rejected',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold
@@ -642,7 +642,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text('',
+                              child: Text(rejectedbyCustomer!=null?rejectedbyCustomer.length.toString():'0',
                                 style: TextStyle(
                                     color:Colors.teal.shade800,
                                     //Color(0xFF004c4c),
