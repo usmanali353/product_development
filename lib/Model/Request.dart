@@ -1,7 +1,7 @@
 class Request {
   int requestId, marketId, statusId, classificationId, rangeId, technologyId,
       structureId, edgeId, surfaceId;
-  String technicalConcentration, event, image,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode;
+  String technicalConcentration, event, image,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date;
   double thickness;
   DateTime dateTime;
   List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners;

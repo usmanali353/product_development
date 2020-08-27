@@ -1,5 +1,3 @@
-import 'package:Arabian_Ceramics/Model/Product.dart';
-import 'package:Arabian_Ceramics/qrcode.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:productdevelopment/Model/Request.dart';
@@ -43,12 +41,12 @@ class _DetailPageState extends State<DetailPage>{
               //color: Color(0xFF004c4c),
               height: MediaQuery.of(context).size.height/3,
               width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(request.image),
-                  fit: BoxFit.cover,
-                )
-              ),
+//              decoration: BoxDecoration(
+//                image: DecorationImage(
+//                  image: Icons.memory(request.image),
+//                  fit: BoxFit.cover,
+//                )
+//              ),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 150, bottom: 10),
@@ -75,7 +73,7 @@ class _DetailPageState extends State<DetailPage>{
                             ),
                             ListTile(
                               title: Text("Request Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                              trailing: Text(request.date),
+                              trailing: Text(request.date??''),
                             ),
                             Divider(),
                             ListTile(
@@ -111,7 +109,7 @@ class _DetailPageState extends State<DetailPage>{
                                 Divider(),
                               ],
                             ):Container(),
-                            product.closeing_date!=null?Column(
+                            request.closeing_date!=null?Column(
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Closing Date",style: TextStyle(fontWeight: FontWeight.bold),),
@@ -120,7 +118,7 @@ class _DetailPageState extends State<DetailPage>{
                                 Divider(),
                               ],
                             ):Container(),
-                            product.trialDate!=null?Column(
+                            request.trialDate!=null?Column(
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Trial Date",style: TextStyle(fontWeight: FontWeight.bold),),
@@ -189,14 +187,14 @@ class _DetailPageState extends State<DetailPage>{
                               title: Text("Range", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              trailing: Text(product.range),
+                              trailing: Text(request.rangeId.toString()),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Material", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              trailing: Text(product.material),
+                              trailing: Text(request.multipleDesignTopoligies.toString()),
                             ),
                             Divider(),
                             ListTile(
@@ -217,28 +215,28 @@ class _DetailPageState extends State<DetailPage>{
                               title: Text("Structure", style: TextStyle(
                                   fontWeight: FontWeight.bold
                               ),),
-                              trailing: Text(request.structureId),
+                              trailing: Text(request.structureId.toString()),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Edge", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              trailing: Text(product.edge),
+                              trailing: Text(request.edgeId.toString()),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Classification", style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),),
-                              trailing: Text(product.classification),
+                              trailing: Text(request.classificationId.toString()),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Suitability", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              subtitle: Text(product.suitibility.replaceAll("[", '').replaceAll("]", '')),
+                              subtitle: Text(request.multipleSuitability.toString()),
                             ),
                             Divider(),
                           ],

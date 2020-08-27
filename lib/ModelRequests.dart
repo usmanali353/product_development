@@ -1,17 +1,13 @@
 
 import 'dart:convert';
 
-import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:intl/intl.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'DetailPage.dart';
 import 'Observations.dart';
 import 'acmcapproval.dart';
 import 'productionCompleted.dart';
@@ -102,17 +98,19 @@ class _ModelReState extends ResumableState<ModelRequests>{
                   });
                 } if(isGm&&products[index].statusName=="Samples Scheduled"){
                   showAlertChangeStatus(context,products[index]);
-                }  if(isGm&&(products[index].statusName=="Approved Trial")){
+                }else if (isGm&&(products[index].statusName=="Approved Trial")){
                   showCustomerApprovalDialog(context,products[index]);
-                } if(isGm&&products[index].statusName=='Approved by Customer'){
+                }else if(isGm&&products[index].statusName=='Approved by Customer'){
                   showDatePicker(helpText:"Select Date for Production for Customer",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 120))).then((selectedDate){
                     if(selectedDate!=null){
 
                     }
                   });
-                }else{
-                 //Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(products[index],productId[index])));
+                }else {
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => DetailPage(products[index])));
                 }
+
               },
               child: Card(
                 elevation: 6,
@@ -327,7 +325,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-      //  Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
+       Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
       },
     );
     Widget approveRejectButton = FlatButton(
@@ -383,7 +381,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       },
     );
   }
-  showTrialApprovalDialog(BuildContext context){
+  showTrialApprovalDialog(BuildContext context,Request request){
     Widget cancelButton = FlatButton(
       child: Text("Cancel"),
       onPressed: () {
@@ -394,7 +392,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-       // Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
       },
     );
     Widget approveRejectButton = FlatButton(
@@ -466,7 +464,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-        //Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
       },
     );
     Widget approveRejectButton = FlatButton(
@@ -540,7 +538,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-        //Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product,productId)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
       },
     );
     Widget approveRejectButton = FlatButton(
