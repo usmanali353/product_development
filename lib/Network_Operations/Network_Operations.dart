@@ -40,6 +40,7 @@ import '../Dashboard.dart';
       if(response.statusCode==200){
         Utils.showSuccess(context, "User Registration successful");
       }else{
+        pd.hide();
         Utils.showError(context, response.body.toString());
       }
     }catch(e){
@@ -99,7 +100,8 @@ import '../Dashboard.dart';
     }
   }
   static void saveRequest(BuildContext context,String token,Request request) async {
-
+    ProgressDialog pd=new ProgressDialog(context);
+    pd.show();
     try{
       final body = jsonEncode({
         "requestId":request.requestId,
@@ -135,7 +137,7 @@ import '../Dashboard.dart';
         print(response.body.toString());
       }
     }catch(e) {
-      // pd.hide();
+       pd.hide();
       Utils.showError(context, "Not Svaed");
       print(e);
       // Utils.showError(context, e.toString());
