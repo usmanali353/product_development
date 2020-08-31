@@ -215,10 +215,14 @@ class _Suitability_State extends ResumableState<Suitability> {
 //                                  _myActivitiesResult = _myActivities.toString();
 //                                });
                                 SharedPreferences.getInstance().then((prefs){
+
+                                    var claims=Utils.parseJwt(prefs.getString("token"));
+
                                   Network_Operations.saveRequest(context,prefs.getString("token") ,Request(
                                     requestId: 0,
                                     marketId: market,
                                     event: event,
+                                    userId: claims['nameid'],
                                     technicalConcentration: technical_consideration.text,
                                     statusId: 1,
                                     thickness: double.parse(thickness),

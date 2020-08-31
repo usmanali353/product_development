@@ -99,12 +99,14 @@ import '../Dashboard.dart';
   static void saveRequest(BuildContext context,String token,Request request) async {
     ProgressDialog pd=new ProgressDialog(context);
     pd.show();
+
     try{
       final body = jsonEncode({
         "requestId":request.requestId,
         "date":DateTime.now(),
         "marketId":request.marketId,
         "event": request.event,
+        "userId":request.userId,
         "technicalConcentration": request.technicalConcentration,
         "statusId": request.statusId,
         "classificationId": request.classificationId,
@@ -126,15 +128,15 @@ import '../Dashboard.dart';
       print(body);
       var req=http.MultipartRequest('POST', Uri.parse(Utils.getBaseUrl()+"Request/RequestSave"));
       req.fields['jsonString'] = body;
-     // req.files.add(await http.MultipartFile.fromPath('File', request.image));
+      req.files.add(await http.MultipartFile.fromPath('File', request.image));
       req.headers.addAll({"Content-type":"application/json","Authorization":"Bearer "+token});
       var res = await req.send();
       print(res.reasonPhrase);
       if(res.statusCode==200){
         pd.hide();
         Utils.showSuccess(context, "Request Saved Successfully");
-        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
-        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+//        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+//        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
       }else{
         pd.hide();
         Utils.showError(context, res.reasonPhrase);

@@ -1,7 +1,7 @@
 class Request {
   int requestId, marketId, statusId, classificationId, rangeId, technologyId,
       structureId, edgeId, surfaceId;
-  String technicalConcentration, event, image,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date;
+  String technicalConcentration, event, image,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId;
   double thickness;
   DateTime dateTime;
   List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners;
@@ -26,6 +26,7 @@ class Request {
     this.multipleDesigners,
     this.designerObservation,
     this.customerObservation,
+    this.userId
   });
   Map<String, dynamic> toJson() {
     var map = new Map<String, dynamic>();
@@ -52,6 +53,7 @@ class Request {
     map["date"]=date;
     map["designerObservation"]=designerObservation;
     map["customerObservation"]=customerObservation;
+    map['userId']=userId;
     return map;
   }
   Request.fromMap(Map<String,dynamic> data){
@@ -78,6 +80,7 @@ class Request {
     multipleDesigners=data["multipleDesigners"];
     designerObservation=data["designerObservation"];
     customerObservation=data["customerObservation"];
+    userId=data['userId'];
   }
 
 }
