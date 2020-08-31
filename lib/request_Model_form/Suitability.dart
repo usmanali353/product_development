@@ -186,7 +186,6 @@ class _Suitability_State extends ResumableState<Suitability> {
                                   if(image!=null){
                                     setState(() {
                                       this.picked_image=image;
-                                      base64EncodedImage=base64.encode(picked_image);
                                       _image = File(image_file.path);
                                     });
                                   }
@@ -229,7 +228,7 @@ class _Suitability_State extends ResumableState<Suitability> {
                                     technologyId: technologyId,
                                     structureId: structureId,
                                     edgeId: edge,
-                                    image: base64EncodedImage,
+                                    image: _image.path,
                                     multipleColors: colorsList,
                                     multipleSizes: sizesList,
                                     multipleDesignTopoligies: designTopologies,

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailPage.dart';
 import 'Observations.dart';
@@ -25,6 +26,7 @@ class ModelRequests extends StatefulWidget {
 
 class _ModelReState extends ResumableState<ModelRequests>{
   List<Request> products=[];
+  var claims;
   //List<String> status=['All','New Request','Approved by ACMC','Rejected by ACMC','Scheduled for Samples Production','Samples Produced','Approved for Trial','Rejected for Trial','Scheduled for Trial','Approved by Customer','Rejected by Customer','Scheduled for Production'];
   GlobalKey<RefreshIndicatorState> refreshIndicatorKey=GlobalKey();
   var selectedPreference,selectedStatus;
@@ -42,17 +44,19 @@ class _ModelReState extends ResumableState<ModelRequests>{
   }
   @override
   void initState() {
-    print(products.toString());
+
     SharedPreferences.getInstance().then((prefs){
       setState(() {
+        claims=Utils.parseJwt(prefs.getString("token"));
+        print(claims);
         token=prefs.getString("token");
       });
-    if(prefs.getString('email')== "tahir@mailinator.com"){
+    if(claims['role']=='GeneralManager'){
       setState(() {
         isGm = true;
       });
     }
-   else if(prefs.getString('email')== "basit@mailinator.com"){
+   else if(claims['role']=='SalesManager'){
       setState(() {
         isSaleManager = true;
       });
@@ -90,13 +94,13 @@ class _ModelReState extends ResumableState<ModelRequests>{
               onTap: (){
                 if(isGm&&products[index].statusName=="New Request"){
                   showAlertDialog(context,products[index]);
-                } if(isGm&&products[index].statusName=="Approved By GM"){
+                }else if(isGm&&products[index].statusName=="Approved By GM"){
                   showDatePicker(helpText:"Select Date for Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((selectedDate){
                     if(selectedDate!=null){
                        Network_Operations.changeStatusOfRequest(context, token, products[index].requestId, 4);
                     }
                   });
-                } if(isGm&&products[index].statusName=="Samples Scheduled"){
+                }else if(isGm&&products[index].statusName=="Samples Scheduled"){
                   showAlertChangeStatus(context,products[index]);
                 }else if (isGm&&(products[index].statusName=="Approved Trial")){
                   showCustomerApprovalDialog(context,products[index]);

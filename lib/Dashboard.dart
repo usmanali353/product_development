@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'ModelRequests.dart';
 import 'Network_Operations/Network_Operations.dart';
+import 'Utils/Utils.dart';
 class Dashboard extends StatefulWidget {
   @override
   _DashboardState createState() => _DashboardState();
@@ -80,8 +81,7 @@ class _DashboardState extends ResumableState<Dashboard> {
   @override
   void initState() {
     SharedPreferences.getInstance().then((prefs){
-      print(prefs.getString("token"));
-
+      print(Utils.parseJwt(prefs.getString("token")).toString());
       Network_Operations.getRequest(context, prefs.getString("token")).then((result){
        debugPrint(result.toString());
        for(int i=0; i<result.length;i++ ) {

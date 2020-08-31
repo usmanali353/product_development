@@ -84,17 +84,14 @@ import '../Dashboard.dart';
     return null;
   }
   static void changeStatusOfRequest(BuildContext context,String token,int requestId,int status) async{
-    ProgressDialog pd=ProgressDialog(context);
-    pd.show();
+   // ProgressDialog pd=ProgressDialog(context);
     try {
       var response = await http.get(Utils.getBaseUrl() + "Request/ChangeStatusOfRequest/$requestId?StatusId=$status", headers: {"Authorization": "Bearer " + token});
       if (response.statusCode == 200) {
-        pd.hide();
         Navigator.pop(context,"Refresh");
          Utils.showSuccess(context, "Status Changed");
       }
     }catch(e){
-      pd.hide();
       print(e);
       Utils.showError(context, "Status not Changed");
     }
@@ -127,20 +124,36 @@ import '../Dashboard.dart';
         "customerObservation":request.customerObservation
       },toEncodable: Utils.myEncode);
       print(body);
-      var response=await http.post(Utils.getBaseUrl()+"Request/RequestSave",body: body,headers:{"Content-type":"application/json","Authorization":"Bearer "+token});
-      print(response.statusCode.toString());
-      if(response.statusCode==200){
-        Navigator.pop(context);
-        Navigator.pop(context);
+      var req=http.MultipartRequest('POST', Uri.parse(Utils.getBaseUrl()+"Request/RequestSave"));
+      req.fields['jsonString'] = body;
+     // req.files.add(await http.MultipartFile.fromPath('File', request.image));
+      req.headers.addAll({"Content-type":"application/json","Authorization":"Bearer "+token});
+      var res = await req.send();
+      print(res.reasonPhrase);
+      if(res.statusCode==200){
+        pd.hide();
         Utils.showSuccess(context, "Request Saved Successfully");
+        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
       }else{
-        print(response.body.toString());
+        pd.hide();
+        Utils.showError(context, res.reasonPhrase);
+        print(req.fields.toString());
       }
+//      var response=await http.post(Utils.getBaseUrl()+"Request/RequestSave",body: body,headers:{"Content-type":"application/json","Authorization":"Bearer "+token});
+//      print(response.statusCode.toString());
+//      if(response.statusCode==200){
+//        Navigator.pop(context);
+//        Navigator.pop(context);
+//        Utils.showSuccess(context, "Request Saved Successfully");
+//      }else{
+//        pd.hide();
+//        print(response.body.toString());
+//      }
     }catch(e) {
        pd.hide();
       Utils.showError(context, "Not Svaed");
       print(e);
-      // Utils.showError(context, e.toString());
     }
   }
   static void approveRequestClient(BuildContext context,String token,int requestId,int approved) async {
