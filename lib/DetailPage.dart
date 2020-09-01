@@ -73,7 +73,7 @@ class _DetailPageState extends State<DetailPage>{
                             ),
                             ListTile(
                               title: Text("Request Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                              trailing: Text(request.date??''),
+                              subtitle: Text(request.date??''),
                             ),
                             Divider(),
                             ListTile(
@@ -83,7 +83,7 @@ class _DetailPageState extends State<DetailPage>{
                             Divider(),
                             ListTile(
                               title: Text("Request Status",style: TextStyle(fontWeight: FontWeight.bold),),
-                              trailing: Text(request.statusName),
+                              subtitle: Text(request.statusName),
                             ),
                             Divider(),
                             request.customerObservation!=null?Column(
@@ -95,11 +95,11 @@ class _DetailPageState extends State<DetailPage>{
                                 Divider(),
                               ],
                             ):Container(),
-                            request.multipleDesigners!=null&&request.designerObservation!=null?Column(
+                            request.multipleDesignerNames!=null&&request.designerObservation!=null?Column(
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Designers",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  trailing: Text(request.multipleDesigners.toString()),
+                                  subtitle: Text(request.multipleDesignerNames.toString().replaceAll("[", "").replaceAll("]", "")),
                                 ),
                                 Divider(),
                                 ListTile(
@@ -113,7 +113,7 @@ class _DetailPageState extends State<DetailPage>{
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Closing Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  trailing: Text(''),
+                                  subtitle: Text(''),
                                 ),
                                 Divider(),
                               ],
@@ -122,7 +122,7 @@ class _DetailPageState extends State<DetailPage>{
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Trial Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  trailing: Text(''),
+                                  subtitle: Text(''),
                                 ),
                                 Divider(),
                               ],
@@ -148,7 +148,7 @@ class _DetailPageState extends State<DetailPage>{
                              children: <Widget>[
                                ListTile(
                                  title: Text("Model Name",style: TextStyle(fontWeight: FontWeight.bold),),
-                                 trailing: Text(request.modelName),
+                                 subtitle: Text(request.modelName),
                                ),
                                Divider(),
                              ],
@@ -157,7 +157,7 @@ class _DetailPageState extends State<DetailPage>{
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Model Code",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  trailing: Text(''),
+                                  subtitle: Text(''),
                                 ),
                                 Divider(),
                               ],
@@ -166,77 +166,77 @@ class _DetailPageState extends State<DetailPage>{
                               title: Text("Surface", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              trailing: Text(request.surfaceName),
+                             subtitle: Text(request.surfaceName),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Thickness", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              trailing: Text(request.thickness.toString()),
+                              subtitle: Text(request.thickness.toString()),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Size", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              trailing: Text(request.multipleSizes.toString()),
+                              subtitle: Text(request.multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "")),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Range", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              trailing: Text(request.rangeId.toString()),
+                              subtitle: Text(request.rangeId.toString()),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Material", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              trailing: Text(request.multipleDesignTopoligies.toString()),
+                              subtitle: Text(request.multipleDesignTopoligyNames.toString().replaceAll("[", "").replaceAll("]", "")),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Color", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              trailing: Text(request.multipleColors.toString()),
+                              subtitle: Text(request.multipleColorNames.toString().replaceAll("[", "").replaceAll("]", "")),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Technology", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              trailing: Text(request.technologyId.toString()),
+                              subtitle: Text(request.technologyId.toString()),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Structure", style: TextStyle(
                                   fontWeight: FontWeight.bold
                               ),),
-                              trailing: Text(request.structureId.toString()),
+                              subtitle: Text(request.structureId.toString()),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Edge", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              trailing: Text(request.edgeId.toString()),
+                              subtitle: Text(request.edgeId.toString()),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Classification", style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),),
-                              trailing: Text(request.classificationId.toString()),
+                              subtitle: Text(request.classificationId.toString()),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Suitability", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              subtitle: Text(request.multipleSuitability.toString()),
+                              subtitle: Text(request.multipleSuitabilityNames.toString().replaceAll("[", "").replaceAll("]", "")),
                             ),
                             Divider(),
                           ],

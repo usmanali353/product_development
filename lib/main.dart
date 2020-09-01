@@ -1,65 +1,37 @@
 import 'package:flutter/material.dart';
-
 import 'package:productdevelopment/Login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-
-
+import 'Dashboard.dart';
 void main() {
-
   runApp(MyApp());
-
 }
-
-
-
 class MyApp extends StatelessWidget {
 
   Map<int, Color> color =
-
   {
-
     50:Color.fromRGBO(0,96,94,  .1),
-
     100:Color.fromRGBO(0,96,94, .2),
-
     200:Color.fromRGBO(0,96,94, .3),
-
     300:Color.fromRGBO(0,96,94, .4),
-
     400:Color.fromRGBO(0,96,94, .5),
-
     500:Color.fromRGBO(0,96,94, .6),
-
     600:Color.fromRGBO(0,96,94, .7),
-
     700:Color.fromRGBO(0,96,94, .8),
-
     800:Color.fromRGBO(0,96,94, .9),
-
     900:Color.fromRGBO(0,96,94,  1),
-
   };
 
   MaterialColor myColor;
-
-
-
   // This widget is the root of your application.
 
   @override
-
   Widget build(BuildContext context) {
-
     myColor = MaterialColor(0xFF004c4c, color);
-
     return MaterialApp(
-
       title: 'Product Development',
-
       debugShowCheckedModeBanner: false,
-
       theme: ThemeData(
-
         // This is the theme of your application.
 
         //
@@ -90,10 +62,24 @@ class MyApp extends StatelessWidget {
 
       ),
 
-      home: Login(),
+      home: checkIsLogin(context),
 
     );
 
   }
 
+  Widget checkIsLogin(BuildContext context){
+    bool isLogin=false;
+    SharedPreferences.getInstance().then((prefs){
+      if(prefs.getString("token")!=null){
+        isLogin=true;
+      }else{
+        isLogin=false;
+      }
+    });
+    if(isLogin){
+      return Dashboard();
+    }else
+     return Login();
+  }
 }

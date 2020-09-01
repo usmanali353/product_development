@@ -1,6 +1,4 @@
-
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:need_resume/need_resume.dart';
@@ -95,9 +93,15 @@ class _ModelReState extends ResumableState<ModelRequests>{
                 if(isGm&&products[index].statusName=="New Request"){
                   showAlertDialog(context,products[index]);
                 }else if(isGm&&products[index].statusName=="Approved By GM"){
-                  showDatePicker(helpText:"Select Date for Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((selectedDate){
-                    if(selectedDate!=null){
-                       Network_Operations.changeStatusOfRequest(context, token, products[index].requestId, 4);
+                  showDatePicker(helpText:"Select Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((startDate){
+                    if(startDate!=null){
+                      showDatePicker(helpText:"Select Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((endDate){
+                        if(endDate!=null){
+                          Network_Operations.changeStatusOfRequest(context, token, products[index].requestId, 4);
+                          Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null);
+                        }
+                      });
+                      // Network_Operations.changeStatusOfRequest(context, token, products[index].requestId, 4);
                     }
                   });
                 }else if(isGm&&products[index].statusName=="Samples Scheduled"){
@@ -255,7 +259,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                       Padding(
                                         padding: EdgeInsets.only(left: 2, right: 2),
                                       ),
-                                      Text(products[index].multipleSizes.toString()),
+                                      Text(products[index].multipleSizeNames.toString()),
                                     ],
 
 

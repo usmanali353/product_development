@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Model/Request.dart';
@@ -99,14 +102,13 @@ import '../Dashboard.dart';
   static void saveRequest(BuildContext context,String token,Request request) async {
     ProgressDialog pd=new ProgressDialog(context);
     pd.show();
-
-    try{
+    try {
       final body = jsonEncode({
-        "requestId":request.requestId,
-        "date":DateTime.now(),
-        "marketId":request.marketId,
+        "requestId": request.requestId,
+        "date": DateTime.now(),
+        "marketId": request.marketId,
         "event": request.event,
-        "userId":request.userId,
+        "userId": request.userId,
         "technicalConcentration": request.technicalConcentration,
         "statusId": request.statusId,
         "classificationId": request.classificationId,
@@ -114,48 +116,37 @@ import '../Dashboard.dart';
         "technologyId": request.technologyId,
         "structureId": request.structureId,
         "edgeId": request.edgeId,
-        "image": request.image,
         "multipleColors": request.multipleColors,
         "multipleSizes": request.multipleSizes,
         "multipleDesignTopoligies": request.multipleDesignTopoligies,
         "multipleSuitability": request.multipleSuitability,
-        "thickness":request.thickness,
-        "surfaceId":request.surfaceId,
-        "multipleDesigners":request.multipleDesigners,
-        "designerObservation":request.designerObservation,
-        "customerObservation":request.customerObservation
-      },toEncodable: Utils.myEncode);
-      print(body);
-      var req=http.MultipartRequest('POST', Uri.parse(Utils.getBaseUrl()+"Request/RequestSave"));
+        "thickness": request.thickness,
+        "surfaceId": request.surfaceId,
+        "multipleDesigners": request.multipleDesigners,
+        "designerObservation": request.designerObservation,
+        "customerObservation": request.customerObservation
+      }, toEncodable: Utils.myEncode);
+      var req = http.MultipartRequest('POST', Uri.parse(Utils.getBaseUrl() + "Request/RequestSave"));
       req.fields['jsonString'] = body;
-      req.files.add(await http.MultipartFile.fromPath('File', request.image));
-      req.headers.addAll({"Content-type":"application/json","Authorization":"Bearer "+token});
+      req.files.add(http.MultipartFile.fromBytes('File',await File(request.image).readAsBytes(),contentType: MediaType("image","jpeg")));
+      req.headers.addAll({
+        "Authorization": "Bearer " + token
+      });
       var res = await req.send();
       print(res.reasonPhrase);
-      if(res.statusCode==200){
+      if (res.statusCode == 200) {
         pd.hide();
         Utils.showSuccess(context, "Request Saved Successfully");
-//        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
-//        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
-      }else{
+        Navigator.pushAndRemoveUntil(
+            context, MaterialPageRoute(builder: (context) => Dashboard()), (
+            Route<dynamic> route) => false);
+      } else {
         pd.hide();
         Utils.showError(context, res.reasonPhrase);
         print(req.fields.toString());
       }
-//      var response=await http.post(Utils.getBaseUrl()+"Request/RequestSave",body: body,headers:{"Content-type":"application/json","Authorization":"Bearer "+token});
-//      print(response.statusCode.toString());
-//      if(response.statusCode==200){
-//        Navigator.pop(context);
-//        Navigator.pop(context);
-//        Utils.showSuccess(context, "Request Saved Successfully");
-//      }else{
-//        pd.hide();
-//        print(response.body.toString());
-//      }
-    }catch(e) {
-       pd.hide();
-      Utils.showError(context, "Not Svaed");
-      print(e);
+    }catch(e){
+      print(e.toString());
     }
   }
   static void approveRequestClient(BuildContext context,String token,int requestId,int approved) async {
@@ -170,8 +161,57 @@ import '../Dashboard.dart';
       }
     }catch(e){
       pd.hide();
-      print(e);
       Utils.showError(context, e.toString());
+    }
+  }
+  static void addDesignersAndObservationToRequest(BuildContext context,int requestId,List<dynamic> designers,String designerObservations,String token) async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      final body = jsonEncode({
+        "requestId":requestId,
+        "MultipleDesigners":designers,
+        "DesignerObservation":designerObservations
+      },toEncodable: Utils.myEncode);
+      var response=await http.post(Utils.getBaseUrl()+"Request/RequestDesignerSave",body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+       pd.hide();
+       Utils.showSuccess(context, response.body.toString());
+       Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+      }else{
+        pd.hide();
+        Utils.showError(context, response.body.toString());
+      }
+    }catch(e){
+      pd.hide();
+      Utils.showError(context, e.toString());
+    }
+
+  }
+  static void addRequestSchedule(BuildContext context,String token,int requestId,DateTime startDate,DateTime endDate,DateTime actualStartDate,DateTime actualEndDate) async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      final body=jsonEncode({
+        "requestId":requestId,
+        "TargetStartDate":startDate,
+        "TargetEndDate":endDate,
+        "ActualStartDate": actualStartDate,
+        "ActualEndDate": actualEndDate,
+      },toEncodable: Utils.myEncode);
+      var response=await http.post(Utils.getBaseUrl()+"Request/RequestSetSchedule",body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+        Utils.showSuccess(context, response.body.toString());
+        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+      }else{
+        pd.hide();
+        Utils.showError(context, response.body.toString());
+      }
+    }catch(e){
+      pd.hide();
+      Utils.showError(context, e.toString());
+      print(e.toString());
     }
   }
 }

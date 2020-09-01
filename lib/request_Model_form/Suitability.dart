@@ -187,6 +187,7 @@ class _Suitability_State extends ResumableState<Suitability> {
                                     setState(() {
                                       this.picked_image=image;
                                       _image = File(image_file.path);
+
                                     });
                                   }
                                 });

@@ -7,16 +7,17 @@ import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'Model/Request.dart';
-class acmcApproval extends StatefulWidget {
- String status,productId,approvedBy,approveById;
- Request request;
- acmcApproval(this.status, this.request);
 
- @override
+class acmcApproval extends StatefulWidget {
+  String status,productId,approvedBy,approveById;
+  Request request;
+  acmcApproval(this.status, this.request);
+  @override
   _acmcApprovalState createState() => _acmcApprovalState(status,request);
 }
+
+
 
 class _acmcApprovalState extends State<acmcApproval> {
   GlobalKey<FormBuilderState> fbKey=GlobalKey();
@@ -27,10 +28,9 @@ class _acmcApprovalState extends State<acmcApproval> {
   Request request;
   TextEditingController designerObservations,modelName,modelCode;
   String status,productId;
-   int requestId;
-   String token;
+  int requestId;
+  String token;
   _acmcApprovalState(this.status, this.request);
-
   @override
   void initState() {
     designerObservations=TextEditingController();
@@ -41,18 +41,19 @@ class _acmcApprovalState extends State<acmcApproval> {
           designer=designerDopDown;
           for(var d in designer){
             designers.add(
-              {
-                "display":d.name,
-                "value":d.id.toString()
-              }
+                {
+                  "display":d.name,
+
+                  "value":d.id.toString()
+                }
             );
           }
         });
       });
     });
-
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,7 +94,6 @@ class _acmcApprovalState extends State<acmcApproval> {
                             myDesigners = value;
                           });
                         },
-
                       ),
                     ),
                   ),
@@ -111,11 +111,10 @@ class _acmcApprovalState extends State<acmcApproval> {
                       controller: designerObservations,
                       validators: [FormBuilderValidators.required()],
                       decoration: InputDecoration(
-                        contentPadding: EdgeInsets.all(16),
-                        border: InputBorder.none,
-                        hintText: "Designer Observations"
+                          contentPadding: EdgeInsets.all(16),
+                          border: InputBorder.none,
+                          hintText: "Designer Observations"
                       ),
-
                     ),
                   ),
                 ),
@@ -127,25 +126,30 @@ class _acmcApprovalState extends State<acmcApproval> {
                       formState.currentState.save();
                       if(status=='Reject'){
                         Network_Operations.changeStatusOfRequest(context, token, request.requestId, 3);
-                        request.multipleDesigners=myDesigners;
-                        request.designerObservation=designerObservations.text;
-                        request.statusId=3;
-                        Network_Operations.saveRequest(context, token, request);
+                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token);
                       }else{
                         Network_Operations.changeStatusOfRequest(context, token, request.requestId, 2);
-                        request.multipleDesigners=myDesigners;
-                        request.designerObservation=designerObservations.text;
-                        request.statusId=2;
-                        Network_Operations.saveRequest(context, token, request);
+                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token);
                       }
+
                     }
+
                   },
+
                 ),
+
               ],
+
             ),
+
           )
+
         ],
+
       ),
+
     );
+
   }
+
 }

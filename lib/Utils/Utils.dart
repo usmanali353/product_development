@@ -25,16 +25,14 @@ class Utils{
   static String getBaseUrl(){
     return "http://192.236.147.77:8086/api/";
   }
-  static void showError(BuildContext context,String message)
-  {
+  static void showError(BuildContext context,String message) {
     Flushbar(
       message: message,
       duration: Duration(seconds: 5),
       backgroundColor: Colors.red,
     ).show(context);
   }
-  static void showSuccess(BuildContext context,String message)
-  {
+  static void showSuccess(BuildContext context,String message) {
     Flushbar(
       message: message,
       duration: Duration(seconds: 5),
@@ -47,7 +45,7 @@ class Utils{
     }
     return item;
   }
- static Map<String, dynamic> parseJwt(String token) {
+  static Map<String, dynamic> parseJwt(String token) {
     final parts = token.split('.');
     if (parts.length != 3) {
       throw Exception('invalid token');
@@ -61,7 +59,6 @@ class Utils{
 
     return payloadMap;
   }
-
   static String _decodeBase64(String str) {
     String output = str.replaceAll('-', '+').replaceAll('_', '/');
 
@@ -80,5 +77,4 @@ class Utils{
 
     return utf8.decode(base64Url.decode(output));
   }
-
 }

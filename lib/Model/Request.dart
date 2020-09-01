@@ -4,7 +4,7 @@ class Request {
   String technicalConcentration, event, image,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId;
   double thickness;
   DateTime dateTime;
-  List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners;
+  List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleColorNames,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames;
   Request({
     this.requestId,
     this.marketId,
@@ -54,6 +54,11 @@ class Request {
     map["designerObservation"]=designerObservation;
     map["customerObservation"]=customerObservation;
     map['userId']=userId;
+    map['multipleDesignTopoligyNames']=multipleDesignTopoligyNames;
+    map['multipleColorNames']=multipleColorNames;
+    map['multipleSizeNames']=multipleSizeNames;
+    map['multipleSuitabilityNames']=multipleSuitabilityNames;
+    map['multipleDesignerNames']=multipleDesignerNames;
     return map;
   }
   Request.fromMap(Map<String,dynamic> data){
@@ -81,6 +86,11 @@ class Request {
     designerObservation=data["designerObservation"];
     customerObservation=data["customerObservation"];
     userId=data['userId'];
+    multipleSizeNames=data['multipleSizeNames'];
+    multipleDesignTopoligyNames=data['multipleDesignTopoligyNames'];
+    multipleColorNames=data['multipleColorNames'];
+    multipleSuitabilityNames=data['multipleSuitabilityNames'];
+    multipleDesignerNames=data['multipleDesignerNames'];
   }
 
 }

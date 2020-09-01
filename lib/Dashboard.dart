@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:need_resume/need_resume.dart';
+import 'package:productdevelopment/Login.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/request_Model_form/Assumptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'ModelRequests.dart';
 import 'Network_Operations/Network_Operations.dart';
 import 'Utils/Utils.dart';
@@ -125,7 +126,6 @@ class _DashboardState extends ResumableState<Dashboard> {
              sampleScheduled.add(result[i]);
            });
          }
-
        }
       });
 
@@ -152,11 +152,22 @@ class _DashboardState extends ResumableState<Dashboard> {
                 children: <Widget>[
                    ListTile(
                      title: Text("Add Model Request"),
-                     trailing: Icon(Icons.add),
+                     leading: Icon(Icons.add),
                      onTap: (){
                        Navigator.push(context,MaterialPageRoute(builder: (context)=>Assumptions()));
                      },
                    ),
+                  Divider(),
+                  ListTile(
+                    title: Text("Sign Out"),
+                    leading: Icon(FontAwesomeIcons.signOutAlt),
+                    onTap: (){
+                     SharedPreferences.getInstance().then((prefs){
+                       prefs.remove("token");
+                       Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Login()),(Route<dynamic> route) => false);
+                     });
+                    },
+                  ),
                   Divider(),
                 ],
               ),
@@ -287,7 +298,6 @@ class _DashboardState extends ResumableState<Dashboard> {
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold
                                 ),
-
                               ),
                             ),
                           ),
@@ -298,7 +308,6 @@ class _DashboardState extends ResumableState<Dashboard> {
                   ),
                 ),
               ),
-
             ],
           ),
           Padding(
@@ -413,7 +422,6 @@ class _DashboardState extends ResumableState<Dashboard> {
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold
                               ),
-
                               ),
                             ),
                           ),
@@ -591,7 +599,6 @@ class _DashboardState extends ResumableState<Dashboard> {
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold
                               ),
-
                               ),
                             ),
                           ),
