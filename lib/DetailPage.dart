@@ -25,7 +25,7 @@ class _DetailPageState extends State<DetailPage>{
         appBar: AppBar(
           title: Text("Request Details"),
           actions: <Widget>[
-            request.statusName=='Approved by Customer'||request.statusName=='Approved Trial'||request.statusName=='Rejected by Customer'?InkWell(
+            request.statusName=='Approved by Customer'||request.statusName=='Approved Trial'||request.statusName=='Rejected by Customer'||request.statusName=="Rejected Trial"?InkWell(
                child: Padding(
                  padding: const EdgeInsets.all(8.0),
                  child: Center(child: Text("Generate QR Code")),

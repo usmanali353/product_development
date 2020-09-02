@@ -3,6 +3,8 @@ import 'package:barcode_scan/platform_wrapper.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class QRScanner extends StatefulWidget{
   @override
@@ -56,6 +58,9 @@ class _QRScanner_State extends State<QRScanner>{
       setState(() {
         this.barcode = barcode;
         if(barcode.rawContent!=null){
+          SharedPreferences.getInstance().then((prefs){
+            Network_Operations.getRequestById(context, prefs.getString("token"), int.parse(barcode.rawContent));
+          });
 
         }
 
@@ -73,7 +78,6 @@ class _QRScanner_State extends State<QRScanner>{
           backgroundColor: Colors.red,
           duration: Duration(seconds: 5),
         ).show(context);
-       // setState(() => this.barcode = 'Unknown error: $e');
       }
     } on FormatException{
       Flushbar(
@@ -81,14 +85,12 @@ class _QRScanner_State extends State<QRScanner>{
         backgroundColor: Colors.red,
         duration: Duration(seconds: 5),
       ).show(context);
-      //setState(() => this.barcode = 'null (User returned using the "back"-button before scanning anything. Result)');
     } catch (e) {
       Flushbar(
         message: e,
         backgroundColor: Colors.red,
         duration: Duration(seconds: 5),
       ).show(context);
-     // setState(() => this.barcode = 'Unknown error: $e');
     }
     return barcode;
   }

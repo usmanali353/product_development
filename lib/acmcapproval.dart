@@ -40,7 +40,6 @@ class _acmcApprovalState extends State<acmcApproval> {
             designers.add(
                 {
                   "display":d.name,
-
                   "value":d.id.toString()
                 }
             );
@@ -111,6 +110,50 @@ class _acmcApprovalState extends State<acmcApproval> {
                           contentPadding: EdgeInsets.all(16),
                           border: InputBorder.none,
                           hintText: "Designer Observations"
+                      ),
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: status=="Approve",
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 16,right: 16),
+                    child: Card(
+                      elevation: 10,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: FormBuilderTextField(
+                        attribute: "Model Name",
+                        controller: modelName,
+                        validators: [FormBuilderValidators.required()],
+                        decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(16),
+                            border: InputBorder.none,
+                            hintText: "Model Name"
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: status=="Approve",
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Card(
+                      elevation: 10,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: FormBuilderTextField(
+                        attribute: "Model Code",
+                        controller: modelCode,
+                        validators: [FormBuilderValidators.required()],
+                        decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(16),
+                            border: InputBorder.none,
+                            hintText: "Model Code"
+                        ),
                       ),
                     ),
                   ),

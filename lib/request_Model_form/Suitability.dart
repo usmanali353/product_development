@@ -41,7 +41,6 @@ class Suitability extends StatefulWidget{
 
 class _Suitability_State extends ResumableState<Suitability> {
   List _myActivities;
-  String _myActivitiesResult;
   var base64EncodedImage;
   final formKey = new GlobalKey<FormState>();
   final fbKey = new GlobalKey<FormBuilderState>();
@@ -187,7 +186,7 @@ class _Suitability_State extends ResumableState<Suitability> {
                                     setState(() {
                                       this.picked_image=image;
                                       _image = File(image_file.path);
-                                      base64EncodedImage=picked_image;
+                                      base64EncodedImage=base64Encode(picked_image);
                                     });
                                   }
                                 });

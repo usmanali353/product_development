@@ -1,8 +1,7 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
+import 'package:productdevelopment/DetailPage.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
@@ -108,7 +107,7 @@ import '../Dashboard.dart';
         "marketId": request.marketId,
         "event": request.event,
         "userId": request.userId,
-        "image":request.image,
+       // "image":request.image,
         "technicalConcentration": request.technicalConcentration,
         "statusId": request.statusId,
         "classificationId": request.classificationId,
@@ -208,5 +207,25 @@ import '../Dashboard.dart';
       Utils.showError(context, e.toString());
       print(e.toString());
     }
+  }
+  static void getRequestById(BuildContext context,String token,int requestId) async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestById/$requestId",headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+        Request request;
+        request=Request.fromMap(jsonDecode(response.body));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
+      }else{
+        pd.hide();
+        Utils.showError(context, "No Request Found against this Barcode");
+      }
+    }catch(e){
+      pd.hide();
+      print(e.toString());
+    }
+
   }
 }

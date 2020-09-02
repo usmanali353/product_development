@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:need_resume/need_resume.dart';
@@ -37,7 +36,6 @@ class _ModelReState extends ResumableState<ModelRequests>{
   void onResume() {
     print(resume.data.toString());
      Navigator.pop(context,'Refresh');
-     Navigator.pop(context,'Refresh');
     super.onResume();
   }
   @override
@@ -69,7 +67,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
   }
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+
     return Scaffold(
         appBar: AppBar(
           title: Text("Model Requests", style: TextStyle(
@@ -147,7 +145,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
                                   image: DecorationImage(
-                                    image: AssetImage("Assets/img/AC.png"), //MemoryImage(base64Decode(products[index]['image'])),
+                                    image: NetworkImage("http://192.236.147.77:8088/assets/user-files/1ee90395-e7dc-4108-a20d-089272eb3f87_Capture.PNG"), //MemoryImage(base64Decode(products[index]['image'])),
                                     fit: BoxFit.cover,
                                   )
                               ),

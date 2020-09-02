@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/Login.dart';
 import 'package:productdevelopment/Model/Request.dart';
+import 'package:productdevelopment/scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ModelRequests.dart';
 import 'Network_Operations/Network_Operations.dart';
@@ -14,8 +15,6 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends ResumableState<Dashboard> {
-
-
   List<Request> newRequest=[],rejectedbyCustomer=[],rejectedbyGM=[],rejectedTrial=[],sampleScheduled=[],approvedForTrial=[],customerApproved=[],approvebyGM=[];
 
   @override
@@ -159,6 +158,14 @@ class _DashboardState extends ResumableState<Dashboard> {
                    ),
                   Divider(),
                   ListTile(
+                    title: Text("Scan Barcode"),
+                    leading: Icon(FontAwesomeIcons.barcode),
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>QRScanner()));
+                    },
+                  ),
+                  Divider(),
+                  ListTile(
                     title: Text("Sign Out"),
                     leading: Icon(FontAwesomeIcons.signOutAlt),
                     onTap: (){
@@ -168,7 +175,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                      });
                     },
                   ),
-                  Divider(),
+
                 ],
               ),
             )
