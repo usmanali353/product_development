@@ -6,8 +6,26 @@ import 'Dashboard.dart';
 void main() {
   runApp(MyApp());
 }
-class MyApp extends StatelessWidget {
 
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isLogin=false;
+  @override
+  void initState(){
+    myColor = MaterialColor(0xFF004c4c, color);
+    SharedPreferences.getInstance().then((prefs){
+      if(prefs.getString("token")!=null){
+        setState(() {
+          isLogin=true;
+        });
+      }
+    });
+    super.initState();
+  }
   Map<int, Color> color =
   {
     50:Color.fromRGBO(0,96,94,  .1),
@@ -21,65 +39,19 @@ class MyApp extends StatelessWidget {
     800:Color.fromRGBO(0,96,94, .9),
     900:Color.fromRGBO(0,96,94,  1),
   };
-
   MaterialColor myColor;
-  // This widget is the root of your application.
-
   @override
   Widget build(BuildContext context) {
-    myColor = MaterialColor(0xFF004c4c, color);
     return MaterialApp(
-      title: 'Product Development',
       debugShowCheckedModeBanner: false,
+      title: 'Product Development',
       theme: ThemeData(
-        // This is the theme of your application.
-
-        //
-
-        // Try running your application with "flutter run". You'll see the
-
-        // application has a blue toolbar. Then, without quitting the app, try
-
-        // changing the primarySwatch below to Colors.green and then invoke
-
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-
-        // Notice that the counter didn't reset back to zero; the application
-
-        // is not restarted.
-
         primarySwatch: myColor,
-
-        // This makes the visual density adapt to the platform that you run
-
-        // the app on. For desktop platforms, the controls will be smaller and
-
-        // closer together (more dense) than on mobile platforms.
-
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-
+        brightness: Brightness.light,
       ),
-
-      home: checkIsLogin(context),
+      home: isLogin?Dashboard():Login(),
 
     );
-
   }
 
-  Widget checkIsLogin(BuildContext context){
-    bool isLogin=false;
-    SharedPreferences.getInstance().then((prefs){
-      if(prefs.getString("token")!=null){
-        isLogin=true;
-      }else{
-        isLogin=false;
-      }
-    });
-    if(isLogin){
-      return Dashboard();
-    }else
-     return Login();
-  }
 }

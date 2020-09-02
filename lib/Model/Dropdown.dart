@@ -3,7 +3,6 @@
 class Dropdown{
   int id;
   String name;
-
   Dropdown(this.id, this.name);
 
   Map<String, dynamic> toJson() {
@@ -12,8 +11,10 @@ class Dropdown{
     map["name"]=name;
     return map;
   }
+
   Dropdown.fromMap(Map<String,dynamic> data){
     id=data['id'];
     name=data["name"];
   }
+
 }

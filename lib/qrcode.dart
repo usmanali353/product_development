@@ -32,7 +32,7 @@ class _GenerateedQR extends State<GenerateedQrcode> {
          RepaintBoundary(
            key: globalKey,
            child: QrImage(
-             data: requestId,
+             data: requestId.toString(),
              version: QrVersions.auto,
              size: 200.0,
            ),

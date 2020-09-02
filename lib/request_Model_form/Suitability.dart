@@ -187,7 +187,7 @@ class _Suitability_State extends ResumableState<Suitability> {
                                     setState(() {
                                       this.picked_image=image;
                                       _image = File(image_file.path);
-
+                                      base64EncodedImage=picked_image;
                                     });
                                   }
                                 });
@@ -210,7 +210,7 @@ class _Suitability_State extends ResumableState<Suitability> {
                             color: Color(0xFF004c4c),
                             child: Text("Proceed",style: TextStyle(color: Colors.white),),
                             onPressed: (){
-                              if(fbKey.currentState.validate()&&formKey.currentState.validate()){
+                              if(fbKey.currentState.validate()&&formKey.currentState.validate()&&base64EncodedImage!=null){
                                 formKey.currentState.save();
 //                                setState(() {
 //                                  _myActivitiesResult = _myActivities.toString();
@@ -233,7 +233,7 @@ class _Suitability_State extends ResumableState<Suitability> {
                                     technologyId: technologyId,
                                     structureId: structureId,
                                     edgeId: edge,
-                                    image: _image.path,
+                                    image: base64EncodedImage,
                                     multipleColors: colorsList,
                                     multipleSizes: sizesList,
                                     multipleDesignTopoligies: designTopologies,

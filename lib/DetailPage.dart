@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:productdevelopment/Model/Request.dart';
+import 'package:productdevelopment/qrcode.dart';
 
 
 class DetailPage extends StatefulWidget {
@@ -24,13 +25,13 @@ class _DetailPageState extends State<DetailPage>{
         appBar: AppBar(
           title: Text("Request Details"),
           actions: <Widget>[
-            request.statusName=='Approved by Customer'||request.statusName=='Trial Approved'||request.statusName=='Rejected by Customer'?InkWell(
+            request.statusName=='Approved by Customer'||request.statusName=='Approved Trial'||request.statusName=='Rejected by Customer'?InkWell(
                child: Padding(
                  padding: const EdgeInsets.all(8.0),
                  child: Center(child: Text("Generate QR Code")),
                ),
               onTap: (){
-               //  Navigator.push(context, MaterialPageRoute(builder: (context)=>GenerateedQrcode(productId)));
+                 Navigator.push(context, MaterialPageRoute(builder: (context)=>GenerateedQrcode(request.requestId)));
               },
             ):Container(),
           ],
@@ -180,14 +181,14 @@ class _DetailPageState extends State<DetailPage>{
                               title: Text("Size", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              subtitle: Text(request.multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "")),
+                              subtitle: Text(request.multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", "")),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Range", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              subtitle: Text(request.rangeId.toString()),
+                              subtitle: Text(request.rangeName),
                             ),
                             Divider(),
                             ListTile(
@@ -208,28 +209,28 @@ class _DetailPageState extends State<DetailPage>{
                               title: Text("Technology", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              subtitle: Text(request.technologyId.toString()),
+                              subtitle: Text(request.technologyName),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Structure", style: TextStyle(
                                   fontWeight: FontWeight.bold
                               ),),
-                              subtitle: Text(request.structureId.toString()),
+                              subtitle: Text(request.structureName),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Edge", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              subtitle: Text(request.edgeId.toString()),
+                              subtitle: Text(request.edgeName),
                             ),
                             Divider(),
                             ListTile(
                               title: Text("Classification", style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),),
-                              subtitle: Text(request.classificationId.toString()),
+                              subtitle: Text(request.classificationName),
                             ),
                             Divider(),
                             ListTile(

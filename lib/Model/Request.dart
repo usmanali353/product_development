@@ -1,8 +1,9 @@
 class Request {
   int requestId, marketId, statusId, classificationId, rangeId, technologyId,
       structureId, edgeId, surfaceId;
-  String technicalConcentration, event, image,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId;
+  String technicalConcentration, event,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId,classificationName,marketName,technologyName,structureName,edgeName,rangeName,client;
   double thickness;
+  var image;
   DateTime dateTime;
   List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleColorNames,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames;
   Request({
@@ -26,7 +27,8 @@ class Request {
     this.multipleDesigners,
     this.designerObservation,
     this.customerObservation,
-    this.userId
+    this.userId,
+    this.client
   });
   Map<String, dynamic> toJson() {
     var map = new Map<String, dynamic>();
@@ -59,6 +61,13 @@ class Request {
     map['multipleSizeNames']=multipleSizeNames;
     map['multipleSuitabilityNames']=multipleSuitabilityNames;
     map['multipleDesignerNames']=multipleDesignerNames;
+    map['classificationName']=classificationName;
+    map['marketName']=marketName;
+    map['structureName']=structureName;
+    map['edgeName']=edgeName;
+    map['technologyName']=technologyName;
+    map['rangeName']=rangeName;
+    map['client']=client;
     return map;
   }
   Request.fromMap(Map<String,dynamic> data){
@@ -91,6 +100,13 @@ class Request {
     multipleColorNames=data['multipleColorNames'];
     multipleSuitabilityNames=data['multipleSuitabilityNames'];
     multipleDesignerNames=data['multipleDesignerNames'];
+    classificationName=data['classificationName'];
+    marketName=data['marketName'];
+    edgeName=data['edgeName'];
+    technologyName=data['technologyName'];
+    structureName=data['structureName'];
+    rangeName=data['rangeName'];
+    client=data["client"];
   }
 
 }

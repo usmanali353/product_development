@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:flutter/material.dart';
@@ -109,6 +108,7 @@ import '../Dashboard.dart';
         "marketId": request.marketId,
         "event": request.event,
         "userId": request.userId,
+        "image":request.image,
         "technicalConcentration": request.technicalConcentration,
         "statusId": request.statusId,
         "classificationId": request.classificationId,
@@ -124,28 +124,21 @@ import '../Dashboard.dart';
         "surfaceId": request.surfaceId,
         "multipleDesigners": request.multipleDesigners,
         "designerObservation": request.designerObservation,
-        "customerObservation": request.customerObservation
+        "customerObservation": request.customerObservation,
+        "client":request.client
       }, toEncodable: Utils.myEncode);
-      var req = http.MultipartRequest('POST', Uri.parse(Utils.getBaseUrl() + "Request/RequestSave"));
-      req.fields['jsonString'] = body;
-      req.files.add(http.MultipartFile.fromBytes('File',await File(request.image).readAsBytes(),contentType: MediaType("image","jpeg")));
-      req.headers.addAll({
-        "Authorization": "Bearer " + token
-      });
-      var res = await req.send();
-      print(res.reasonPhrase);
-      if (res.statusCode == 200) {
-        pd.hide();
-        Utils.showSuccess(context, "Request Saved Successfully");
-        Navigator.pushAndRemoveUntil(
-            context, MaterialPageRoute(builder: (context) => Dashboard()), (
-            Route<dynamic> route) => false);
-      } else {
-        pd.hide();
-        Utils.showError(context, res.reasonPhrase);
-        print(req.fields.toString());
-      }
+       print(body);
+       var response =await http.post(Utils.getBaseUrl()+"Request/RequestSave",body: body,headers:{"Content-Type": "application/json", "Authorization": "Bearer " + token});
+       if(response.statusCode==200){
+         pd.hide();
+         Utils.showSuccess(context, "Request Saved Successfully");
+         Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+       }else{
+         pd.hide();
+         Utils.showError(context, response.statusCode.toString());
+       }
     }catch(e){
+      pd.hide();
       print(e.toString());
     }
   }
@@ -181,6 +174,7 @@ import '../Dashboard.dart';
       }else{
         pd.hide();
         Utils.showError(context, response.body.toString());
+        print(response.body.toString());
       }
     }catch(e){
       pd.hide();
@@ -207,6 +201,7 @@ import '../Dashboard.dart';
       }else{
         pd.hide();
         Utils.showError(context, response.body.toString());
+        print(response.body.toString());
       }
     }catch(e){
       pd.hide();

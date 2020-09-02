@@ -1,11 +1,8 @@
-import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:intl/intl.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Model/Request.dart';
 
@@ -125,11 +122,11 @@ class _acmcApprovalState extends State<acmcApproval> {
                     if(fbKey.currentState.validate()&&formState.currentState.validate()){
                       formState.currentState.save();
                       if(status=='Reject'){
+                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token);
                         Network_Operations.changeStatusOfRequest(context, token, request.requestId, 3);
-                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token);
                       }else{
-                        Network_Operations.changeStatusOfRequest(context, token, request.requestId, 2);
                         Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token);
+                        Network_Operations.changeStatusOfRequest(context, token, request.requestId, 2);
                       }
 
                     }
