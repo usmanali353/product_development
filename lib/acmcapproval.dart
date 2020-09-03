@@ -31,6 +31,8 @@ class _acmcApprovalState extends State<acmcApproval> {
   @override
   void initState() {
     designerObservations=TextEditingController();
+    modelName=TextEditingController();
+    modelCode=TextEditingController();
     SharedPreferences.getInstance().then((prefs){
       token=prefs.getString("token");
       Network_Operations.getDropDowns(context, prefs.getString("token"), "Designers").then((designerDopDown){
@@ -165,10 +167,10 @@ class _acmcApprovalState extends State<acmcApproval> {
                     if(fbKey.currentState.validate()&&formState.currentState.validate()){
                       formState.currentState.save();
                       if(status=='Reject'){
-                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token);
+                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,null,null);
                         Network_Operations.changeStatusOfRequest(context, token, request.requestId, 3);
                       }else{
-                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token);
+                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,modelName.text,modelCode.text);
                         Network_Operations.changeStatusOfRequest(context, token, request.requestId, 2);
                       }
 

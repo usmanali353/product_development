@@ -89,7 +89,7 @@ import '../Dashboard.dart';
     try {
       var response = await http.get(Utils.getBaseUrl() + "Request/ChangeStatusOfRequest/$requestId?StatusId=$status", headers: {"Authorization": "Bearer " + token});
       if (response.statusCode == 200) {
-        Navigator.pop(context,"Refresh");
+       // Navigator.pop(context,"Refresh");
          Utils.showSuccess(context, "Status Changed");
       }
     }catch(e){
@@ -107,7 +107,7 @@ import '../Dashboard.dart';
         "marketId": request.marketId,
         "event": request.event,
         "userId": request.userId,
-       // "image":request.image,
+        "image":request.image,
         "technicalConcentration": request.technicalConcentration,
         "statusId": request.statusId,
         "classificationId": request.classificationId,
@@ -138,7 +138,7 @@ import '../Dashboard.dart';
        }
     }catch(e){
       pd.hide();
-      print(e.toString());
+      Utils.showError(context, e.toString());
     }
   }
   static void approveRequestClient(BuildContext context,String token,int requestId,int approved) async {
@@ -150,20 +150,26 @@ import '../Dashboard.dart';
         pd.hide();
         Navigator.pop(context,"Refresh");
         Utils.showSuccess(context, "Request Approved");
+      }else{
+        pd.hide();
+        print(response.statusCode);
+      //  Utils.showError(context,response.body.toString());
       }
     }catch(e){
       pd.hide();
       Utils.showError(context, e.toString());
     }
   }
-  static void addDesignersAndObservationToRequest(BuildContext context,int requestId,List<dynamic> designers,String designerObservations,String token) async{
+  static void addDesignersAndObservationToRequest(BuildContext context,int requestId,List<dynamic> designers,String designerObservations,String token,String modelName,String modelCode) async{
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
       final body = jsonEncode({
         "requestId":requestId,
         "MultipleDesigners":designers,
-        "DesignerObservation":designerObservations
+        "DesignerObservation":designerObservations,
+        "modelName":modelName,
+        "modelCode":modelCode
       },toEncodable: Utils.myEncode);
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestDesignerSave",body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
@@ -196,7 +202,9 @@ import '../Dashboard.dart';
       if(response.statusCode==200){
         pd.hide();
         Utils.showSuccess(context, response.body.toString());
+        //changeStatusOfRequest(context, token, requestId, status)
         Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+
       }else{
         pd.hide();
         Utils.showError(context, response.body.toString());
@@ -227,5 +235,22 @@ import '../Dashboard.dart';
       print(e.toString());
     }
 
+  }
+  static Future<List<Request>> getRequestForGM(BuildContext context,String token)async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        var req=jsonDecode(response.body);
+        List<Request> requests=[];
+        for(int i=0;i<req['allRequests'].length;i++){
+          requests.add(Request.fromMap(req['allRequests'][i]));
+        }
+        return requests;
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:need_resume/need_resume.dart';
+import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
@@ -8,7 +9,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailPage.dart';
 import 'Observations.dart';
 import 'acmcapproval.dart';
-import 'productionCompleted.dart';
 
 
 class ModelRequests extends StatefulWidget {
@@ -52,7 +52,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
         isGm = true;
       });
     }
-   else if(claims['role']=='SalesManager'){
+   else if(claims['role']=='Sales Manager'){
       setState(() {
         isSaleManager = true;
       });
@@ -75,12 +75,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
           ),
           ),
           actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: (){
-                //showStatusAlertDialog(context);
-              },
-            )
+
           ],
         ),
       body: ListView.builder(
@@ -90,7 +85,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
               onTap: (){
                 if(isGm&&products[index].statusName=="New Request"){
                   showAlertDialog(context,products[index]);
-                }else if(isGm&&products[index].statusName=="Approved By GM"){
+                }else if(isSaleManager&&products[index].statusName=="Approved By GM"){
                   showDatePicker(helpText:"Select Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((startDate){
                     if(startDate!=null){
                       showDatePicker(helpText:"Select Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((endDate){
@@ -106,11 +101,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                 }else if (isGm&&(products[index].statusName=="Approved Trial")){
                   showCustomerApprovalDialog(context,products[index]);
                 }else if(isGm&&products[index].statusName=='Approved by Customer'){
-                  showDatePicker(helpText:"Select Date for Production for Customer",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 120))).then((selectedDate){
-                    if(selectedDate!=null){
 
-                    }
-                  });
                 }else {
                   Navigator.push(context, MaterialPageRoute(
                       builder: (context) => DetailPage(products[index])));
@@ -145,7 +136,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
                                   image: DecorationImage(
-                                    image: NetworkImage("http://192.236.147.77:8088/assets/user-files/1ee90395-e7dc-4108-a20d-089272eb3f87_Capture.PNG"), //MemoryImage(base64Decode(products[index]['image'])),
+                                    image: NetworkImage(products[index].image!=null?products[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"), //MemoryImage(base64Decode(products[index]['image'])),
                                     fit: BoxFit.cover,
                                   )
                               ),
@@ -225,7 +216,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                             children: <Widget>[
                               Padding(
                                 padding: const EdgeInsets.only(left: 6, top: 8),
-                                child: Text('', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                                child: Text(products[index].modelName!=null?products[index].modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
                               ),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -337,7 +328,13 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Set"),
       onPressed: () {
         Navigator.pop(context);
-        push(context, MaterialPageRoute(builder: (context)=>Observations(selectedPreference,request)));
+        if(selectedPreference=="Approve") {
+          Network_Operations.approveRequestClient(
+              context, token, request.requestId, 1);
+        }else{
+          Network_Operations.approveRequestClient(
+              context, token, request.requestId, 0);
+        }
       },
     );
     AlertDialog alert = AlertDialog(
@@ -476,11 +473,11 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Set"),
       onPressed: () {
         if(selectedPreference=="Approve"){
-          Navigator.pop(context);
-          push(context, MaterialPageRoute(builder: (context)=>productionCompleted(selectedPreference,request)));
+            Network_Operations.changeStatusOfRequest(context, token, request.requestId, 5);
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
         }else if(selectedPreference=="Reject"){
-          Navigator.pop(context);
-          push(context, MaterialPageRoute(builder: (context)=>productionCompleted(selectedPreference,request)));
+          Network_Operations.changeStatusOfRequest(context, token, request.requestId, 6);
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
         }
       },
     );

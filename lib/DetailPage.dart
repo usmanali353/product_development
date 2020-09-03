@@ -42,12 +42,12 @@ class _DetailPageState extends State<DetailPage>{
               //color: Color(0xFF004c4c),
               height: MediaQuery.of(context).size.height/3,
               width: MediaQuery.of(context).size.width,
-//              decoration: BoxDecoration(
-//                image: DecorationImage(
-//                  image: Icons.memory(request.image),
-//                  fit: BoxFit.cover,
-//                )
-//              ),
+             decoration: BoxDecoration(
+               image: DecorationImage(
+                 image: NetworkImage(request.image!=null?request.image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"),
+                 fit: BoxFit.cover,
+               )
+             ),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 150, bottom: 10),
@@ -56,6 +56,7 @@ class _DetailPageState extends State<DetailPage>{
                   //height: MediaQuery.of(context).size.height * 0.65,
                   //width: ,
                   child: new Card(
+
                     elevation: 6.0,
                     margin: EdgeInsets.only(right: 15.0, left: 15.0),
                       child: Scrollbar(
@@ -110,11 +111,20 @@ class _DetailPageState extends State<DetailPage>{
                                 Divider(),
                               ],
                             ):Container(),
-                            request.closeing_date!=null?Column(
+                            request.targetStartDate!=null?Column(
                               children: <Widget>[
                                 ListTile(
-                                  title: Text("Closing Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  subtitle: Text(''),
+                                  title: Text("Target Start Date",style: TextStyle(fontWeight: FontWeight.bold),),
+                                  subtitle: Text(request.targetStartDate),
+                                ),
+                                Divider(),
+                              ],
+                            ):Container(),
+                            request.targetEndDate!=null?Column(
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text("Target End Date",style: TextStyle(fontWeight: FontWeight.bold),),
+                                  subtitle: Text(request.targetEndDate),
                                 ),
                                 Divider(),
                               ],
@@ -158,7 +168,7 @@ class _DetailPageState extends State<DetailPage>{
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Model Code",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  subtitle: Text(''),
+                                  subtitle: Text(request.modelCode!=null?request.modelCode:''),
                                 ),
                                 Divider(),
                               ],

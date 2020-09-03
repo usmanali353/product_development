@@ -23,6 +23,156 @@ class _DashboardState extends ResumableState<Dashboard> {
       SharedPreferences.getInstance().then((prefs){
         print(prefs.getString("token"));
         newRequest.clear();rejectedbyCustomer.clear();rejectedbyGM.clear();rejectedTrial.clear();sampleScheduled.clear();approvedForTrial.clear();customerApproved.clear();approvebyGM.clear();
+        var claims = Utils.parseJwt(prefs.getString("token"));
+        if(claims["role"]=="General Manager"){
+          Network_Operations.getRequestForGM(context, prefs.getString("token")).then((result){
+            debugPrint(result.toString());
+            for(int i=0; i<result.length;i++ ) {
+              if (result[i].statusName =="New Request"){
+                setState(() {
+                  newRequest.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Approved By GM"){
+                setState(() {
+                  approvebyGM.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Approved By Customer"){
+                setState(() {
+                  customerApproved.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Approved Trial"){
+                setState(() {
+                  approvedForTrial.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Rejected By Customer"){
+                setState(() {
+                  rejectedbyCustomer.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Rejected By GM"){
+                setState(() {
+                  rejectedbyGM.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Rejected Trial"){
+                setState(() {
+                  rejectedTrial.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Samples Scheduled"){
+                setState(() {
+                  sampleScheduled.add(result[i]);
+                });
+              }
+            }
+          });
+        }else{
+          Network_Operations.getRequest(context, prefs.getString("token")).then((result){
+            debugPrint(result.toString());
+            for(int i=0; i<result.length;i++ ) {
+              if (result[i].statusName =="New Request"){
+                setState(() {
+                  newRequest.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Approved By GM"){
+                setState(() {
+                  approvebyGM.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Approved By Customer"){
+                setState(() {
+                  customerApproved.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Approved Trial"){
+                setState(() {
+                  approvedForTrial.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Rejected By Customer"){
+                setState(() {
+                  rejectedbyCustomer.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Rejected By GM"){
+                setState(() {
+                  rejectedbyGM.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Rejected Trial"){
+                setState(() {
+                  rejectedTrial.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Samples Scheduled"){
+                setState(() {
+                  sampleScheduled.add(result[i]);
+                });
+              }
+            }
+          });
+        }
+      });
+    }
+
+    super.onResume();
+  }
+  @override
+  void initState() {
+    SharedPreferences.getInstance().then((prefs){
+      var claims = Utils.parseJwt(prefs.getString("token"));
+      if(claims["role"]=="General Manager"){
+        Network_Operations.getRequestForGM(context, prefs.getString("token")).then((result){
+          debugPrint(result.toString());
+          for(int i=0; i<result.length;i++ ) {
+            if (result[i].statusName =="New Request"){
+              setState(() {
+                newRequest.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Approved By GM"){
+              setState(() {
+                approvebyGM.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Approved By Customer"){
+              setState(() {
+                customerApproved.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Approved Trial"){
+              setState(() {
+                approvedForTrial.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Rejected By Customer"){
+              setState(() {
+                rejectedbyCustomer.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Rejected By GM"){
+              setState(() {
+                rejectedbyGM.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Rejected Trial"){
+              setState(() {
+                rejectedTrial.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Samples Scheduled"){
+              setState(() {
+                sampleScheduled.add(result[i]);
+              });
+            }
+          }
+        });
+      }else{
         Network_Operations.getRequest(context, prefs.getString("token")).then((result){
           debugPrint(result.toString());
           for(int i=0; i<result.length;i++ ) {
@@ -60,73 +210,16 @@ class _DashboardState extends ResumableState<Dashboard> {
               setState(() {
                 rejectedTrial.add(result[i]);
               });
-
             }
             if (result[i].statusName =="Samples Scheduled"){
               setState(() {
                 sampleScheduled.add(result[i]);
               });
             }
-
           }
-          print(newRequest.toString());
         });
+      }
 
-
-      });
-    }
-
-    super.onResume();
-  }
-  @override
-  void initState() {
-    SharedPreferences.getInstance().then((prefs){
-      print(Utils.parseJwt(prefs.getString("token")).toString());
-      Network_Operations.getRequest(context, prefs.getString("token")).then((result){
-       debugPrint(result.toString());
-       for(int i=0; i<result.length;i++ ) {
-         if (result[i].statusName =="New Request"){
-           setState(() {
-             newRequest.add(result[i]);
-           });
-         }
-         if (result[i].statusName =="Approved By GM"){
-           setState(() {
-             approvebyGM.add(result[i]);
-           });
-         }
-         if (result[i].statusName =="Approved By Customer"){
-           setState(() {
-             customerApproved.add(result[i]);
-           });
-         }
-         if (result[i].statusName =="Approved Trial"){
-           setState(() {
-             approvedForTrial.add(result[i]);
-           });
-         }
-         if (result[i].statusName =="Rejected By Customer"){
-           setState(() {
-             rejectedbyCustomer.add(result[i]);
-           });
-         }
-         if (result[i].statusName =="Rejected By GM"){
-           setState(() {
-             rejectedbyGM.add(result[i]);
-           });
-         }
-         if (result[i].statusName =="Rejected Trial"){
-           setState(() {
-             rejectedTrial.add(result[i]);
-           });
-         }
-         if (result[i].statusName =="Samples Scheduled"){
-           setState(() {
-             sampleScheduled.add(result[i]);
-           });
-         }
-       }
-      });
 
 
     });
@@ -618,7 +711,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                 // push(context, MaterialPageRoute(builder: (context)=>ModelRequests(user,scheduledProduction,scheduledProductionId)));
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(rejectedbyCustomer)));
                   // Navigator.push(context, MaterialPageRoute(builder: (context)=>SalesOrdersList(DateFormat("yyyy-MM-dd").format(DateTime.now()),DateFormat("yyyy-MM-dd").format(DateTime.now().add(Duration(days: 30))),customerId,DateFormat.MMMM().format(DateTime.now()).toString()+' Deliveries')));
                 },
                 child: Card(
