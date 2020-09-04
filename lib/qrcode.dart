@@ -1,11 +1,15 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share/share.dart';
 
 class GenerateedQrcode extends StatefulWidget {
   var requestId;
@@ -38,7 +42,7 @@ class _GenerateedQR extends State<GenerateedQrcode> {
            ),
          ),
          MaterialButton(
-           color: Colors.teal,
+           color: Color(0xFF004c4c),
            child: Text("Print",style: TextStyle(color: Colors.white),),
            onPressed: ()async{
              RenderRepaintBoundary boundary = globalKey.currentContext.findRenderObject();
@@ -56,7 +60,23 @@ class _GenerateedQR extends State<GenerateedQrcode> {
                  onLayout: (PdfPageFormat format) async => doc.save());
            },
 
-         )
+         ),
+         MaterialButton(
+           color: Color(0xFF004c4c),
+           child: Text("Share",style: TextStyle(color: Colors.white),),
+           onPressed: ()async {
+             RenderRepaintBoundary boundary = globalKey.currentContext
+                 .findRenderObject();
+             var image = await boundary.toImage();
+             ByteData byteData = await image.toByteData(
+                 format: ImageByteFormat.png);
+             Uint8List pngBytes = byteData.buffer.asUint8List();
+             final tempDir = await getTemporaryDirectory();
+             final file = await  File('${tempDir.path}/image.png').create();
+             await file.writeAsBytes(pngBytes);
+             Share.shareFiles([file.path],text: "Share Barcode");
+           }
+         ),
        ],
 
      ),

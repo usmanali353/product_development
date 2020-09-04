@@ -86,6 +86,9 @@ dependencies:
 
   http:
 
+  path_provider:
+
+  share: ^0.6.5
 
 
 dev_dependencies:

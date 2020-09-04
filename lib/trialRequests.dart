@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -264,11 +265,13 @@ import 'package:shared_preferences/shared_preferences.dart';
          if(selectedPreference=="Approve"){
            SharedPreferences.getInstance().then((prefs){
              Network_Operations.approveRequestClient(context, prefs.getString("token"), request.requestId, 1);
+             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
            });
            //Network_Operations.approveRequestClient(context, token, request.requestId, 1);
          }else if(selectedPreference=="Reject"){
            SharedPreferences.getInstance().then((prefs){
              Network_Operations.approveRequestClient(context, prefs.getString("token"), request.requestId, 0);
+             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
            });
          }
        },

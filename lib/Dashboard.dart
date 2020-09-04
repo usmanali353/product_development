@@ -17,14 +17,14 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends ResumableState<Dashboard> {
   List<Request> newRequest=[],rejectedbyCustomer=[],rejectedbyGM=[],rejectedTrial=[],sampleScheduled=[],approvedForTrial=[],customerApproved=[],approvebyGM=[];
-
+ var claims;
   @override
   void onResume() {
     if(resume.data.toString()=="Refresh"){
       SharedPreferences.getInstance().then((prefs){
         print(prefs.getString("token"));
         newRequest.clear();rejectedbyCustomer.clear();rejectedbyGM.clear();rejectedTrial.clear();sampleScheduled.clear();approvedForTrial.clear();customerApproved.clear();approvebyGM.clear();
-        var claims = Utils.parseJwt(prefs.getString("token"));
+         claims = Utils.parseJwt(prefs.getString("token"));
         if(claims["role"]=="General Manager"){
           Network_Operations.getRequestForGM(context, prefs.getString("token")).then((result){
             debugPrint(result.toString());
@@ -172,8 +172,8 @@ class _DashboardState extends ResumableState<Dashboard> {
   @override
   void initState() {
     SharedPreferences.getInstance().then((prefs){
-      var claims = Utils.parseJwt(prefs.getString("token"));
-      if(claims["role"]=="General Manager"||claims["role"]=="Sales Manager"){
+       claims = Utils.parseJwt(prefs.getString("token"));
+      if(claims["role"]=="General Manager"){
         Network_Operations.getRequestForGM(context, prefs.getString("token")).then((result){
           debugPrint(result.toString());
           for(int i=0; i<result.length;i++ ) {
@@ -351,13 +351,18 @@ class _DashboardState extends ResumableState<Dashboard> {
                     },
                   ),
                   Divider(),
-                  ListTile(
-                    title: Text("Trial Products"),
-                    leading: Icon(FontAwesomeIcons.signOutAlt),
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>TrialRequests()));
-                    },
-                  ),
+        claims["role"]=="Client"?Column(
+          children: [
+            ListTile(
+              title: Text("Trial Products"),
+              leading: Icon(FontAwesomeIcons.balanceScale),
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>TrialRequests()));
+              },
+            ),
+            Divider(),
+          ],
+        ):Container(),
                   ListTile(
                     title: Text("Sign Out"),
                     leading: Icon(FontAwesomeIcons.signOutAlt),
