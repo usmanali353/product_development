@@ -34,7 +34,6 @@ class Suitability extends StatefulWidget{
     this.designTopologies);
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _Suitability_State(market,client,event,other,sizesList,surface,thickness,classification,colorsList,technologyId, structureId, edge,range,designTopologies);
   }
 }

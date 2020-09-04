@@ -228,7 +228,7 @@ import '../Dashboard.dart';
         Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
       }else{
         pd.hide();
-        Utils.showError(context, "No Request Found against this Barcode");
+        Utils.showError(context, "No Request Found against this Id");
       }
     }catch(e){
       pd.hide();
@@ -281,6 +281,7 @@ import '../Dashboard.dart';
       if(response.statusCode==200){
         pd.hide();
         Utils.showSuccess(context, "Request Saved Successfully");
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
       }else{
         pd.hide();
         Utils.showError(context, response.statusCode.toString());
@@ -288,5 +289,55 @@ import '../Dashboard.dart';
     }catch(e){
       print(e.toString());
     }
+  }
+  static Future<List<dynamic>> getClients(BuildContext context,String token)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestClientsDropdown",headers: {"Content-Type":"application/json","Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+       var clientsMap= jsonDecode(response.body);
+       List<dynamic> clients=[];
+        for (var entry in clientsMap.entries) {
+          clients.add({
+            "display":entry.value,
+            "value":entry.key
+          });
+        }
+       print(clients);
+      return clients;
+      }else{
+        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+      }
+
+    }catch(e){
+      Utils.showError(context, e.toString());
+      print(e.toString());
+    }
+    return null;
+  }
+  static Future<List<Request>> getTrialRequests(BuildContext context,String token)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+        List<Request> requests=[];
+        for(int i=0;i<jsonDecode(response.body).length;i++){
+          requests.add(Request.fromMap(jsonDecode(response.body)[i]));
+        }
+        return requests;
+      }else{
+        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
   }
 }

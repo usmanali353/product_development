@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/qrcode.dart';
 
@@ -25,7 +26,7 @@ class _DetailPageState extends State<DetailPage>{
         appBar: AppBar(
           title: Text("Request Details"),
           actions: <Widget>[
-            request.statusName=='Approved by Customer'||request.statusName=='Approved Trial'||request.statusName=='Rejected by Customer'||request.statusName=="Rejected Trial"?InkWell(
+            request.statusName=='Approved by Customer'||request.statusName=='Approved Trial'||request.statusName=='Rejected By Customer'||request.statusName=="Rejected Trial"?InkWell(
                child: Padding(
                  padding: const EdgeInsets.all(8.0),
                  child: Center(child: Text("Generate QR Code")),
@@ -75,7 +76,7 @@ class _DetailPageState extends State<DetailPage>{
                             ),
                             ListTile(
                               title: Text("Request Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                              subtitle: Text(request.date??''),
+                              subtitle: Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(request.date))??''),
                             ),
                             Divider(),
                             ListTile(
@@ -115,7 +116,7 @@ class _DetailPageState extends State<DetailPage>{
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Target Start Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  subtitle: Text(request.targetStartDate),
+                                  subtitle: Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(request.targetStartDate))),
                                 ),
                                 Divider(),
                               ],
@@ -124,7 +125,7 @@ class _DetailPageState extends State<DetailPage>{
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Target End Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  subtitle: Text(request.targetEndDate),
+                                  subtitle: Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(request.targetEndDate))),
                                 ),
                                 Divider(),
                               ],
@@ -133,7 +134,7 @@ class _DetailPageState extends State<DetailPage>{
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Actual Start Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  subtitle: Text(request.actualStartDate),
+                                  subtitle: Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(request.actualStartDate))),
                                 ),
                                 Divider(),
                               ],
@@ -142,7 +143,7 @@ class _DetailPageState extends State<DetailPage>{
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Actual End Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  subtitle: Text(request.actualEndDate),
+                                  subtitle: Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(request.actualEndDate))),
                                 ),
                                 Divider(),
                               ],

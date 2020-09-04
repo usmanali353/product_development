@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
+import 'package:productdevelopment/addClientToTrial.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailPage.dart';
 import 'acmcapproval.dart';
@@ -267,7 +269,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                       Padding(
                                         padding: EdgeInsets.only(left: 2, right: 2),
                                       ),
-                                      Text(products[index].date!=null?products[index].date:'')
+                                      Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(products[index].date)))
                                     ],
 
                                   ),
@@ -473,8 +475,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Set"),
       onPressed: () {
         if(selectedPreference=="Approve"){
-            Network_Operations.changeStatusOfRequest(context, token, request.requestId, 5);
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>AddClientToTrial(request.requestId)));
         }else if(selectedPreference=="Reject"){
           Network_Operations.changeStatusOfRequest(context, token, request.requestId, 6);
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);

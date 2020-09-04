@@ -4,6 +4,7 @@ import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/Login.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/scanner.dart';
+import 'package:productdevelopment/trialRequests.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ModelRequests.dart';
 import 'Network_Operations/Network_Operations.dart';
@@ -350,6 +351,13 @@ class _DashboardState extends ResumableState<Dashboard> {
                     },
                   ),
                   Divider(),
+                  ListTile(
+                    title: Text("Trial Products"),
+                    leading: Icon(FontAwesomeIcons.signOutAlt),
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>TrialRequests()));
+                    },
+                  ),
                   ListTile(
                     title: Text("Sign Out"),
                     leading: Icon(FontAwesomeIcons.signOutAlt),
