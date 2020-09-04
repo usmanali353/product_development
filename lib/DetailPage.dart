@@ -63,7 +63,7 @@ class _DetailPageState extends State<DetailPage>{
                         child: ListView(
                           children: <Widget>[
                             Padding(
-                              padding: EdgeInsets.only(top:4,bottom: 4),
+                              padding: EdgeInsets.only(top:10,bottom: 4),
                               child: Center(
                                 child: Text("Request Details", style:
                                 TextStyle(
@@ -129,11 +129,20 @@ class _DetailPageState extends State<DetailPage>{
                                 Divider(),
                               ],
                             ):Container(),
-                            request.trialDate!=null?Column(
+                            request.actualStartDate!=null?Column(
                               children: <Widget>[
                                 ListTile(
-                                  title: Text("Trial Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  subtitle: Text(''),
+                                  title: Text("Actual Start Date",style: TextStyle(fontWeight: FontWeight.bold),),
+                                  subtitle: Text(request.actualStartDate),
+                                ),
+                                Divider(),
+                              ],
+                            ):Container(),
+                            request.actualEndDate!=null?Column(
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text("Actual End Date",style: TextStyle(fontWeight: FontWeight.bold),),
+                                  subtitle: Text(request.actualEndDate),
                                 ),
                                 Divider(),
                               ],

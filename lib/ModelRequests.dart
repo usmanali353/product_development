@@ -7,7 +7,6 @@ import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailPage.dart';
-import 'Observations.dart';
 import 'acmcapproval.dart';
 
 
@@ -85,22 +84,23 @@ class _ModelReState extends ResumableState<ModelRequests>{
               onTap: (){
                 if(isGm&&products[index].statusName=="New Request"){
                   showAlertDialog(context,products[index]);
-                }else if(isSaleManager&&products[index].statusName=="Approved By GM"){
-                  showDatePicker(helpText:"Select Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((startDate){
+                }else if(isSaleManager||isGm&&products[index].statusName=="Approved By GM"){
+                  showDatePicker(helpText:"Select Target Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((startDate){
                     if(startDate!=null){
-                      showDatePicker(helpText:"Select Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((endDate){
+                      showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((endDate){
                         if(endDate!=null){
                           Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null);
                           Network_Operations.changeStatusOfRequest(context, token, products[index].requestId, 4);
+                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
                         }
                       });
                     }
                   });
-                }else if(isGm&&products[index].statusName=="Samples Scheduled"){
+                }else if(isGm&&products[index].statusName=="Samples Scheduled"&&products[index].targetStartDate!=null&&products[index].targetEndDate!=null){
                   showAlertChangeStatus(context,products[index]);
                 }else if (isGm&&(products[index].statusName=="Approved Trial")){
                   showCustomerApprovalDialog(context,products[index]);
-                }else if(isGm&&products[index].statusName=='Approved by Customer'){
+                }else if(isClient&&products[index].statusName=='Approved by Customer'){
 
                 }else {
                   Navigator.push(context, MaterialPageRoute(
@@ -329,11 +329,11 @@ class _ModelReState extends ResumableState<ModelRequests>{
       onPressed: () {
         Navigator.pop(context);
         if(selectedPreference=="Approve") {
-          Network_Operations.approveRequestClient(
-              context, token, request.requestId, 1);
+          Network_Operations.changeStatusOfRequest(context, token, request.requestId, 7);
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
         }else{
-          Network_Operations.approveRequestClient(
-              context, token, request.requestId, 0);
+          Network_Operations.changeStatusOfRequest(context, token, request.requestId, 8);
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
         }
       },
     );
@@ -596,6 +596,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
 
     // show the dialog
     showDialog(
+
       context: context,
       builder: (BuildContext context) {
         return alert;

@@ -1,7 +1,7 @@
 class Request {
   int requestId, marketId, statusId, classificationId, rangeId, technologyId,
       structureId, edgeId, surfaceId;
-  String technicalConcentration, event,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId,classificationName,marketName,technologyName,structureName,edgeName,rangeName,client,targetStartDate,targetEndDate;
+  String technicalConcentration, event,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId,classificationName,marketName,technologyName,structureName,edgeName,rangeName,client,targetStartDate,targetEndDate,actualStartDate,actualEndDate;
   double thickness;
   var image;
   DateTime dateTime;
@@ -72,6 +72,8 @@ class Request {
     map['modelCode']=modelCode;
     map['targetStartDate']=targetStartDate;
     map['targetEndDate']=targetEndDate;
+    map['actualStartDate']=actualStartDate;
+    map['actualEndDate']=actualEndDate;
     return map;
   }
   Request.fromMap(Map<String,dynamic> data){
@@ -115,6 +117,8 @@ class Request {
     modelCode=data["modelCode"];
     targetStartDate=data['targetStartDate'];
     targetEndDate=data['targetEndDate'];
+    actualStartDate=data['actualStartDate'];
+    actualEndDate=data['actualEndDate'];
   }
 
 }

@@ -253,4 +253,40 @@ import '../Dashboard.dart';
     }
     return null;
   }
+  static Future<List<Request>> getRequestByStatus(BuildContext context,String token,int statusId) async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        List<Request> requests=[];
+        for(int i=0;i<jsonDecode(response.body).length;i++){
+          requests.add(Request.fromMap(jsonDecode(response.body)[i]));
+        }
+        return requests;
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static void trialClient(BuildContext context,String token,List<dynamic> clientIds,int requestId)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      final body=jsonEncode({
+       "requestId":requestId,
+        "MultipleClients":clientIds
+      });
+      var response=await http.post(Utils.getBaseUrl()+"Request/RequestClientSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+        Utils.showSuccess(context, "Request Saved Successfully");
+      }else{
+        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      print(e.toString());
+    }
+  }
 }

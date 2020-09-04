@@ -70,6 +70,52 @@ class _DashboardState extends ResumableState<Dashboard> {
               }
             }
           });
+        }else if(claims["role"]=="Sales Manager"){
+          Network_Operations.getRequestByStatus(context, prefs.getString("token"),2).then((result){
+            debugPrint(result.toString());
+            for(int i=0; i<result.length;i++ ) {
+              if (result[i].statusName =="New Request"){
+                setState(() {
+                  newRequest.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Approved By GM"){
+                setState(() {
+                  approvebyGM.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Approved By Customer"){
+                setState(() {
+                  customerApproved.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Approved Trial"){
+                setState(() {
+                  approvedForTrial.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Rejected By Customer"){
+                setState(() {
+                  rejectedbyCustomer.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Rejected By GM"){
+                setState(() {
+                  rejectedbyGM.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Rejected Trial"){
+                setState(() {
+                  rejectedTrial.add(result[i]);
+                });
+              }
+              if (result[i].statusName =="Samples Scheduled"){
+                setState(() {
+                  sampleScheduled.add(result[i]);
+                });
+              }
+            }
+          });
         }else{
           Network_Operations.getRequest(context, prefs.getString("token")).then((result){
             debugPrint(result.toString());
@@ -126,8 +172,54 @@ class _DashboardState extends ResumableState<Dashboard> {
   void initState() {
     SharedPreferences.getInstance().then((prefs){
       var claims = Utils.parseJwt(prefs.getString("token"));
-      if(claims["role"]=="General Manager"){
+      if(claims["role"]=="General Manager"||claims["role"]=="Sales Manager"){
         Network_Operations.getRequestForGM(context, prefs.getString("token")).then((result){
+          debugPrint(result.toString());
+          for(int i=0; i<result.length;i++ ) {
+            if (result[i].statusName =="New Request"){
+              setState(() {
+                newRequest.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Approved By GM"){
+              setState(() {
+                approvebyGM.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Approved By Customer"){
+              setState(() {
+                customerApproved.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Approved Trial"){
+              setState(() {
+                approvedForTrial.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Rejected By Customer"){
+              setState(() {
+                rejectedbyCustomer.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Rejected By GM"){
+              setState(() {
+                rejectedbyGM.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Rejected Trial"){
+              setState(() {
+                rejectedTrial.add(result[i]);
+              });
+            }
+            if (result[i].statusName =="Samples Scheduled"){
+              setState(() {
+                sampleScheduled.add(result[i]);
+              });
+            }
+          }
+        });
+      }else if(claims["role"]=="Sales Manager"){
+        Network_Operations.getRequestByStatus(context, prefs.getString("token"),2).then((result){
           debugPrint(result.toString());
           for(int i=0; i<result.length;i++ ) {
             if (result[i].statusName =="New Request"){
