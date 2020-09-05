@@ -351,7 +351,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                     },
                   ),
                   Divider(),
-        claims["role"]=="Client"?Column(
+       claims!=null&&claims["role"]=="Client"?Column(
           children: [
             ListTile(
               title: Text("Trial Products"),

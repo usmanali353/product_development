@@ -24,14 +24,16 @@ class ModelRequests extends StatefulWidget {
 
 class _ModelReState extends ResumableState<ModelRequests>{
   List<Request> products=[];
+  List<dynamic> colors=[];
+  List<int> colorIds=[];
   var claims;
-  //List<String> status=['All','New Request','Approved by ACMC','Rejected by ACMC','Scheduled for Samples Production','Samples Produced','Approved for Trial','Rejected for Trial','Scheduled for Trial','Approved by Customer','Rejected by Customer','Scheduled for Production'];
   GlobalKey<RefreshIndicatorState> refreshIndicatorKey=GlobalKey();
   var selectedPreference,selectedStatus;
   _ModelReState(this.products);
  bool isGm=false;
  bool isSaleManager= false;
  bool isClient=false;
+ bool isColorsVisible=false;
   String token;
   @override
   void onResume() {
@@ -41,9 +43,20 @@ class _ModelReState extends ResumableState<ModelRequests>{
   }
   @override
   void initState() {
-
     SharedPreferences.getInstance().then((prefs){
       setState(() {
+        Network_Operations.getAll(context, prefs.getString("token"), "Colors").then((colors){
+          setState(() {
+            this.colors=colors;
+            for(int i=0;i<colors.length;i++){
+              colorIds.add(colors[i]['colorId']);
+            }
+            if(colors!=null){
+              isColorsVisible=true;
+            }
+            print(this.colors.toString());
+          });
+        });
         claims=Utils.parseJwt(prefs.getString("token"));
         print(claims);
         token=prefs.getString("token");
@@ -91,9 +104,11 @@ class _ModelReState extends ResumableState<ModelRequests>{
                     if(startDate!=null){
                       showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((endDate){
                         if(endDate!=null){
-                          Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null);
-                          Network_Operations.changeStatusOfRequest(context, token, products[index].requestId, 4);
-                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+                          Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null).then((value){
+                            Network_Operations.changeStatusOfRequest(context, token, products[index].requestId, 4);
+                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+                          });
+                         // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
                         }
                       });
                     }
@@ -144,67 +159,74 @@ class _ModelReState extends ResumableState<ModelRequests>{
                               ),
                             ),
                             //Padding(padding: EdgeInsets.only(top:2),),
-                            Row(
+                            isColorsVisible?Row(
                               children: <Widget>[
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(2),
-                                    color: Colors.orange.shade100,
-                                    //color: Colors.teal,
+                                for(int i=0;i<products[index].multipleColors.length;i++)
+                                  Padding(
+                                    padding: const EdgeInsets.all(2),
+                                    child: Wrap(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(2),
+                                            color: Color(Utils.getColorFromHex(colors[colorIds.indexOf(int.parse(products[index].multipleColors[i]))]['colorCode'])),
+                                            //color: Colors.teal,
+                                          ),
+                                          height: 10,
+                                          width: 15,
+                                        ),
+
+                                      ],
+                                    ),
                                   ),
-                                  height: 10,
-                                  width: 15,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 2, right: 2),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(2),
-                                    color: Colors.grey.shade300,
-                                    //color: Colors.teal,
-                                  ),
-                                  height: 10,
-                                  width: 15,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 2, right: 2),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(2),
-                                    color: Colors.brown.shade200,
-                                    //color: Colors.teal,
-                                  ),
-                                  height: 10,
-                                  width: 15,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 2, right: 2),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(2),
-                                    color: Colors.brown.shade500,
-                                    //color: Colors.teal,
-                                  ),
-                                  height: 10,
-                                  width: 15,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 2, right: 2),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(2),
-                                    color: Colors.orangeAccent.shade100,
-                                    //color: Colors.teal,
-                                  ),
-                                  height: 10,
-                                  width: 15,
-                                ),
+
+                                // Container(
+                                //   decoration: BoxDecoration(
+                                //     borderRadius: BorderRadius.circular(2),
+                                //     color: Colors.grey.shade300,
+                                //     //color: Colors.teal,
+                                //   ),
+                                //   height: 10,
+                                //   width: 15,
+                                // ),
+                                // Padding(
+                                //   padding: EdgeInsets.only(left: 2, right: 2),
+                                // ),
+                                // Container(
+                                //   decoration: BoxDecoration(
+                                //     borderRadius: BorderRadius.circular(2),
+                                //     color: Colors.brown.shade200,
+                                //     //color: Colors.teal,
+                                //   ),
+                                //   height: 10,
+                                //   width: 15,
+                                // ),
+                                // Padding(
+                                //   padding: EdgeInsets.only(left: 2, right: 2),
+                                // ),
+                                // Container(
+                                //   decoration: BoxDecoration(
+                                //     borderRadius: BorderRadius.circular(2),
+                                //     color: Colors.brown.shade500,
+                                //     //color: Colors.teal,
+                                //   ),
+                                //   height: 10,
+                                //   width: 15,
+                                // ),
+                                // Padding(
+                                //   padding: EdgeInsets.only(left: 2, right: 2),
+                                // ),
+                                // Container(
+                                //   decoration: BoxDecoration(
+                                //     borderRadius: BorderRadius.circular(2),
+                                //     color: Colors.orangeAccent.shade100,
+                                //     //color: Colors.teal,
+                                //   ),
+                                //   height: 10,
+                                //   width: 15,
+                                // ),
                               ],
-                            )
+                            ):Container(),
                           ],
                         ),
                         VerticalDivider(color: Colors.grey,),

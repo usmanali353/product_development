@@ -76,63 +76,63 @@ import 'package:shared_preferences/shared_preferences.dart';
                              //Padding(padding: EdgeInsets.only(top:2),),
                              Row(
                                children: <Widget>[
-                                 Container(
-                                   decoration: BoxDecoration(
-                                     borderRadius: BorderRadius.circular(2),
-                                     color: Colors.orange.shade100,
-                                     //color: Colors.teal,
-                                   ),
-                                   height: 10,
-                                   width: 15,
-                                 ),
-                                 Padding(
-                                   padding: EdgeInsets.only(left: 2, right: 2),
-                                 ),
-                                 Container(
-                                   decoration: BoxDecoration(
-                                     borderRadius: BorderRadius.circular(2),
-                                     color: Colors.grey.shade300,
-                                     //color: Colors.teal,
-                                   ),
-                                   height: 10,
-                                   width: 15,
-                                 ),
-                                 Padding(
-                                   padding: EdgeInsets.only(left: 2, right: 2),
-                                 ),
-                                 Container(
-                                   decoration: BoxDecoration(
-                                     borderRadius: BorderRadius.circular(2),
-                                     color: Colors.brown.shade200,
-                                     //color: Colors.teal,
-                                   ),
-                                   height: 10,
-                                   width: 15,
-                                 ),
-                                 Padding(
-                                   padding: EdgeInsets.only(left: 2, right: 2),
-                                 ),
-                                 Container(
-                                   decoration: BoxDecoration(
-                                     borderRadius: BorderRadius.circular(2),
-                                     color: Colors.brown.shade500,
-                                     //color: Colors.teal,
-                                   ),
-                                   height: 10,
-                                   width: 15,
-                                 ),
-                                 Padding(
-                                   padding: EdgeInsets.only(left: 2, right: 2),
-                                 ),
-                                 Container(
-                                   decoration: BoxDecoration(
-                                     borderRadius: BorderRadius.circular(2),
-                                     color: Colors.orangeAccent.shade100,
-                                     //color: Colors.teal,
-                                   ),
-                                   height: 10,
-                                   width: 15,
-                                 ),
+                                 // Container(
+                                 //   decoration: BoxDecoration(
+                                 //     borderRadius: BorderRadius.circular(2),
+                                 //     color: Colors.orange.shade100,
+                                 //     //color: Colors.teal,
+                                 //   ),
+                                 //   height: 10,
+                                 //   width: 15,
+                                 // ),
+                                 // Padding(
+                                 //   padding: EdgeInsets.only(left: 2, right: 2),
+                                 // ),
+                                 // Container(
+                                 //   decoration: BoxDecoration(
+                                 //     borderRadius: BorderRadius.circular(2),
+                                 //     color: Colors.grey.shade300,
+                                 //     //color: Colors.teal,
+                                 //   ),
+                                 //   height: 10,
+                                 //   width: 15,
+                                 // ),
+                                 // Padding(
+                                 //   padding: EdgeInsets.only(left: 2, right: 2),
+                                 // ),
+                                 // Container(
+                                 //   decoration: BoxDecoration(
+                                 //     borderRadius: BorderRadius.circular(2),
+                                 //     color: Colors.brown.shade200,
+                                 //     //color: Colors.teal,
+                                 //   ),
+                                 //   height: 10,
+                                 //   width: 15,
+                                 // ),
+                                 // Padding(
+                                 //   padding: EdgeInsets.only(left: 2, right: 2),
+                                 // ),
+                                 // Container(
+                                 //   decoration: BoxDecoration(
+                                 //     borderRadius: BorderRadius.circular(2),
+                                 //     color: Colors.brown.shade500,
+                                 //     //color: Colors.teal,
+                                 //   ),
+                                 //   height: 10,
+                                 //   width: 15,
+                                 // ),
+                                 // Padding(
+                                 //   padding: EdgeInsets.only(left: 2, right: 2),
+                                 // ),
+                                 // Container(
+                                 //   decoration: BoxDecoration(
+                                 //     borderRadius: BorderRadius.circular(2),
+                                 //     color: Colors.orangeAccent.shade100,
+                                 //     //color: Colors.teal,
+                                 //   ),
+                                 //   height: 10,
+                                 //   width: 15,
+                                 // ),
                                ],
                              )
                            ],
@@ -264,20 +264,22 @@ import 'package:shared_preferences/shared_preferences.dart';
          Navigator.pop(context);
          if(selectedPreference=="Approve"){
            SharedPreferences.getInstance().then((prefs){
-             Network_Operations.approveRequestClient(context, prefs.getString("token"), request.requestId, 1);
-             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+             Network_Operations.approveRequestClient(context, prefs.getString("token"), request.id, 1).then((value){
+               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+             });
            });
            //Network_Operations.approveRequestClient(context, token, request.requestId, 1);
          }else if(selectedPreference=="Reject"){
            SharedPreferences.getInstance().then((prefs){
-             Network_Operations.approveRequestClient(context, prefs.getString("token"), request.requestId, 0);
-             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+             Network_Operations.approveRequestClient(context, prefs.getString("token"), request.id, 0).then((value){
+               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+             });
            });
          }
        },
      );
      AlertDialog alert = AlertDialog(
-       title: Text("Approve/Reject Model for Trials"),
+       title: Text("Approve/Reject Trialed Model"),
        content: StatefulBuilder(
          builder: (context, setState) {
            return Column(

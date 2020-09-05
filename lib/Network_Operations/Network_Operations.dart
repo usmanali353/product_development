@@ -57,7 +57,7 @@ import '../Dashboard.dart';
         List<Dropdown> list=List();
         list.clear();
         for(int i=0;i<data.length;i++){
-          list.add(Dropdown(data[i]["id"],data[i]["name"]));
+          list.add(Dropdown(data[i]["id"],data[i]["name"],data[i]["name"]));
         }
         print(data.toString());
         return list;
@@ -84,7 +84,7 @@ import '../Dashboard.dart';
     }
     return null;
   }
-  static void changeStatusOfRequest(BuildContext context,String token,int requestId,int status) async{
+  static Future<void> changeStatusOfRequest(BuildContext context,String token,int requestId,int status) async{
    // ProgressDialog pd=ProgressDialog(context);
     try {
       var response = await http.get(Utils.getBaseUrl() + "Request/ChangeStatusOfRequest/$requestId?StatusId=$status", headers: {"Authorization": "Bearer " + token});
@@ -141,7 +141,7 @@ import '../Dashboard.dart';
       Utils.showError(context, e.toString());
     }
   }
-  static void approveRequestClient(BuildContext context,String token,int requestId,int approved) async {
+  static Future<void> approveRequestClient(BuildContext context,String token,int requestId,int approved) async {
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
@@ -160,7 +160,7 @@ import '../Dashboard.dart';
       Utils.showError(context, e.toString());
     }
   }
-  static void addDesignersAndObservationToRequest(BuildContext context,int requestId,List<dynamic> designers,String designerObservations,String token,String modelName,String modelCode) async{
+  static Future<void> addDesignersAndObservationToRequest(BuildContext context,int requestId,List<dynamic> designers,String designerObservations,String token,String modelName,String modelCode) async{
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
@@ -187,7 +187,7 @@ import '../Dashboard.dart';
     }
 
   }
-  static void addRequestSchedule(BuildContext context,String token,int requestId,DateTime startDate,DateTime endDate,DateTime actualStartDate,DateTime actualEndDate) async{
+  static Future<void> addRequestSchedule(BuildContext context,String token,int requestId,DateTime startDate,DateTime endDate,DateTime actualStartDate,DateTime actualEndDate) async{
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
@@ -333,6 +333,61 @@ import '../Dashboard.dart';
       }else{
         pd.hide();
         Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static Future<List<dynamic>> getAll(BuildContext context,String token,String endPoint)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"configuration/GetAll$endPoint",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+        return jsonDecode(response.body);
+      }else{
+        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      pd.hide();
+     Utils.showError(context, e.toString());
+    }
+   return null;
+  }
+  static Future<Map<String,dynamic>> getRangeById(BuildContext context,String token,int rangeId)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"configuration/GetRangeById/$rangeId",headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+       return jsonDecode(response.body);
+      }else{
+        pd.hide();
+        Utils.showError(context, "No Range Found against this Id");
+      }
+    }catch(e){
+      pd.hide();
+      print(e.toString());
+    }
+    return null;
+  }
+  static Future<List<Dropdown>> getDesignerDropDowns(BuildContext context,String token,String endpoint)async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Configuration/Get"+endpoint+"Dropdown",headers:{"Authorization":"Bearer "+token});
+      var data= jsonDecode(response.body);
+      if(response.statusCode==200){
+        List<Dropdown> list=List();
+        list.clear();
+        for(int i=0;i<data.length;i++){
+          list.add(Dropdown(data[i]["id"],data[i]["name"],data[i]["stringId"]));
+        }
+        print(data.toString());
+        return list;
       }
     }catch(e){
       print(e);

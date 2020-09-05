@@ -88,7 +88,7 @@ dependencies:
 
   path_provider:
 
-  share: ^0.6.5
+  esys_flutter_share: ^1.0.2
 
 
 dev_dependencies:

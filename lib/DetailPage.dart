@@ -2,7 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/Request.dart';
+import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/qrcode.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class DetailPage extends StatefulWidget {
@@ -16,8 +19,21 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage>{
    Request request;
   _DetailPageState(this.request);
+  var rangeInfo;
+  bool rangeInfoVisible=false;
   @override
   void initState() {
+    SharedPreferences.getInstance().then((prefs){
+      Network_Operations.getRangeById(context, prefs.getString("token"), request.rangeId).then((rangeById){
+        setState(() {
+          this.rangeInfo=rangeById;
+          if(rangeInfo!=null){
+            rangeInfoVisible=true;
+          }
+        });
+      });
+    });
+
     super.initState();
   }
   @override
@@ -204,13 +220,27 @@ class _DetailPageState extends State<DetailPage>{
                               subtitle: Text(request.multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", "")),
                             ),
                             Divider(),
-                            ListTile(
-                              title: Text("Range", style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                              ),),
-                              subtitle: Text(request.rangeName),
-                            ),
-                            Divider(),
+                            rangeInfoVisible?Column(
+
+                              children: [
+                                ListTile(
+                                    title: Text("Range", style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),),
+                                    subtitle: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Image.network(rangeInfo['image'],width: 100,height: 100,),
+                                        ),
+                                        Text(request.rangeName),
+                                      ],
+                                    )
+                                ),
+                                Divider(),
+                              ],
+                            ):Container(),
                             ListTile(
                               title: Text("Material", style: TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -260,6 +290,23 @@ class _DetailPageState extends State<DetailPage>{
                               subtitle: Text(request.multipleSuitabilityNames.toString().replaceAll("[", "").replaceAll("]", "")),
                             ),
                             Divider(),
+                            request.statusName=='Approved By Customer'||request.statusName=='Approved Trial'||request.statusName=='Rejected By Customer'||request.statusName=="Rejected Trial"?Column(
+                              children: [
+                                ListTile(
+                                  title: Text("Qr Code", style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),),
+                                  subtitle: Center(
+                                    child: QrImage(
+                                      data: request.requestId.toString(),
+                                      version: QrVersions.auto,
+                                      size: 100.0,
+                                    ),
+                                  ),
+                                ),
+                                Divider(),
+                              ],
+                            ):Container(),
                           ],
                         ),
                       ),
