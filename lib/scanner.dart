@@ -4,6 +4,7 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:productdevelopment/WebBrowser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class QRScanner extends StatefulWidget{
@@ -58,9 +59,10 @@ class _QRScanner_State extends State<QRScanner>{
       setState(() {
         this.barcode = barcode;
         if(barcode.rawContent!=null){
-          SharedPreferences.getInstance().then((prefs){
-            Network_Operations.getRequestById(context, prefs.getString("token"), int.parse(barcode.rawContent));
-          });
+          // SharedPreferences.getInstance().then((prefs){
+          //   Network_Operations.getRequestById(context, prefs.getString("token"), int.parse(barcode.rawContent));
+          // });
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>WebBrowser(barcode.rawContent)));
 
         }
 

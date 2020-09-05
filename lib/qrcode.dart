@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
-import 'package:esys_flutter_share/esys_flutter_share.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -71,7 +70,6 @@ class _GenerateedQR extends State<GenerateedQrcode> {
              ByteData byteData = await image.toByteData(
                  format: ImageByteFormat.png);
              Uint8List pngBytes = byteData.buffer.asUint8List();
-             await Share.file("Barcode Sharing", "Barcode for Request", pngBytes,'*/*');
            }
          ),
        ],

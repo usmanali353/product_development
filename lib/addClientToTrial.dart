@@ -3,6 +3,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'Model/Dropdown.dart';
 class AddClientToTrial extends StatefulWidget {
   int requestId;
 
@@ -15,16 +17,22 @@ class AddClientToTrial extends StatefulWidget {
 class _AddClientToTrialState extends State<AddClientToTrial> {
   GlobalKey<FormState> fbKey=GlobalKey();
   List myClients;
-  List<dynamic> clients;
+  List<dynamic> clients=[];
   int requestId;
-
+  List<Dropdown> clientsDropdown=[];
   _AddClientToTrialState(this.requestId);
  @override
   void initState() {
    SharedPreferences.getInstance().then((prefs){
-     Network_Operations.getClients(context, prefs.getString("token")).then((clientsDropDown){
+     Network_Operations.getDropDowns(context, prefs.getString("token"),"Clients").then((cli){
        setState(() {
-         this.clients=clientsDropDown;
+         this.clientsDropdown=cli;
+         for(var c in cli){
+           clients.add({
+             "display":c.name,
+              "value":   c.id.toString()
+           });
+         }
        });
      });
    });

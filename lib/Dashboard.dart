@@ -351,18 +351,6 @@ class _DashboardState extends ResumableState<Dashboard> {
                     },
                   ),
                   Divider(),
-       claims!=null&&claims["role"]=="Client"?Column(
-          children: [
-            ListTile(
-              title: Text("Trial Products"),
-              leading: Icon(FontAwesomeIcons.balanceScale),
-              onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context)=>TrialRequests()));
-              },
-            ),
-            Divider(),
-          ],
-        ):Container(),
                   ListTile(
                     title: Text("Sign Out"),
                     leading: Icon(FontAwesomeIcons.signOutAlt),

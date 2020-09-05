@@ -167,7 +167,7 @@ class _acmcApprovalState extends State<acmcApproval> {
                     if(fbKey.currentState.validate()&&formState.currentState.validate()){
                       formState.currentState.save();
                       if(status=='Reject'){
-                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,null,null).then((value){
+                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token," "," ").then((value){
                           Network_Operations.changeStatusOfRequest(context, token, request.requestId, 3);
                         });
                       }else{

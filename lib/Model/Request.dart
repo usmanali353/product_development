@@ -1,11 +1,11 @@
 class Request {
   int requestId, marketId, statusId, classificationId, rangeId, technologyId,
       structureId, edgeId, surfaceId,id;
-  String technicalConcentration, event,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId,classificationName,marketName,technologyName,structureName,edgeName,rangeName,client,targetStartDate,targetEndDate,actualStartDate,actualEndDate,status;
+  String technicalConcentration, event,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId,classificationName,marketName,technologyName,structureName,edgeName,rangeName,client,targetStartDate,targetEndDate,actualStartDate,actualEndDate,status,qrcodeImage;
   double thickness;
   var image;
   DateTime dateTime;
-  List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleColorNames,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames;
+  List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleColorNames,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames;
   Request({
     this.requestId,
     this.marketId,
@@ -76,6 +76,8 @@ class Request {
     map['actualEndDate']=actualEndDate;
     map['status']=status;
     map['id']=id;
+    map['multipleClientNames']=multipleClientNames;
+    map['qrcodeImage']=qrcodeImage;
     return map;
   }
   Request.fromMap(Map<String,dynamic> data){
@@ -123,6 +125,8 @@ class Request {
     actualEndDate=data['actualEndDate'];
     status=data['status'];
     id=data['id'];
+    multipleClientNames=data['multipleClientNames'];
+    qrcodeImage=data['qrcodeImage'];
   }
 
 }

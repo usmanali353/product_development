@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/qrcode.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -41,17 +40,6 @@ class _DetailPageState extends State<DetailPage>{
     return Scaffold(
         appBar: AppBar(
           title: Text("Request Details"),
-          actions: <Widget>[
-            request.statusName=='Approved by Customer'||request.statusName=='Approved Trial'||request.statusName=='Rejected By Customer'||request.statusName=="Rejected Trial"?InkWell(
-               child: Padding(
-                 padding: const EdgeInsets.all(8.0),
-                 child: Center(child: Text("Generate QR Code")),
-               ),
-              onTap: (){
-                 Navigator.push(context, MaterialPageRoute(builder: (context)=>GenerateedQrcode(request.requestId)));
-              },
-            ):Container(),
-          ],
         ),
         body: Stack(
           children: <Widget>[
@@ -160,6 +148,15 @@ class _DetailPageState extends State<DetailPage>{
                                 ListTile(
                                   title: Text("Actual End Date",style: TextStyle(fontWeight: FontWeight.bold),),
                                   subtitle: Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(request.actualEndDate))),
+                                ),
+                                Divider(),
+                              ],
+                            ):Container(),
+                            request.multipleClientNames!=null?Column(
+                              children: <Widget>[
+                                ListTile(
+                                  title: Text("Clients",style: TextStyle(fontWeight: FontWeight.bold),),
+                                  subtitle: Text(request.multipleClientNames.toString().replaceAll("[", "").replaceAll("]", "")),
                                 ),
                                 Divider(),
                               ],
@@ -290,18 +287,14 @@ class _DetailPageState extends State<DetailPage>{
                               subtitle: Text(request.multipleSuitabilityNames.toString().replaceAll("[", "").replaceAll("]", "")),
                             ),
                             Divider(),
-                            request.statusName=='Approved By Customer'||request.statusName=='Approved Trial'||request.statusName=='Rejected By Customer'||request.statusName=="Rejected Trial"?Column(
+                            request.statusName=='Approved By Customer'||request.statusName=='Approved Trial'||request.statusName=='Rejected By Customer'||request.statusName=="Rejected Trial"&&request.qrcodeImage!=null?Column(
                               children: [
                                 ListTile(
                                   title: Text("Qr Code", style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),),
                                   subtitle: Center(
-                                    child: QrImage(
-                                      data: request.requestId.toString(),
-                                      version: QrVersions.auto,
-                                      size: 100.0,
-                                    ),
+                                    child: Image.network(request.qrcodeImage!=null?request.qrcodeImage:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",width: 100,height: 100,)
                                   ),
                                 ),
                                 Divider(),
