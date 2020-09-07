@@ -1,9 +1,13 @@
 import 'dart:convert';
-
+import 'dart:io';
+import 'dart:math';
+import 'package:http/http.dart' as http;
 import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Utils{
@@ -84,5 +88,32 @@ class Utils{
       hexColor = "FF" + hexColor;
     }
     return int.parse(hexColor, radix: 16);
+  }
+ static Future<File> urlToFile(BuildContext context,String imageUrl) async {
+ProgressDialog pd=ProgressDialog(context);
+pd.show();
+try{
+  var rng = new Random();
+
+  Directory tempDir = await getTemporaryDirectory();
+
+  String tempPath = tempDir.path;
+
+  File file = new File('$tempPath'+ (rng.nextInt(10000)).toString() +'.png');
+
+  http.Response response = await http.get(imageUrl);
+  if(response.statusCode==200){
+    pd.hide();
+    await file.writeAsBytes(response.bodyBytes);
+  }else{
+    pd.hide();
+    Utils.showError(context, response.statusCode.toString());
+  }
+  return file;
+}catch(e){
+  pd.hide();
+  print(e.toString());
+}
+   return null;
   }
 }

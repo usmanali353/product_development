@@ -59,11 +59,11 @@ class _QRScanner_State extends State<QRScanner>{
       setState(() {
         this.barcode = barcode;
         if(barcode.rawContent!=null){
-          // SharedPreferences.getInstance().then((prefs){
-          //   Network_Operations.getRequestById(context, prefs.getString("token"), int.parse(barcode.rawContent));
-          // });
-          Navigator.push(context, MaterialPageRoute(builder: (context)=>WebBrowser(barcode.rawContent)));
-
+          SharedPreferences.getInstance().then((prefs){
+            print(barcode.rawContent.split("?")[1].replaceAll("RequestId=", ""));
+            Network_Operations.getRequestById(context, prefs.getString("token"), int.parse( barcode.rawContent.split("?")[1].replaceAll("RequestId=", "")));
+          });
+        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>WebBrowser(barcode.rawContent)));
         }
 
       });

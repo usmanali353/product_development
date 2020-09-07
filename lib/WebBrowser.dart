@@ -49,6 +49,7 @@ class _WebBrowserState extends State<WebBrowser> {
         body: SafeArea(
 
           child:  WebView(
+            userAgent: "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0",
 
             initialUrl: url,
 

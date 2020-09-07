@@ -10,6 +10,7 @@ import 'package:productdevelopment/addClientToTrial.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailPage.dart';
 import 'acmcapproval.dart';
+import 'trialRequests.dart';
 
 
 class ModelRequests extends StatefulWidget {
@@ -112,7 +113,8 @@ class _ModelReState extends ResumableState<ModelRequests>{
                 }else if(isGm&&products[index].statusName=="Samples Scheduled"){
                   showAlertChangeStatus(context,products[index]);
                 }else if(products[index].statusName=="Approved Trial"){
-                  showCustomerApprovalDialog(context, products[index]);
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>TrialRequests(products[index].requestId)));
+                 // showCustomerApprovalDialog(context, products[index]);
                 }else {
                   Navigator.push(context, MaterialPageRoute(
                       builder: (context) => DetailPage(products[index])));

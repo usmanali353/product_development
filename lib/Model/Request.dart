@@ -1,7 +1,7 @@
 class Request {
   int requestId, marketId, statusId, classificationId, rangeId, technologyId,
       structureId, edgeId, surfaceId,id;
-  String technicalConcentration, event,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId,classificationName,marketName,technologyName,structureName,edgeName,rangeName,client,targetStartDate,targetEndDate,actualStartDate,actualEndDate,status,qrcodeImage;
+  String technicalConcentration, event,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId,classificationName,marketName,technologyName,structureName,edgeName,rangeName,client,targetStartDate,targetEndDate,actualStartDate,actualEndDate,status,qrcodeImage,clientName;
   double thickness;
   var image;
   DateTime dateTime;
@@ -78,6 +78,7 @@ class Request {
     map['id']=id;
     map['multipleClientNames']=multipleClientNames;
     map['qrcodeImage']=qrcodeImage;
+    map['clientName']=clientName;
     return map;
   }
   Request.fromMap(Map<String,dynamic> data){
@@ -127,6 +128,7 @@ class Request {
     id=data['id'];
     multipleClientNames=data['multipleClientNames'];
     qrcodeImage=data['qrcodeImage'];
+    clientName=data['clientName'];
   }
 
 }

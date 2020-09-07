@@ -6,19 +6,26 @@ import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
  class TrialRequests extends StatefulWidget {
+int requestId;
 
-   @override
-   _TrialRequestsState createState() => _TrialRequestsState();
+TrialRequests(this.requestId);
+
+  @override
+   _TrialRequestsState createState() => _TrialRequestsState(requestId);
  }
 
  class _TrialRequestsState extends State<TrialRequests> {
    List<Request> requests;
    bool isVisible=false;
    var selectedPreference;
-   @override
+   int requestId;
+
+   _TrialRequestsState(this.requestId);
+
+  @override
   void initState() {
      SharedPreferences.getInstance().then((prefs){
-       Network_Operations.getTrialRequests(context, prefs.getString("token")).then((trialRequests){
+       Network_Operations.getTrialRequests(context, prefs.getString("token"),requestId).then((trialRequests){
          setState(() {
            this.requests=trialRequests;
            if(requests!=null){
@@ -173,13 +180,13 @@ import 'package:shared_preferences/shared_preferences.dart';
                                    Row(
                                      children: <Widget>[
                                        Icon(
-                                         Icons.zoom_out_map,
+                                         Icons.person,
                                          color: Colors.teal,
                                        ),
                                        Padding(
                                          padding: EdgeInsets.only(left: 2, right: 2),
                                        ),
-                                       Text(requests[index].multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", "")),
+                                       Text(requests[index].clientName),
                                      ],
 
 

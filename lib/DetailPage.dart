@@ -9,6 +9,7 @@ import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:productdevelopment/qrcode.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -316,7 +317,9 @@ class _DetailPageState extends State<DetailPage>{
                                         children: [
                                           MaterialButton(
                                             onPressed: (){
-                                              Share.share("Qr Code for "+request.modelName+" "+request.qrcodeImage);
+                                              Utils.urlToFile(context,request.qrcodeImage).then((file){
+                                                Share.shareFiles([file.path], text: 'Qr Code for Model '+request.modelName);
+                                              });
                                             },
                                             child: Text("Share",style: TextStyle(color: Colors.white),),
                                             color: Color(0xFF004c4c),

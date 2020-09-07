@@ -225,7 +225,7 @@ import '../Dashboard.dart';
         pd.hide();
         Request request;
         request=Request.fromMap(jsonDecode(response.body));
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
       }else{
         pd.hide();
         Utils.showError(context, "No Request Found against this Id");
@@ -318,11 +318,11 @@ import '../Dashboard.dart';
     }
     return null;
   }
-  static Future<List<Request>> getTrialRequests(BuildContext context,String token)async{
+  static Future<List<Request>> getTrialRequests(BuildContext context,String token,int requestId)async{
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.hide();
         List<Request> requests=[];
