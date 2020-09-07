@@ -18,9 +18,9 @@
 
         android:name="io.flutter.app.FlutterApplication"
 
-        android:label="productdevelopment"
+        android:label="ACMC Products"
 
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@drawable/arabianceramics">
 
         <activity
 

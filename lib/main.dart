@@ -44,7 +44,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Product Development',
+      title: 'ACMC Products',
       theme: ThemeData(
         primarySwatch: myColor,
         brightness: Brightness.light,
