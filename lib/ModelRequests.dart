@@ -62,7 +62,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
         print(claims);
         token=prefs.getString("token");
       });
-    if(claims['role']=='General Manager'){
+    if(claims['role'].contains('General Manager')){
       setState(() {
         isGm = true;
       });

@@ -3,6 +3,7 @@ import 'package:productdevelopment/Login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Dashboard.dart';
+import 'Utils/Utils.dart';
 void main() {
   runApp(MyApp());
 }
@@ -19,9 +20,12 @@ class _MyAppState extends State<MyApp> {
     myColor = MaterialColor(0xFF004c4c, color);
     SharedPreferences.getInstance().then((prefs){
       if(prefs.getString("token")!=null){
-        setState(() {
-          isLogin=true;
-        });
+        var claims=Utils.parseJwt(prefs.getString("token"));
+        if(DateTime.fromMillisecondsSinceEpoch(int.parse(claims['exp'].toString()+"000")).isAfter(DateTime.now())){
+          setState(() {
+            isLogin=true;
+          });
+        }
       }
     });
     super.initState();

@@ -25,7 +25,8 @@ class _DashboardState extends ResumableState<Dashboard> {
         print(prefs.getString("token"));
         newRequest.clear();rejectedbyCustomer.clear();rejectedbyGM.clear();rejectedTrial.clear();sampleScheduled.clear();approvedForTrial.clear();customerApproved.clear();approvebyGM.clear();
          claims = Utils.parseJwt(prefs.getString("token"));
-        if(claims["role"]=="General Manager"){
+
+        if(claims["role"].contains("General Manager")){
           Network_Operations.getRequestForGM(context, prefs.getString("token")).then((result){
             debugPrint(result.toString());
             for(int i=0; i<result.length;i++ ) {
@@ -173,7 +174,7 @@ class _DashboardState extends ResumableState<Dashboard> {
   void initState() {
     SharedPreferences.getInstance().then((prefs){
        claims = Utils.parseJwt(prefs.getString("token"));
-      if(claims["role"]=="General Manager"){
+      if(claims["role"].contains("General Manager")){
         Network_Operations.getRequestForGM(context, prefs.getString("token")).then((result){
           debugPrint(result.toString());
           for(int i=0; i<result.length;i++ ) {
