@@ -50,7 +50,6 @@ class _MyAppState extends State<MyApp> {
         brightness: Brightness.light,
       ),
       home: isLogin?Dashboard():Login(),
-
     );
   }
 

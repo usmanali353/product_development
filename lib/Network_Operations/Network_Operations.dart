@@ -202,9 +202,9 @@ import '../Dashboard.dart';
       if(response.statusCode==200){
         pd.hide();
         Utils.showSuccess(context, response.body.toString());
-        //changeStatusOfRequest(context, token, requestId, status)
-        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
-
+        changeStatusOfRequest(context, token, requestId, 4).then((value){
+          Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+        });
       }else{
         pd.hide();
         Utils.showError(context, response.body.toString());

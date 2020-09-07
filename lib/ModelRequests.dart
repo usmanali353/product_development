@@ -104,18 +104,15 @@ class _ModelReState extends ResumableState<ModelRequests>{
                     if(startDate!=null){
                       showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((endDate){
                         if(endDate!=null){
-                          Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null).then((value){
-                            Network_Operations.changeStatusOfRequest(context, token, products[index].requestId, 4).then((value){
-                              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
-                            });
-                          });
-                         // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+                          Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null);
                         }
                       });
                     }
                   });
-                }else if(isGm&&products[index].statusName=="Samples Scheduled"&&products[index].targetStartDate!=null&&products[index].targetEndDate!=null){
+                }else if(isGm&&products[index].statusName=="Samples Scheduled"){
                   showAlertChangeStatus(context,products[index]);
+                }else if(products[index].statusName=="Approved Trial"){
+                  showCustomerApprovalDialog(context, products[index]);
                 }else {
                   Navigator.push(context, MaterialPageRoute(
                       builder: (context) => DetailPage(products[index])));
@@ -347,14 +344,16 @@ class _ModelReState extends ResumableState<ModelRequests>{
     Widget approveRejectButton = FlatButton(
       child: Text("Set"),
       onPressed: () {
-        Navigator.pop(context);
         if(selectedPreference=="Approve") {
+          Navigator.pop(context);
           Network_Operations.changeStatusOfRequest(context, token, request.requestId, 7).then((value){
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+            Navigator.pop(context,"Refresh");
+            Navigator.pop(context,"Refresh");
           });
         }else{
           Network_Operations.changeStatusOfRequest(context, token, request.requestId, 8).then((value){
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+            Navigator.pop(context,"Refresh");
+            Navigator.pop(context,"Refresh");
           });
         }
       },

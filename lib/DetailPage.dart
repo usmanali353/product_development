@@ -1,9 +1,16 @@
+import 'dart:typed_data';
+import 'dart:ui';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/qrcode.dart';
+import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -19,7 +26,9 @@ class _DetailPageState extends State<DetailPage>{
    Request request;
   _DetailPageState(this.request);
   var rangeInfo;
+   GlobalKey globalKey = new GlobalKey();
   bool rangeInfoVisible=false;
+   final doc = pw.Document();
   @override
   void initState() {
     SharedPreferences.getInstance().then((prefs){
@@ -293,9 +302,49 @@ class _DetailPageState extends State<DetailPage>{
                                   title: Text("Qr Code", style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),),
-                                  subtitle: Center(
-                                    child: Image.network(request.qrcodeImage!=null?request.qrcodeImage:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",width: 100,height: 100,)
-                                  ),
+                                  subtitle:Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children:[
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: RepaintBoundary(
+                                          key: globalKey,
+                                            child: Image.network(request.qrcodeImage!=null?request.qrcodeImage:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",width: 100,height: 100,)
+                                        ),
+                                      ),
+                                      Column(
+                                        children: [
+                                          MaterialButton(
+                                            onPressed: (){
+                                              Share.share("Qr Code for "+request.modelName+" "+request.qrcodeImage);
+                                            },
+                                            child: Text("Share",style: TextStyle(color: Colors.white),),
+                                            color: Color(0xFF004c4c),
+                                          ),
+                                          MaterialButton(
+                                            onPressed: ()async{
+                                              RenderRepaintBoundary boundary = globalKey.currentContext.findRenderObject();
+                                              var image = await boundary.toImage();
+                                              ByteData byteData = await image.toByteData(format: ImageByteFormat.png);
+                                              Uint8List pngBytes = byteData.buffer.asUint8List();
+                                              final PdfImage img = await pdfImageFromImageProvider(pdf: doc.document, image: MemoryImage(pngBytes));
+                                              doc.addPage(pw.Page(
+                                                  build: (pw.Context context) {
+                                                    return pw.Center(
+                                                      child: pw.Image(img),
+                                                    ); // Center
+                                                  })); // Pa
+                                              await Printing.layoutPdf(
+                                                  onLayout: (PdfPageFormat format) async => doc.save());
+                                            },
+                                            child: Text("Print",style: TextStyle(color: Colors.white),),
+                                            color: Color(0xFF004c4c),
+                                          ),
+                                        ],
+                                      )
+
+                                    ]
+                                  )
                                 ),
                                 Divider(),
                               ],
