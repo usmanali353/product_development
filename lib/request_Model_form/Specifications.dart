@@ -9,10 +9,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Specifications extends StatefulWidget {
   var market,clientId,event,other;
 
-  Specifications(this.market, this.clientId, this.event, this.other);
+  Specifications(this.market, this.clientId, this.event);
 
   @override
-  _SpecificationsState createState() => _SpecificationsState(market,clientId,event,other);
+  _SpecificationsState createState() => _SpecificationsState(market,clientId,event);
 }
 
 class _SpecificationsState extends ResumableState<Specifications> {
@@ -26,7 +26,7 @@ class _SpecificationsState extends ResumableState<Specifications> {
 
   String selected_product_name, selected_surface, selected_size,selected_classification;
   int product_name_id, surface_id, size_id,classification_id;
-  _SpecificationsState(this.market, this.clientId, this.event, this.other);
+  _SpecificationsState(this.market, this.clientId, this.event);
   List _myActivities,selectedSizes;
   String _myActivitiesResult;
   final formKey = new GlobalKey<FormState>();
@@ -152,22 +152,6 @@ class _SpecificationsState extends ResumableState<Specifications> {
                             surfaceVisible=true;
                             this.selected_classification=value;
                             this.classification_id=classifications[classificationName.indexOf(value)].id;
-//                            if(selected_classification=="Floor Tiles"||selected_classification=="Wall Tiles"){
-//                              if(surface.length>0){
-//                                surface.clear();
-//                              }
-//                              surface.add("Glossy");
-//                              surface.add("Mate");
-//                              surface.add("Outdoor");
-//                              surface.add("Plain");
-//                              surface.add("Structured");
-//                            }else if(selected_classification=='Floor Decor'||selected_classification=="Wall Decor"){
-//                              if(surface.length>0){
-//                                surface.clear();
-//                              }
-//                              surface.add("Mate");
-//                              surface.add("Glossy");
-//                            }
                           });
                         },
                       ),
@@ -203,115 +187,6 @@ class _SpecificationsState extends ResumableState<Specifications> {
                             setState(() {
                               this.selected_surface=value;
                               this.surface_id=surface[surfaceName.indexOf(value)].id;
-//                            if(selected_surface=="Mate"&&selected_classification=='Floor Tiles'){
-//                              if(size.length>0){
-//                                selected_size=null;
-//                                size.clear();
-//                              }
-//                              size.add(
-//                                {"display":"32 x 32","value":"32 x 32"}
-//                              );
-//                            }else if(selected_surface=="Mate"&&selected_classification=='Floor Decor'){
-//                              if(size.length>0){
-//                                selected_size=null;
-//                                size.clear();
-//                              }
-//                              size.add(
-//                                  {"display":"32 x 32","value":"32 x 32"}
-//                              );
-//                            }else if(selected_surface=="Mate"&&selected_classification=='Wall Tiles'){
-//                              if(size.length>0){
-//                                selected_size=null;
-//                                size.clear();
-//                              } size.add(
-//                                  {"display":"25 x 40","value":"25 x 40"}
-//                              );
-//                            }else if(selected_surface=="Mate"&&selected_classification=='Wall Decor'){
-//                              if(size.length>0){
-//                                selected_size=null;
-//                                size.clear();
-//                              }
-//                              size.add(
-//                                  {"display":"25 x 40","value":"25 x 40"}
-//                              );
-//                            }else if(selected_surface=="Glossy"&&selected_classification=='Floor Tiles'){
-//                              if(size.length>0){
-//                                selected_size=null;
-//                                size.clear();
-//                              }
-//                              size.add(
-//                                  {"display":"45 x 45","value":"45 x 45"},
-//                              );
-//                              size.add(
-//                                  {"display":"60 x 60","value":"60 x 60"}
-//                              );
-
-//                            }else if(selected_surface=="Glossy"&&selected_classification=='Floor Decor'){
-//                              if(size.length>0){
-//                                selected_size=null;
-//                                size.clear();
-//                              }
-//                              size.add(
-//                                  {"display":"45 x 45","value":"45 x 45"},
-//                              );
-//                            }else if(selected_surface=="Glossy"&&selected_classification=='Wall Tiles'){
-//                              if(size.length>0){
-//                                selected_size=null;
-//                                size.clear();
-//                              }
-//                              size.add(
-//                                  {"display":"25 x 50","value":"25 x 50"},
-//                              );
-//                            }else if(selected_surface=="Glossy"&&selected_classification=='Wall Decor'){
-//                              if(size.length>0){
-//                                selected_size=null;
-//                                size.clear();
-//                              }
-//                              size.add('25 x 50');
-//                            }else if(selected_surface=="Plain"&&selected_classification=='Floor Tiles'){
-//                              if(size.length>0){
-//                                selected_size=null;
-//                                size.clear();
-//                              }
-//                              size.add(
-//                                  {"display":"32 x 32","value":"32 x 32"},
-//                              );
-//                            }else if(selected_surface=="Plain"&&selected_classification=='Wall Tiles'){
-//                              if(size.length>0){
-//                                selected_size=null;
-//                                size.clear();
-//                              }
-//                              size.add(
-//                                  {"display":"25 x 40","value":"25 x 40"},
-//                              );
-//                            }else if(selected_surface=="Structured"&&selected_classification=='Floor Tiles'){
-//                              if(size.length>0){
-//                                selected_size=null;
-//                                size.clear();
-//                              }
-//                              size.add(
-//                                  {"display":"45 x 45","value":"45 x 45"},
-//                              );
-//                              size.add(
-//                                  {"display":"60 x 60","value":"60 x 60"},
-//                              );
-//                            }else  if(selected_surface=="Structured"&&selected_classification=='Wall Tiles'){
-//                              if(size.length>0){
-//                                selected_size=null;
-//                                size.clear();
-//                              }
-//                              size.add(
-//                                  {"display":"25 x 50","value":"25 x 50"},
-//                              );
-//                            }else  if(selected_surface=="Outdoor"&&selected_classification=='Floor Tiles'){
-//                              if(size.length>0){
-//                                selected_size=null;
-//                                size.clear();
-//                              }
-//                              size.add(
-//                                  {"display":"60 x 60","value":"60 x 60"}
-//                              );
-
                                });
                             }
                       ),
@@ -423,7 +298,7 @@ class _SpecificationsState extends ResumableState<Specifications> {
                           setState(() {
                             _myActivitiesResult = _myActivities.toString();
                           });
-                          push(context, MaterialPageRoute(builder: (context)=>designTopology(market,clientId,event,other,selectedSizes,surface_id,thickness.text,classification_id,_myActivities)));
+                          push(context, MaterialPageRoute(builder: (context)=>designTopology(market,clientId,event,selectedSizes,surface_id,thickness.text,classification_id,_myActivities)));
                         }
                       },
                     ),

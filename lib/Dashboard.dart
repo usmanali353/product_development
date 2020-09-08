@@ -174,6 +174,7 @@ class _DashboardState extends ResumableState<Dashboard> {
   void initState() {
     SharedPreferences.getInstance().then((prefs){
        claims = Utils.parseJwt(prefs.getString("token"));
+       Network_Operations.getRequestCount(context, prefs.getString("token"));
       if(claims["role"].contains("General Manager")){
         Network_Operations.getRequestForGM(context, prefs.getString("token")).then((result){
           debugPrint(result.toString());
@@ -313,9 +314,6 @@ class _DashboardState extends ResumableState<Dashboard> {
           }
         });
       }
-
-
-
     });
     super.initState();
   }

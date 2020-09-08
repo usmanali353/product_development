@@ -31,9 +31,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
   GlobalKey<RefreshIndicatorState> refreshIndicatorKey=GlobalKey();
   var selectedPreference,selectedStatus;
   _ModelReState(this.products);
- bool isGm=false;
- bool isSaleManager= false;
- bool isClient=false;
+ bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge,isMarketingManager=false,isProductManager=false;
  bool isColorsVisible=false;
   String token;
   @override
@@ -62,17 +60,32 @@ class _ModelReState extends ResumableState<ModelRequests>{
         print(claims);
         token=prefs.getString("token");
       });
+      //Checking Roles
     if(claims['role'].contains('General Manager')){
       setState(() {
         isGm = true;
       });
-    }
-   else if(claims['role']=='Sales Manager'){
+    } else if(claims['role'].contains('Sales Manager')){
       setState(() {
         isSaleManager = true;
       });
-    }
-   else{
+    }else if(claims['role'].contains('Designer')){
+      setState(() {
+        isFDesigner=true;
+      });
+    }else if(claims['role'].contains('Lab Incharge')){
+      setState(() {
+        isLabIncharge=true;
+      });
+    }else if(claims['role'].contains('Marketing Manager')){
+       setState(() {
+         isMarketingManager=false;
+       });
+    }else if(claims['role'].contains('Product Manager')){
+       setState(() {
+         isProductManager=false;
+       });
+    }else{
     setState(() {
       isClient=true;
     });
@@ -101,9 +114,9 @@ class _ModelReState extends ResumableState<ModelRequests>{
                 if(isGm&&products[index].statusName=="New Request"){
                   showAlertDialog(context,products[index]);
                 }else if(isSaleManager||isGm&&products[index].statusName=="Approved By GM"){
-                  showDatePicker(helpText:"Select Target Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((startDate){
+                  showDatePicker(helpText:"Select Target Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((startDate){
                     if(startDate!=null){
-                      showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 60))).then((endDate){
+                      showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((endDate){
                         if(endDate!=null){
                           Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null);
                         }

@@ -11,11 +11,11 @@ class designTopology extends StatefulWidget {
   var market,clientId,event,other,size,surfaceId,thickness,classification,color;
   List<dynamic> sizesList=[],colorsList=[];
 
-  designTopology(this.market, this.clientId, this.event, this.other, this.sizesList,
+  designTopology(this.market, this.clientId, this.event, this.sizesList,
       this.surfaceId, this.thickness, this.classification, this.colorsList);
 
   @override
-  _designTopologyState createState() => _designTopologyState(market,clientId,event,other,sizesList,surfaceId,thickness,classification,colorsList);
+  _designTopologyState createState() => _designTopologyState(market,clientId,event,sizesList,surfaceId,thickness,classification,colorsList);
 }
 
 class _designTopologyState extends ResumableState<designTopology> {
@@ -34,7 +34,6 @@ int range_id, material_id,technology_id, structure_id, edge_id;
       this.market,
       this.clientId,
       this.event,
-      this.other,
       this.sizesList,
       this.surfaceId,
       this.thickness,
@@ -328,7 +327,6 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                               market,
                               clientId,
                               event,
-                              other,
                               sizesList,
                               surfaceId,
                               thickness,

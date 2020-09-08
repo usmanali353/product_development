@@ -395,4 +395,23 @@ import '../Dashboard.dart';
     }
     return null;
   }
+  static Future<Map<String,dynamic>> getRequestCount(BuildContext context,String token)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestsCountForDashboard",headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        pd.hide();
+        print(response.body.toString());
+        return jsonDecode(response.body);
+      }else{
+        pd.hide();
+        Utils.showError(context, response.body.toString());
+      }
+    }catch(e){
+      pd.hide();
+      Utils.showError(context, e.toString());
+    }
+   return null;
+  }
 }

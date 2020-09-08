@@ -10,10 +10,8 @@ import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
-import 'package:productdevelopment/qrcode.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 class DetailPage extends StatefulWidget {
  Request request;
@@ -68,8 +66,6 @@ class _DetailPageState extends State<DetailPage>{
               padding: const EdgeInsets.only(top: 150, bottom: 10),
               child: Center(
                 child: new Container(
-                  //height: MediaQuery.of(context).size.height * 0.65,
-                  //width: ,
                   child: new Card(
 
                     elevation: 6.0,

@@ -89,7 +89,7 @@ class Utils{
     }
     return int.parse(hexColor, radix: 16);
   }
- static Future<File> urlToFile(BuildContext context,String imageUrl) async {
+  static Future<File> urlToFile(BuildContext context,String imageUrl) async {
 ProgressDialog pd=ProgressDialog(context);
 pd.show();
 try{

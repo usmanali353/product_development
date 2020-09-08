@@ -15,13 +15,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Suitability extends StatefulWidget{
 
-  var market,client,event,other,size,surface,thickness,classification,color,technologyId,structureId, edge,range,material;
+  var market,client,event,size,surface,thickness,classification,color,technologyId,structureId, edge,range,material;
   List<dynamic> designTopologies=[],sizesList=[],colorsList=[];
   Suitability(
     this.market,
     this.client,
     this.event,
-    this.other,
     this.sizesList,
     this.surface,
     this.thickness,
@@ -34,7 +33,7 @@ class Suitability extends StatefulWidget{
     this.designTopologies);
   @override
   State<StatefulWidget> createState() {
-    return _Suitability_State(market,client,event,other,sizesList,surface,thickness,classification,colorsList,technologyId, structureId, edge,range,designTopologies);
+    return _Suitability_State(market,client,event,sizesList,surface,thickness,classification,colorsList,technologyId, structureId, edge,range,designTopologies);
   }
 }
 
@@ -80,7 +79,6 @@ class _Suitability_State extends ResumableState<Suitability> {
       this.market,
       this.client,
       this.event,
-      this.other,
       this.sizesList,
       this.surface,
       this.thickness,

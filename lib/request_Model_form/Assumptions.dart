@@ -24,7 +24,7 @@ class Assumptions extends StatefulWidget {
 
 class _AssumptionsState extends ResumableState<Assumptions> {
 
-  TextEditingController event,client,other;
+  TextEditingController event;
 
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey();
 
@@ -59,10 +59,6 @@ class _AssumptionsState extends ResumableState<Assumptions> {
   void initState() {
 
     event=TextEditingController();
-
-    client=TextEditingController();
-
-    other=TextEditingController();
 
     SharedPreferences.getInstance().then((prefs){
 
@@ -301,108 +297,29 @@ class _AssumptionsState extends ResumableState<Assumptions> {
                   ),
                 ),
 
-                // Client TextBox
-
-                Visibility(
-
-                  visible: selectedClient=="Other",
-
-                  child: Padding(
-
-                    padding: EdgeInsets.only(top: 16,left: 16,right: 16),
-
-                    child: Card(
-
-                      elevation: 10,
-
-                      shape: RoundedRectangleBorder(
-
-                        borderRadius: BorderRadius.circular(15),
-
-                      ),
-
-                      child: FormBuilderTextField(
-
-                        controller: client,
-
-                        attribute: "Client",
-
-                        validators: [FormBuilderValidators.required()],
-
-                        decoration: InputDecoration(hintText: "Client",
-
-                          border: InputBorder.none,
-
-                          contentPadding: EdgeInsets.all(16),
-
-                        ),
-
-                      ),
-
-                    ),
-
-                  ),
-
-                ),
-
-                //Other TextBox
-
                 Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Center(
 
-                  padding: EdgeInsets.only(top: 16,left: 16,right: 16,bottom: 16),
+                    child: MaterialButton(
 
-                  child: Card(
+                      child: Text("Proceed",style: TextStyle(color: Colors.white),),
 
-                    elevation: 10,
+                      color: Color(0xFF004c4c),
 
-                    shape: RoundedRectangleBorder(
+                      onPressed: (){
 
-                      borderRadius: BorderRadius.circular(15),
+                        if(_fbKey.currentState.validate()){
 
-                    ),
+                          push(context, MaterialPageRoute(builder: (context)=>Specifications(marketId,selectedClient,event.text)));
 
-                    child: FormBuilderTextField(
+                        }
 
-                      controller: other,
-
-                      attribute: "Other",
-
-                      validators: [FormBuilderValidators.required()],
-
-                      decoration: InputDecoration(hintText: "Other",
-
-                        border: InputBorder.none,
-
-                        contentPadding: EdgeInsets.all(16),
-
-                      ),
+                      },
 
                     ),
 
                   ),
-
-                ),
-
-                Center(
-
-                  child: MaterialButton(
-
-                    child: Text("Proceed",style: TextStyle(color: Colors.white),),
-
-                    color: Color(0xFF004c4c),
-
-                    onPressed: (){
-
-                      if(_fbKey.currentState.validate()){
-
-                        push(context, MaterialPageRoute(builder: (context)=>Specifications(marketId,selectedClient=="Other"?client.text:clientId,event.text,other.text)));
-
-                      }
-
-                    },
-
-                  ),
-
                 ),
 
               ],
