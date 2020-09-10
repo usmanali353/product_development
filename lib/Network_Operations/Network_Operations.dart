@@ -5,9 +5,11 @@ import 'package:productdevelopment/DetailPage.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
+import 'package:productdevelopment/trialRequests.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Dashboard.dart';
+import 'package:productdevelopment/Model/TrialRequests.dart';
 
  class Network_Operations{
   static void signIn(BuildContext context,String email,String password) async {
@@ -319,16 +321,16 @@ import '../Dashboard.dart';
     }
     return null;
   }
-  static Future<List<Request>> getTrialRequests(BuildContext context,String token,int requestId)async{
+  static Future<List<TrialRequests>> getTrialRequests(BuildContext context,String token,int requestId)async{
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.hide();
-        List<Request> requests=[];
+        List<TrialRequests> requests=[];
         for(int i=0;i<jsonDecode(response.body).length;i++){
-          requests.add(Request.fromMap(jsonDecode(response.body)[i]));
+          requests.add(TrialRequests.fromJson(jsonDecode(response.body)[i]));
         }
         return requests;
       }else{

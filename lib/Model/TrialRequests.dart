@@ -1,30 +1,75 @@
-
-
-
 import 'package:productdevelopment/Model/Colors.dart';
 
 class TrialRequests{
-  int id,requestId,clientId;
-  String date,surfaceName,image,clientName,modelName,modelCode,status;
+  int id;
+  int requestId;
+  int clientId;
+  bool approved;
+  DateTime date;
+  String surfaceName;
+  String image;
+  String qrcodeImage;
+  String status;
+  String clientName;
+  String modelCode;
+  String modelName;
+  List<dynamic> multipleClients;
   List<Colors> multipleColors;
-  List<dynamic> multipleSizeNames,multipleImages;
+  List<String> multipleSizeNames;
+  List<dynamic> multipleImages;
+  TrialRequests({
+    this.id,
+    this.requestId,
+    this.clientId,
+    this.approved,
+    this.date,
+    this.surfaceName,
+    this.image,
+    this.qrcodeImage,
+    this.status,
+    this.clientName,
+    this.modelCode,
+    this.modelName,
+    this.multipleClients,
+    this.multipleColors,
+    this.multipleSizeNames,
+    this.multipleImages,
+  });
+  factory TrialRequests.fromJson(Map<String, dynamic> json) => TrialRequests(
+    id: json["id"],
+    requestId: json["requestId"],
+    clientId: json["clientId"],
+    approved: json["approved"],
+    date: DateTime.parse(json["date"]),
+    surfaceName: json["surfaceName"],
+    image: json["image"],
+    qrcodeImage: json["qrcodeImage"],
+    status: json["status"],
+    clientName: json["clientName"],
+    modelCode: json["modelCode"],
+    modelName: json["modelName"],
+    multipleClients: json["multipleClients"],
+    multipleColors: List<Colors>.from(json["multipleColors"].map((x) => Colors.fromJson(x))),
+    multipleSizeNames: List<String>.from(json["multipleSizeNames"].map((x) => x)),
+    multipleImages: List<dynamic>.from(json["multipleImages"].map((x) => x)),
+  );
 
-  TrialRequests(
-      {
-      this.id,
-      this.requestId,
-      this.clientId,
-      this.date,
-      this.surfaceName,
-      this.image,
-      this.clientName,
-      this.modelName,
-      this.modelCode,
-      this.multipleColors,
-      this.multipleSizeNames,
-      this.multipleImages,
-        this.status,
-      }
-      );
-
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "requestId": requestId,
+    "clientId": clientId,
+    "approved": approved,
+    "date": date.toIso8601String(),
+    "surfaceName": surfaceName,
+    "image": image,
+    "qrcodeImage": qrcodeImage,
+    "status": status,
+    "clientName": clientName,
+    "modelCode": modelCode,
+    "modelName": modelName,
+    "multipleClients": multipleClients,
+    "multipleColors": List<dynamic>.from(multipleColors.map((x) => x.toJson())),
+    "multipleSizeNames": List<dynamic>.from(multipleSizeNames.map((x) => x)),
+    "multipleImages": List<dynamic>.from(multipleImages.map((x) => x)),
+  };
 }
