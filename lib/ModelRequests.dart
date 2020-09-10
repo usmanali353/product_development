@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:need_resume/need_resume.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
@@ -25,8 +26,6 @@ class ModelRequests extends StatefulWidget {
 
 class _ModelReState extends ResumableState<ModelRequests>{
   List<Request> products=[];
-  List<dynamic> colors=[];
-  List<int> colorIds=[];
   var claims;
   GlobalKey<RefreshIndicatorState> refreshIndicatorKey=GlobalKey();
   var selectedPreference,selectedStatus;
@@ -44,18 +43,6 @@ class _ModelReState extends ResumableState<ModelRequests>{
   void initState() {
     SharedPreferences.getInstance().then((prefs){
       setState(() {
-        Network_Operations.getAll(context, prefs.getString("token"), "Colors").then((colors){
-          setState(() {
-            this.colors=colors;
-            for(int i=0;i<colors.length;i++){
-              colorIds.add(colors[i]['colorId']);
-            }
-            if(colors!=null){
-              isColorsVisible=true;
-            }
-            print(this.colors.toString());
-          });
-        });
         claims=Utils.parseJwt(prefs.getString("token"));
         print(claims);
         token=prefs.getString("token");
@@ -154,22 +141,38 @@ class _ModelReState extends ResumableState<ModelRequests>{
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           //crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Container(
-                              //color: Color(0xFF004c4c),
-                              height: 90,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  image: DecorationImage(
-                                    image: NetworkImage(products[index].image!=null?products[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"), //MemoryImage(base64Decode(products[index]['image'])),
-                                    fit: BoxFit.cover,
-                                  )
+                            GestureDetector(
+                              onTap: (){
+                                return showDialog<Null>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return  Container(
+                                        width: 200,
+                                        height: 200,
+                                        child: PhotoView(
+                                          imageProvider: NetworkImage(products[index].image),
+                                        ),
+                                      );
+                                    }
+                                );
+                              },
+                              child: Container(
+                                //color: Color(0xFF004c4c),
+                                height: 90,
+                                width: 90,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: DecorationImage(
+                                      image: NetworkImage(products[index].image!=null?products[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"), //MemoryImage(base64Decode(products[index]['image'])),
+                                      fit: BoxFit.cover,
+                                    )
+                                ),
                               ),
                             ),
                             //Padding(padding: EdgeInsets.only(top:2),),
-                            isColorsVisible?Row(
+                            products[index].multipleColorNames!=null&&products[index].multipleColorNames.length>0?Row(
                               children: <Widget>[
-                                for(int i=0;i<products[index].multipleColors.length;i++)
+                                for(int i=0;i<products[index].multipleColorNames.length;i++)
                                   Padding(
                                     padding: const EdgeInsets.all(2),
                                     child: Wrap(
@@ -177,7 +180,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                         Container(
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(2),
-                                            color: Color(Utils.getColorFromHex(colors[colorIds.indexOf(int.parse(products[index].multipleColors[i]))]['colorCode'])),
+                                            color: Color(Utils.getColorFromHex(products[index].multipleColorNames[i].colorCode)),
                                             //color: Colors.teal,
                                           ),
                                           height: 10,
@@ -270,21 +273,22 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                   Padding(
                                     padding: EdgeInsets.only(left: 50),
                                   ),
-                                  Row(
-                                    children: <Widget>[
-                                      Icon(
-                                        Icons.zoom_out_map,
-                                        color: Colors.teal,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(left: 2, right: 2),
-                                      ),
-                                      Text(products[index].multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", "")),
-                                    ],
 
-
-                                  ),
                                 ],
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.zoom_out_map,
+                                    color: Colors.teal,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 2, right: 2),
+                                  ),
+                                  Text(products[index].multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", "")),
+                                ],
+
+
                               ),
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,

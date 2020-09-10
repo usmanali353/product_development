@@ -245,6 +245,7 @@ import '../Dashboard.dart';
         for(int i=0;i<req['allRequests'].length;i++){
           requests.add(Request.fromMap(req['allRequests'][i]));
         }
+        print(requests[0].toJson());
         return requests;
       }
     }catch(e){
@@ -406,12 +407,33 @@ import '../Dashboard.dart';
         return jsonDecode(response.body);
       }else{
         pd.hide();
-        Utils.showError(context, response.body.toString());
+        Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
       pd.hide();
       Utils.showError(context, e.toString());
     }
    return null;
+  }
+  static void addRequestImages(BuildContext context,String token,int colorId,String colorImage)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      final body=jsonEncode({
+        "id":colorId,
+        "colorImage":colorImage
+      },toEncodable: Utils.myEncode);
+      var response=await http.post(Utils.getBaseUrl()+"Request/RequestColorSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        pd.hide();
+        Utils.showSuccess(context, "Image Added Successfully");
+      }else{
+        pd.hide();
+        Utils.showError(context,response.statusCode.toString());
+      }
+    }catch(e){
+      pd.hide();
+      Utils.showError(context, e.toString());
+    }
   }
 }

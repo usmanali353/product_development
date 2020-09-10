@@ -85,7 +85,7 @@ class _AddClientToTrialState extends State<AddClientToTrial> {
                         Network_Operations.trialClient(context, prefs.getString("token"), myClients, requestId);
                       });
                     },
-                    color: Colors.teal,
+                    color: Color(0xFF004c4c),
                     child: Text("Add Clients",style: TextStyle(color: Colors.white),),
                   ),
                 )

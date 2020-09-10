@@ -24,23 +24,17 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage>{
    Request request;
   _DetailPageState(this.request);
-  var rangeInfo;
    GlobalKey globalKey = new GlobalKey();
-  bool rangeInfoVisible=false;
    final doc = pw.Document();
+   List<String> colorsNames=[];
+
   @override
   void initState() {
-    SharedPreferences.getInstance().then((prefs){
-      Network_Operations.getRangeById(context, prefs.getString("token"), request.rangeId).then((rangeById){
-        setState(() {
-          this.rangeInfo=rangeById;
-          if(rangeInfo!=null){
-            rangeInfoVisible=true;
-          }
-        });
-      });
-    });
-
+   for(int i=0;i<request.multipleColorNames.length;i++) {
+     setState(() {
+       colorsNames.add(request.multipleColorNames[i].colorName);
+     });
+   }
     super.initState();
   }
   @override
@@ -67,7 +61,6 @@ class _DetailPageState extends State<DetailPage>{
               child: Center(
                 child: new Container(
                   child: new Card(
-
                     elevation: 6.0,
                     margin: EdgeInsets.only(right: 15.0, left: 15.0),
                       child: Scrollbar(
@@ -223,7 +216,7 @@ class _DetailPageState extends State<DetailPage>{
                               subtitle: Text(request.multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", "")),
                             ),
                             Divider(),
-                            rangeInfoVisible?Column(
+                            request.rangeImage!=null?Column(
 
                               children: [
                                 ListTile(
@@ -235,7 +228,7 @@ class _DetailPageState extends State<DetailPage>{
                                       children: [
                                         Padding(
                                           padding: const EdgeInsets.all(8.0),
-                                          child: Image.network(rangeInfo['image'],width: 100,height: 100,),
+                                          child: Image.network(request.rangeImage,width: 100,height: 100,),
                                         ),
                                         Text(request.rangeName),
                                       ],
@@ -252,10 +245,21 @@ class _DetailPageState extends State<DetailPage>{
                             ),
                             Divider(),
                             ListTile(
-                              title: Text("Color", style: TextStyle(
+                                title: Text("Color", style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),),
+                                subtitle: Text(colorsNames.toString().replaceAll("[","").replaceAll("]", ""))
+                            ),
+                            Divider(),
+                            ListTile(
+                              title: Text("Images", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
-                              subtitle: Text(request.multipleColorNames.toString().replaceAll("[", "").replaceAll("]", "")),
+                              subtitle: Wrap(
+                                children: [
+                                  for ( var images in request.multipleImages) images!=null?Image.network(images,width: 100,height: 100):Container(),
+                                ],
+                              )
                             ),
                             Divider(),
                             ListTile(

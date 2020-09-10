@@ -1,11 +1,14 @@
+import 'package:productdevelopment/Model/Colors.dart';
+
 class Request {
   int requestId, marketId, statusId, classificationId, rangeId, technologyId,
       structureId, edgeId, surfaceId,id;
-  String technicalConcentration, event,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId,classificationName,marketName,technologyName,structureName,edgeName,rangeName,client,targetStartDate,targetEndDate,actualStartDate,actualEndDate,status,qrcodeImage,clientName;
+  String technicalConcentration, event,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId,classificationName,marketName,technologyName,structureName,edgeName,rangeName,client,targetStartDate,targetEndDate,actualStartDate,actualEndDate,status,qrcodeImage,clientName,rangeImage;
   double thickness;
   var image;
   DateTime dateTime;
-  List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleColorNames,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames;
+  List<Colors> multipleColorNames;
+  List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames,multipleImages;
   Request({
     this.requestId,
     this.marketId,
@@ -57,7 +60,6 @@ class Request {
     map["customerObservation"]=customerObservation;
     map['userId']=userId;
     map['multipleDesignTopoligyNames']=multipleDesignTopoligyNames;
-    map['multipleColorNames']=multipleColorNames;
     map['multipleSizeNames']=multipleSizeNames;
     map['multipleSuitabilityNames']=multipleSuitabilityNames;
     map['multipleDesignerNames']=multipleDesignerNames;
@@ -79,6 +81,9 @@ class Request {
     map['multipleClientNames']=multipleClientNames;
     map['qrcodeImage']=qrcodeImage;
     map['clientName']=clientName;
+    map['rangeImage']=rangeImage;
+    map['multipleImages']=multipleImages;
+    map['multipleColorNames'] = List<dynamic>.from(multipleColorNames.map((x) => x.toJson()));
     return map;
   }
   Request.fromMap(Map<String,dynamic> data){
@@ -108,7 +113,7 @@ class Request {
     userId=data['userId'];
     multipleSizeNames=data['multipleSizeNames'];
     multipleDesignTopoligyNames=data['multipleDesignTopoligyNames'];
-    multipleColorNames=data['multipleColorNames'];
+    multipleColorNames= List<Colors>.from(data["multipleColorNames"].map((x) => Colors.fromJson(x)));
     multipleSuitabilityNames=data['multipleSuitabilityNames'];
     multipleDesignerNames=data['multipleDesignerNames'];
     classificationName=data['classificationName'];
@@ -129,6 +134,8 @@ class Request {
     multipleClientNames=data['multipleClientNames'];
     qrcodeImage=data['qrcodeImage'];
     clientName=data['clientName'];
+    rangeImage=data['rangeImage'];
+    multipleImages=data['multipleImages'];
   }
 
 }
