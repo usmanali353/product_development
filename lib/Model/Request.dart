@@ -113,7 +113,7 @@ class Request {
     userId=data['userId'];
     multipleSizeNames=data['multipleSizeNames'];
     multipleDesignTopoligyNames=data['multipleDesignTopoligyNames'];
-    multipleColorNames= List<Colors>.from(data["multipleColorNames"].map((x) => Colors.fromJson(x)));
+    multipleColorNames=List<Colors>.from(data["multipleColorNames"].map((x) => Colors.fromJson(x)));
     multipleSuitabilityNames=data['multipleSuitabilityNames'];
     multipleDesignerNames=data['multipleDesignerNames'];
     classificationName=data['classificationName'];

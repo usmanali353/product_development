@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/Model/Request.dart';
@@ -180,13 +181,13 @@ TrialRequests(this.requestId);
                                    Row(
                                      children: <Widget>[
                                        Icon(
-                                         Icons.person,
+                                         Icons.date_range,
                                          color: Colors.teal,
                                        ),
                                        Padding(
                                          padding: EdgeInsets.only(left: 2, right: 2),
                                        ),
-                                       Text(requests[index].clientName),
+                                       Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(requests[index].date))),
                                      ],
 
 
@@ -200,13 +201,13 @@ TrialRequests(this.requestId);
                                    Row(
                                      children: <Widget>[
                                        Icon(
-                                         Icons.date_range,
+                                         Icons.zoom_out_map,
                                          color: Colors.teal,
                                        ),
                                        Padding(
                                          padding: EdgeInsets.only(left: 2, right: 2),
                                        ),
-                                       Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(requests[index].date)))
+                                       Text(requests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""))
                                      ],
 
                                    ),

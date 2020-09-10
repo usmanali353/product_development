@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:photo_view/photo_view.dart';
@@ -11,6 +12,7 @@ import 'package:productdevelopment/addClientToTrial.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailPage.dart';
 import 'acmcapproval.dart';
+import 'addImagetoColor.dart';
 import 'trialRequests.dart';
 
 
@@ -96,21 +98,55 @@ class _ModelReState extends ResumableState<ModelRequests>{
       body: ListView.builder(
               itemCount:products.length, itemBuilder: (context,int index)
           {
-            return InkWell(
-              onTap: (){
-                if(isGm&&products[index].statusName=="New Request"){
-                  showAlertDialog(context,products[index]);
-                }else if(isSaleManager||isGm&&products[index].statusName=="Approved By GM"){
-                  showDatePicker(helpText:"Select Target Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((startDate){
-                    if(startDate!=null){
-                      showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((endDate){
-                        if(endDate!=null){
-                          Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null);
+            return GestureDetector(
+              onTapDown: (TapDownDetails details)async{
+                if(products[index].statusName=="New Request"){
+                  await showMenu(
+                    context: context,
+                    position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                    items: [
+                      PopupMenuItem<String>(
+                          child: const Text('Change Status'), value: 'changeStatus'),
+                      PopupMenuItem<String>(
+                          child: const Text('Add Images'), value: 'addImage'),
+                    ],
+                    elevation: 8.0,
+                  ).then((selectedItem){
+                     if(selectedItem=="changeStatus"){
+                       showAlertDialog(context,products[index]);
+                     }else if(selectedItem=="addImage"){
+                       Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
+                     }
+                  });
+
+                }else if(products[index].statusName=="Approved By GM"){
+                  await showMenu(
+                    context: context,
+                    position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                    items: [
+                      PopupMenuItem<String>(
+                          child: const Text('Change Status'), value: 'changeStatus'),
+                      PopupMenuItem<String>(
+                          child: const Text('See Details'), value: 'Details'),
+                    ],
+                    elevation: 8.0,
+                  ).then((selectedItem){
+                    if(selectedItem=="changeStatus"){
+                      showDatePicker(helpText:"Select Target Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((startDate){
+                        if(startDate!=null){
+                          showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((endDate){
+                            if(endDate!=null){
+                              Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null);
+                            }
+                          });
                         }
                       });
+                    }else if(selectedItem=="Details"){
+                      Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailPage(products[index])));
                     }
                   });
-                }else if(isGm&&products[index].statusName=="Samples Scheduled"){
+
+                }else if(products[index].statusName=="Samples Scheduled"){
                   showAlertChangeStatus(context,products[index]);
                 }else if(products[index].statusName=="Approved Trial"){
                   Navigator.push(context, MaterialPageRoute(builder: (context)=>TrialRequests(products[index].requestId)));
@@ -142,7 +178,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                           //crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             GestureDetector(
-                              onTap: (){
+                              onTapDown: (TapDownDetails details)async{
                                 return showDialog<Null>(
                                     context: context,
                                     builder: (BuildContext context) {
@@ -155,6 +191,8 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                       );
                                     }
                                 );
+
+
                               },
                               child: Container(
                                 //color: Color(0xFF004c4c),
