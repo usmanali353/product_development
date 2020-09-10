@@ -5,7 +5,6 @@ import 'package:productdevelopment/DetailPage.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
-import 'package:productdevelopment/trialRequests.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Dashboard.dart';

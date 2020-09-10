@@ -5,7 +5,7 @@ class TrialRequests{
   int requestId;
   int clientId;
   bool approved;
-  DateTime date;
+  String date;
   String surfaceName;
   String image;
   String qrcodeImage;
@@ -40,7 +40,7 @@ class TrialRequests{
     requestId: json["requestId"],
     clientId: json["clientId"],
     approved: json["approved"],
-    date: DateTime.parse(json["date"]),
+    date: json["date"],
     surfaceName: json["surfaceName"],
     image: json["image"],
     qrcodeImage: json["qrcodeImage"],
@@ -59,7 +59,7 @@ class TrialRequests{
     "requestId": requestId,
     "clientId": clientId,
     "approved": approved,
-    "date": date.toIso8601String(),
+    "date": date,
     "surfaceName": surfaceName,
     "image": image,
     "qrcodeImage": qrcodeImage,

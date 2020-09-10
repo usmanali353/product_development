@@ -11,9 +11,9 @@ import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:productdevelopment/addClientToTrial.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailPage.dart';
+import 'RequestsForTrial.dart';
 import 'acmcapproval.dart';
 import 'addImagetoColor.dart';
-import 'trialRequests.dart';
 
 
 class ModelRequests extends StatefulWidget {
@@ -149,7 +149,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                 }else if(products[index].statusName=="Samples Scheduled"){
                   showAlertChangeStatus(context,products[index]);
                 }else if(products[index].statusName=="Approved Trial"){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>TrialRequests(products[index].requestId)));
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products[index].requestId)));
                  // showCustomerApprovalDialog(context, products[index]);
                 }else {
                   Navigator.push(context, MaterialPageRoute(

@@ -4,24 +4,26 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/Model/Request.dart';
+import 'package:productdevelopment/Model/TrialRequests.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
- class TrialRequests extends StatefulWidget {
+ class RequestsForTrial extends StatefulWidget {
 int requestId;
 
-TrialRequests(this.requestId);
+RequestsForTrial(this.requestId);
 
   @override
-   _TrialRequestsState createState() => _TrialRequestsState(requestId);
+   _RequestsForTrialState createState() => _RequestsForTrialState(requestId);
  }
 
- class _TrialRequestsState extends State<TrialRequests> {
-   List<Request> requests;
+ class _RequestsForTrialState extends State<RequestsForTrial> {
+   List<TrialRequests> requests;
    bool isVisible=false;
    var selectedPreference;
    int requestId;
 
-   _TrialRequestsState(this.requestId);
+   _RequestsForTrialState(this.requestId);
 
   @override
   void initState() {
@@ -82,20 +84,27 @@ TrialRequests(this.requestId);
                                ),
                              ),
                              //Padding(padding: EdgeInsets.only(top:2),),
-                             Row(
+                             requests[index].multipleColors!=null&&requests[index].multipleColors.length>0?Row(
                                children: <Widget>[
-                                 // Container(
-                                 //   decoration: BoxDecoration(
-                                 //     borderRadius: BorderRadius.circular(2),
-                                 //     color: Colors.orange.shade100,
-                                 //     //color: Colors.teal,
-                                 //   ),
-                                 //   height: 10,
-                                 //   width: 15,
-                                 // ),
-                                 // Padding(
-                                 //   padding: EdgeInsets.only(left: 2, right: 2),
-                                 // ),
+                                 for(int i=0;i<requests[index].multipleColors.length;i++)
+                                   Padding(
+                                     padding: const EdgeInsets.all(2),
+                                     child: Wrap(
+                                       children: [
+                                         Container(
+                                           decoration: BoxDecoration(
+                                             borderRadius: BorderRadius.circular(2),
+                                             color: Color(Utils.getColorFromHex(requests[index].multipleColors[i].colorCode)),
+                                             //color: Colors.teal,
+                                           ),
+                                           height: 10,
+                                           width: 15,
+                                         ),
+
+                                       ],
+                                     ),
+                                   ),
+
                                  // Container(
                                  //   decoration: BoxDecoration(
                                  //     borderRadius: BorderRadius.circular(2),
@@ -142,7 +151,7 @@ TrialRequests(this.requestId);
                                  //   width: 15,
                                  // ),
                                ],
-                             )
+                             ):Container(),
                            ],
                          ),
                          VerticalDivider(color: Colors.grey,),
@@ -250,7 +259,7 @@ TrialRequests(this.requestId);
        ),
      );
    }
-   showTrialApprovalDialog(BuildContext context,Request request){
+   showTrialApprovalDialog(BuildContext context,TrialRequests request){
      Widget cancelButton = FlatButton(
        child: Text("Cancel"),
        onPressed: () {
