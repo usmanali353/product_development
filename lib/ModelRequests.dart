@@ -1,12 +1,15 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:need_resume/need_resume.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:productdevelopment/RequestImagesGallery.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:productdevelopment/addClientToTrial.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,12 +38,12 @@ class _ModelReState extends ResumableState<ModelRequests>{
  bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge,isMarketingManager=false,isProductManager=false;
  bool isColorsVisible=false;
   String token;
-  @override
-  void onResume() {
-    print(resume.data.toString());
-     Navigator.pop(context,'Refresh');
-    super.onResume();
-  }
+  // @override
+  // void onResume() {
+  //   print(resume.data.toString());
+  //    Navigator.pop(context,'Refresh');
+  //   super.onResume();
+  // }
   @override
   void initState() {
     SharedPreferences.getInstance().then((prefs){
@@ -101,6 +104,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
             return GestureDetector(
               onTapDown: (TapDownDetails details)async{
                 if(products[index].statusName=="New Request"){
+
                   await showMenu(
                     context: context,
                     position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
@@ -177,22 +181,9 @@ class _ModelReState extends ResumableState<ModelRequests>{
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           //crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            GestureDetector(
-                              onTapDown: (TapDownDetails details)async{
-                                return showDialog<Null>(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return  Container(
-                                        width: 200,
-                                        height: 200,
-                                        child: PhotoView(
-                                          imageProvider: NetworkImage(products[index].image),
-                                        ),
-                                      );
-                                    }
-                                );
-
-
+                            InkWell(
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
                               },
                               child: Container(
                                 //color: Color(0xFF004c4c),

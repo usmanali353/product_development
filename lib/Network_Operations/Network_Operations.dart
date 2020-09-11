@@ -428,6 +428,7 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
       if(response.statusCode==200){
         pd.hide();
         Utils.showSuccess(context, "Image Added Successfully");
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
       }else{
         pd.hide();
         Utils.showError(context,response.statusCode.toString());

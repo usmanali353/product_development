@@ -1,12 +1,10 @@
  import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'Utils/Utils.dart';
 class addImageToColors extends StatefulWidget {
   Request request;
@@ -121,6 +119,7 @@ class addImageToColors extends StatefulWidget {
 
                             }
                           });
+
                         },
                         child: Text("Select Image",style: TextStyle(color: Colors.white),),
                       ),
