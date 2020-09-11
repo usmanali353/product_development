@@ -30,27 +30,35 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(title: Text("Gallery"),),
-      body: PhotoViewGallery.builder(itemCount: imageUrl.length, builder: (context,index){
-        return PhotoViewGalleryPageOptions(
-          imageProvider: NetworkImage(
-            imageUrl[index],
-          ),
+      body: Center(
+        child: Container(
 
-          heroAttributes: PhotoViewHeroAttributes(tag: request.multipleColorNames[index].colorName),
-          maxScale: PhotoViewComputedScale.contained*1,
-          minScale: PhotoViewComputedScale.covered*1,
-        );
-      },
-        scrollPhysics: BouncingScrollPhysics(),
-        backgroundDecoration: BoxDecoration(
-          color: Theme.of(context).canvasColor
+          width: MediaQuery.of(context).size.width,
+          height:  MediaQuery.of(context).size.height/2,
+          child: PhotoViewGallery.builder(itemCount: imageUrl.length, builder: (context,index){
+            return PhotoViewGalleryPageOptions(
+              imageProvider: NetworkImage(
+                imageUrl[index],
+              ),
+
+              heroAttributes: PhotoViewHeroAttributes(tag: request.multipleColorNames[index].colorName),
+              maxScale: PhotoViewComputedScale.contained*1,
+              minScale: PhotoViewComputedScale.covered*1,
+            );
+          },
+            scrollPhysics: BouncingScrollPhysics(),
+            backgroundDecoration: BoxDecoration(
+              color: Theme.of(context).canvasColor
+            ),
+            loadingBuilder: (context,e){
+             return Center(
+               child: CircularProgressIndicator(),
+             );
+            },
+          ),
         ),
-        loadingBuilder: (context,e){
-         return Center(
-           child: CircularProgressIndicator(),
-         );
-        },
       ),
     );
   }

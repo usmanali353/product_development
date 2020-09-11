@@ -50,7 +50,7 @@ RequestsForTrial(this.requestId);
                onTap: (){
                  if(requests[index].status=="Approved By Customer"){
                     showProductionApprovalDialog(context, requests[index]);
-                 }else if(requests[index].status!="Approved By Customer"||requests[index].status!="Rejected By Customer"){
+                 }else if(requests[index].status=="Not Approved Nor Rejected"){
                    showTrialApprovalDialog(context, requests[index]);
                  }else{
                    SharedPreferences.getInstance().then((prefs){
@@ -371,14 +371,14 @@ RequestsForTrial(this.requestId);
          Navigator.pop(context);
          if(selectedPreference=="Approve"){
            SharedPreferences.getInstance().then((prefs){
-             Network_Operations.changeStatusOfRequest(context, prefs.getString("token"), request.requestId, 9).then((value){
+             Network_Operations.approveRequestClient(context, prefs.getString("token"), request.id, 9).then((value){
                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
              });
            });
            //Network_Operations.approveRequestClient(context, token, request.requestId, 1);
          }else if(selectedPreference=="Reject"){
            SharedPreferences.getInstance().then((prefs){
-             Network_Operations.approveRequestClient(context, prefs.getString("token"), request.requestId, 10).then((value){
+             Network_Operations.approveRequestClient(context, prefs.getString("token"), request.id, 10).then((value){
                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
              });
            });

@@ -13,6 +13,8 @@ import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'RequestImagesGallery.dart';
+
 class DetailPage extends StatefulWidget {
  Request request;
  DetailPage(this.request);
@@ -27,7 +29,7 @@ class _DetailPageState extends State<DetailPage>{
    GlobalKey globalKey = new GlobalKey();
    final doc = pw.Document();
    List<String> colorsNames=[];
-
+   List<String> imageUrl=[];
   @override
   void initState() {
    for(int i=0;i<request.multipleColorNames.length;i++) {
@@ -35,6 +37,13 @@ class _DetailPageState extends State<DetailPage>{
        colorsNames.add(request.multipleColorNames[i].colorName);
      });
    }
+   setState(() {
+     for(int i=0;i<request.multipleImages.length;i++){
+       if(request.multipleImages[i]!=null){
+         imageUrl.add(request.multipleImages[i]);
+       }
+     }
+   });
     super.initState();
   }
   @override
@@ -45,16 +54,24 @@ class _DetailPageState extends State<DetailPage>{
         ),
         body: Stack(
           children: <Widget>[
-            Container(
-              //color: Color(0xFF004c4c),
-              height: MediaQuery.of(context).size.height/3,
-              width: MediaQuery.of(context).size.width,
-             decoration: BoxDecoration(
-               image: DecorationImage(
-                 image: NetworkImage(request.image!=null?request.image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"),
-                 fit: BoxFit.cover,
-               )
-             ),
+            InkWell(
+              onTap: (){
+                if(imageUrl.length>0) {
+                  Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => RequestImageGallery(request)));
+                }
+              },
+              child: Container(
+                //color: Color(0xFF004c4c),
+                height: MediaQuery.of(context).size.height/3,
+                width: MediaQuery.of(context).size.width,
+               decoration: BoxDecoration(
+                 image: DecorationImage(
+                   image: NetworkImage(request.image!=null?request.image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"),
+                   fit: BoxFit.cover,
+                 )
+               ),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 150, bottom: 10),

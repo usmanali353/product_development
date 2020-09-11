@@ -146,7 +146,7 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
-      var response = await http.get(Utils.getBaseUrl() + "Request/ChangeStatusOfTrialRequest/$requestId?StatusId=$StatusId", headers: {"Authorization": "Bearer " + token});
+      var response = await http.get(Utils.getBaseUrl()+"Request/ChangeStatusOfTrialRequest/$requestId?StatusId=$StatusId", headers: {"Content-Type":"application/json","Authorization": "Bearer " + token});
       if (response.statusCode == 200) {
         pd.hide();
         Navigator.pop(context,"Refresh");
@@ -188,7 +188,7 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
     }
 
   }
-  static Future<void> addRequestSchedule(BuildContext context,String token,int requestId,DateTime startDate,DateTime endDate,DateTime actualStartDate,DateTime actualEndDate) async{
+  static Future<void> addRequestSchedule(BuildContext context,String token,int requestId,DateTime startDate,DateTime endDate,DateTime actualStartDate,DateTime actualEndDate,int statusId) async{
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
@@ -203,7 +203,7 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
       if(response.statusCode==200){
         pd.hide();
         Utils.showSuccess(context, response.body.toString());
-        changeStatusOfRequest(context, token, requestId, 4).then((value){
+        changeStatusOfRequest(context, token, requestId, statusId).then((value){
           Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
         });
       }else{
@@ -271,9 +271,7 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
     }
     return null;
   }
-  static void trialClient(BuildContext context,String token,List<dynamic> clientIds,int requestId)async{
-    ProgressDialog pd=ProgressDialog(context);
-    pd.show();
+  static Future<void> trialClient(BuildContext context,String token,List<dynamic> clientIds,int requestId)async{
     try{
       final body=jsonEncode({
        "requestId":requestId,
@@ -281,11 +279,9 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
       });
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestClientSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
         Utils.showSuccess(context, "Request Saved Successfully");
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
       }else{
-        pd.hide();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){

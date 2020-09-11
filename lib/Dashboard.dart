@@ -21,13 +21,11 @@ class _DashboardState extends ResumableState<Dashboard> {
   void onResume() {
     if(resume.data.toString()=="Refresh"){
       SharedPreferences.getInstance().then((prefs){
-        print(prefs.getString("token"));
         newRequest.clear();rejectedbyCustomer.clear();rejectedbyGM.clear();rejectedTrial.clear();sampleScheduled.clear();approvedForTrial.clear();customerApproved.clear();approvebyGM.clear();
          claims = Utils.parseJwt(prefs.getString("token"));
 
         if(claims["role"].contains("General Manager")){
           Network_Operations.getRequestForGM(context, prefs.getString("token")).then((result){
-            debugPrint(result.toString());
             for(int i=0; i<result.length;i++ ) {
               if (result[i].statusName =="New Request"){
                 setState(() {
@@ -81,7 +79,6 @@ class _DashboardState extends ResumableState<Dashboard> {
           });
         }else if(claims["role"]=="Sales Manager"){
           Network_Operations.getRequestByStatus(context, prefs.getString("token"),2).then((result){
-            debugPrint(result.toString());
             for(int i=0; i<result.length;i++ ) {
               if (result[i].statusName =="New Request"){
                 setState(() {
@@ -135,7 +132,6 @@ class _DashboardState extends ResumableState<Dashboard> {
           });
         }else{
           Network_Operations.getRequest(context, prefs.getString("token")).then((result){
-            debugPrint(result.toString());
             for(int i=0; i<result.length;i++ ) {
               if (result[i].statusName =="New Request"){
                 setState(() {
@@ -197,10 +193,8 @@ class _DashboardState extends ResumableState<Dashboard> {
   void initState() {
     SharedPreferences.getInstance().then((prefs){
        claims = Utils.parseJwt(prefs.getString("token"));
-       Network_Operations.getRequestCount(context, prefs.getString("token"));
       if(claims["role"].contains("General Manager")){
         Network_Operations.getRequestForGM(context, prefs.getString("token")).then((result){
-          debugPrint(result.toString());
           for(int i=0; i<result.length;i++ ) {
             if (result[i].statusName =="New Request"){
               setState(() {
@@ -240,13 +234,20 @@ class _DashboardState extends ResumableState<Dashboard> {
             if (result[i].statusName =="Samples Scheduled"){
               setState(() {
                 sampleScheduled.add(result[i]);
+              });
+            }else if(result[i].statusName == "Approved For Production"){
+              setState(() {
+                productionApproved.add(result[i]);
+              });
+            }else if(result[i].statusName == "Rejected For Production"){
+              setState(() {
+                productionRejected.add(result[i]);
               });
             }
           }
         });
       }else if(claims["role"]=="Sales Manager"){
         Network_Operations.getRequestByStatus(context, prefs.getString("token"),2).then((result){
-          debugPrint(result.toString());
           for(int i=0; i<result.length;i++ ) {
             if (result[i].statusName =="New Request"){
               setState(() {
@@ -286,13 +287,20 @@ class _DashboardState extends ResumableState<Dashboard> {
             if (result[i].statusName =="Samples Scheduled"){
               setState(() {
                 sampleScheduled.add(result[i]);
+              });
+            }else if(result[i].statusName == "Approved For Production"){
+              setState(() {
+                productionApproved.add(result[i]);
+              });
+            }else if(result[i].statusName == "Rejected For Production"){
+              setState(() {
+                productionRejected.add(result[i]);
               });
             }
           }
         });
       }else{
         Network_Operations.getRequest(context, prefs.getString("token")).then((result){
-          debugPrint(result.toString());
           for(int i=0; i<result.length;i++ ) {
             if (result[i].statusName =="New Request"){
               setState(() {
@@ -332,6 +340,14 @@ class _DashboardState extends ResumableState<Dashboard> {
             if (result[i].statusName =="Samples Scheduled"){
               setState(() {
                 sampleScheduled.add(result[i]);
+              });
+            }else if(result[i].statusName == "Approved For Production"){
+              setState(() {
+                productionApproved.add(result[i]);
+              });
+            }else if(result[i].statusName == "Rejected For Production"){
+              setState(() {
+                productionRejected.add(result[i]);
               });
             }
           }

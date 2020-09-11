@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:need_resume/need_resume.dart';
+import 'package:productdevelopment/ApproveForTrial.dart';
 import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
@@ -140,7 +141,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                         if(startDate!=null){
                           showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((endDate){
                             if(endDate!=null){
-                              Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null);
+                              Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null,4);
                             }
                           });
                         }
@@ -552,7 +553,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Set"),
       onPressed: () {
         if(selectedPreference=="Approve"){
-          Navigator.push(context, MaterialPageRoute(builder: (context)=>AddClientToTrial(request.requestId)));
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>ApproveForTrial(request)));
         }else if(selectedPreference=="Reject"){
           Network_Operations.changeStatusOfRequest(context, token, request.requestId, 6);
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
