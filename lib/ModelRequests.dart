@@ -183,7 +183,17 @@ class _ModelReState extends ResumableState<ModelRequests>{
                           children: <Widget>[
                             InkWell(
                               onTap: (){
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
+                                setState(() {
+                                  List<String> imageUrl=[];
+                                  for(int i=0;i<products[index].multipleImages.length;i++){
+                                    if(products[index].multipleImages[i]!=null){
+                                      imageUrl.add(products[index].multipleImages[i]);
+                                    }
+                                  }
+                                  if(imageUrl.length>0){
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
+                                  }
+                                });
                               },
                               child: Container(
                                 //color: Color(0xFF004c4c),

@@ -48,7 +48,15 @@ RequestsForTrial(this.requestId);
          child: ListView.builder(itemCount:requests!=null?requests.length:0,itemBuilder:(context,int index){
              return InkWell(
                onTap: (){
-                 showTrialApprovalDialog(context,requests[index]);
+                 if(requests[index].status=="Approved By Customer"){
+                    showProductionApprovalDialog(context, requests[index]);
+                 }else if(requests[index].status!="Approved By Customer"||requests[index].status!="Rejected By Customer"){
+                   showTrialApprovalDialog(context, requests[index]);
+                 }else{
+                   SharedPreferences.getInstance().then((prefs){
+                     Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
+                   });
+                 }
                },
                child: Card(
                  elevation: 6,
@@ -281,14 +289,14 @@ RequestsForTrial(this.requestId);
          Navigator.pop(context);
          if(selectedPreference=="Approve"){
            SharedPreferences.getInstance().then((prefs){
-             Network_Operations.approveRequestClient(context, prefs.getString("token"), request.id, 1).then((value){
+             Network_Operations.approveRequestClient(context, prefs.getString("token"), request.id, 7).then((value){
                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
              });
            });
            //Network_Operations.approveRequestClient(context, token, request.requestId, 1);
          }else if(selectedPreference=="Reject"){
            SharedPreferences.getInstance().then((prefs){
-             Network_Operations.approveRequestClient(context, prefs.getString("token"), request.id, 0).then((value){
+             Network_Operations.approveRequestClient(context, prefs.getString("token"), request.id, 8).then((value){
                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
              });
            });
@@ -297,6 +305,88 @@ RequestsForTrial(this.requestId);
      );
      AlertDialog alert = AlertDialog(
        title: Text("Approve/Reject Trialed Model"),
+       content: StatefulBuilder(
+         builder: (context, setState) {
+           return Column(
+             mainAxisSize: MainAxisSize.min,
+             children: <Widget>[
+               RadioListTile(
+                 title: Text("Approve"),
+                 value: 'Approve',
+                 groupValue: selectedPreference,
+                 onChanged: (choice) {
+                   setState(() {
+                     this.selectedPreference = choice;
+                   });
+                 },
+               ),
+               RadioListTile(
+                 title: Text("Reject"),
+                 value: 'Reject',
+                 groupValue: selectedPreference,
+                 onChanged: (choice) {
+                   setState(() {
+                     this.selectedPreference = choice;
+                   });
+                 },
+               ),
+             ],
+           );
+         },
+       ),
+       actions: [
+         cancelButton,
+         detailsPage,
+         approveRejectButton
+       ],
+     );
+
+     // show the dialog
+     showDialog(
+       context: context,
+       builder: (BuildContext context) {
+         return alert;
+       },
+     );
+   }
+   showProductionApprovalDialog(BuildContext context,TrialRequests request){
+     Widget cancelButton = FlatButton(
+       child: Text("Cancel"),
+       onPressed: () {
+         Navigator.pop(context);
+       },
+     );
+     Widget detailsPage = FlatButton(
+       child: Text("Go to Details"),
+       onPressed: () {
+         Navigator.pop(context);
+         SharedPreferences.getInstance().then((prefs){
+           Network_Operations.getRequestById(context, prefs.getString("token"), request.requestId);
+         });
+       },
+     );
+     Widget approveRejectButton = FlatButton(
+       child: Text("Set"),
+       onPressed: () {
+         Navigator.pop(context);
+         if(selectedPreference=="Approve"){
+           SharedPreferences.getInstance().then((prefs){
+             Network_Operations.changeStatusOfRequest(context, prefs.getString("token"), request.requestId, 9).then((value){
+               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+             });
+           });
+           //Network_Operations.approveRequestClient(context, token, request.requestId, 1);
+         }else if(selectedPreference=="Reject"){
+           SharedPreferences.getInstance().then((prefs){
+             Network_Operations.approveRequestClient(context, prefs.getString("token"), request.requestId, 10).then((value){
+               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+             });
+           });
+         }
+       },
+     );
+     AlertDialog alert = AlertDialog(
+       title: Text("Approve/Reject Model for Production"),
        content: StatefulBuilder(
          builder: (context, setState) {
            return Column(

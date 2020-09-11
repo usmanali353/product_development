@@ -15,7 +15,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends ResumableState<Dashboard> {
-  List<Request> newRequest=[],rejectedbyCustomer=[],rejectedbyGM=[],rejectedTrial=[],sampleScheduled=[],approvedForTrial=[],customerApproved=[],approvebyGM=[];
+  List<Request> newRequest=[],rejectedbyCustomer=[],rejectedbyGM=[],rejectedTrial=[],sampleScheduled=[],approvedForTrial=[],customerApproved=[],approvebyGM=[],productionApproved=[],productionRejected=[];
  var claims;
   @override
   void onResume() {
@@ -68,6 +68,14 @@ class _DashboardState extends ResumableState<Dashboard> {
                 setState(() {
                   sampleScheduled.add(result[i]);
                 });
+              }else if(result[i].statusName == "Approved For Production"){
+                setState(() {
+                  productionApproved.add(result[i]);
+                });
+              }else if(result[i].statusName == "Rejected For Production"){
+                setState(() {
+                  productionRejected.add(result[i]);
+                });
               }
             }
           });
@@ -114,6 +122,14 @@ class _DashboardState extends ResumableState<Dashboard> {
                 setState(() {
                   sampleScheduled.add(result[i]);
                 });
+              }else if(result[i].statusName == "Approved For Production"){
+                setState(() {
+                  productionApproved.add(result[i]);
+                });
+              }else if(result[i].statusName == "Rejected For Production"){
+                setState(() {
+                  productionRejected.add(result[i]);
+                });
               }
             }
           });
@@ -159,6 +175,14 @@ class _DashboardState extends ResumableState<Dashboard> {
               if (result[i].statusName =="Samples Scheduled"){
                 setState(() {
                   sampleScheduled.add(result[i]);
+                });
+              }else if(result[i].statusName == "Approved For Production"){
+                setState(() {
+                  productionApproved.add(result[i]);
+                });
+              }else if(result[i].statusName == "Rejected For Production"){
+                setState(() {
+                  productionRejected.add(result[i]);
                 });
               }
             }
@@ -841,6 +865,123 @@ class _DashboardState extends ResumableState<Dashboard> {
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
                               child: Text(rejectedbyCustomer!=null?rejectedbyCustomer.length.toString():'0',
+                                style: TextStyle(
+                                    color:Colors.teal.shade800,
+                                    //Color(0xFF004c4c),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 15),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              //Today Deliveries
+              InkWell(
+                onTap:(){
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(productionApproved)));
+                  // Navigator.push(context, MaterialPageRoute(builder: (context)=>DeliveryList((DateFormat("yyyy-MM-dd").format(DateTime.now())),customerId)));
+                },
+                child: Card(
+                  elevation: 10,
+                  child: Container(
+                    height: 130,
+                    //width: 185,
+                    width: MediaQuery.of(context).size.width * 0.45 ,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Color(0xFF004c4c),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Container(
+                          //margin: EdgeInsets.only(left: 12),
+                          child: Text("Production Approved",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(left: 5, right: 5),
+                          height: 30,
+                          width: 150,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: Colors.grey.shade100,
+                          ),
+                          child: Center(
+                            child: Container(
+                              //margin: EdgeInsets.only(left: 10,top: 5),
+                              child: Text(productionApproved!=null?productionApproved.length.toString():'0', style: TextStyle(color:Color(0xFF004c4c),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold
+                              ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // Weekly Deliveries
+              InkWell(
+                onTap: (){
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(productionRejected)));
+                  // Navigator.push(context, MaterialPageRoute(builder: (context)=>SalesOrdersList(DateFormat("yyyy-MM-dd").format(DateTime.now()),DateFormat("yyyy-MM-dd").format(DateTime.now().add(Duration(days: 30))),customerId,DateFormat.MMMM().format(DateTime.now()).toString()+' Deliveries')));
+                },
+                child: Card(
+                  elevation: 10,
+                  child: Container(
+                    height: 130,
+                    width: MediaQuery.of(context).size.width * 0.45 ,
+                    //width: MediaQuery.of(context).size.width /2.2 ,
+                    //width: 185,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Color(0xFF004c4c),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Container(
+                          //margin: EdgeInsets.only(left: 12),
+                          child: Text('Production Rejected',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ),
+                        Container(
+                          //padding: EdgeInsets.all(3),
+                          margin: EdgeInsets.only(left: 5, right: 5),
+                          height: 30,
+                          width: 145,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15),
+                            color: Colors.grey.shade100,
+                          ),
+                          child: Center(
+                            child: Container(
+                              //margin: EdgeInsets.only(left: 10,top: 5),
+                              child: Text(productionRejected!=null?productionRejected.length.toString():'0',
                                 style: TextStyle(
                                     color:Colors.teal.shade800,
                                     //Color(0xFF004c4c),

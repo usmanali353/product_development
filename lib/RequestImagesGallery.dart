@@ -36,10 +36,11 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
           imageProvider: NetworkImage(
             imageUrl[index],
           ),
+
+          heroAttributes: PhotoViewHeroAttributes(tag: request.multipleColorNames[index].colorName),
           maxScale: PhotoViewComputedScale.contained*1,
           minScale: PhotoViewComputedScale.covered*1,
         );
-
       },
         scrollPhysics: BouncingScrollPhysics(),
         backgroundDecoration: BoxDecoration(

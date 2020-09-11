@@ -142,11 +142,11 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
       Utils.showError(context, e.toString());
     }
   }
-  static Future<void> approveRequestClient(BuildContext context,String token,int requestId,int approved) async {
+  static Future<void> approveRequestClient(BuildContext context,String token,int requestId,int StatusId) async {
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
-      var response = await http.get(Utils.getBaseUrl() + "Request/ChangeStatusOfTrialRequest/$requestId?Approved=$approved", headers: {"Authorization": "Bearer " + token});
+      var response = await http.get(Utils.getBaseUrl() + "Request/ChangeStatusOfTrialRequest/$requestId?StatusId=$StatusId", headers: {"Authorization": "Bearer " + token});
       if (response.statusCode == 200) {
         pd.hide();
         Navigator.pop(context,"Refresh");
