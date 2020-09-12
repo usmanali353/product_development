@@ -15,344 +15,51 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends ResumableState<Dashboard> {
-  List<Request> newRequest=[],rejectedbyCustomer=[],rejectedbyGM=[],rejectedTrial=[],sampleScheduled=[],approvedForTrial=[],customerApproved=[],approvebyGM=[],productionApproved=[],productionRejected=[];
  var claims;
-  @override
+ var requestCount;
+ @override
   void onResume() {
-    if(resume.data.toString()=="Refresh"){
-      SharedPreferences.getInstance().then((prefs){
-        newRequest.clear();rejectedbyCustomer.clear();rejectedbyGM.clear();rejectedTrial.clear();sampleScheduled.clear();approvedForTrial.clear();customerApproved.clear();approvebyGM.clear();
-         claims = Utils.parseJwt(prefs.getString("token"));
+   SharedPreferences.getInstance().then((prefs){
+     setState(() {
+       claims=Utils.parseJwt(prefs.getString("token"));
+       if(claims['role'].contains("General Manager")) {
+         Network_Operations.getRequestCount(context, prefs.getString("token")).then((requestCountMap){
+           setState(() {
+             this.requestCount=requestCountMap['statuses'];
+           });
+         });
+       }else{
+         Network_Operations.getRequestCountIndividualUser(context,prefs.getString("token")).then((requestCountMap){
+           setState(() {
+             this.requestCount=requestCountMap['statuses'];
+           });
+         });
+       }
+     });
 
-        if(claims["role"].contains("General Manager")){
-          Network_Operations.getRequestForGM(context, prefs.getString("token")).then((result){
-            for(int i=0; i<result.length;i++ ) {
-              if (result[i].statusName =="New Request"){
-                setState(() {
-                  newRequest.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Approved By GM"){
-                setState(() {
-                  approvebyGM.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Approved By Customer"){
-                setState(() {
-                  customerApproved.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Approved Trial"){
-                setState(() {
-                  approvedForTrial.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Rejected By Customer"){
-                setState(() {
-                  rejectedbyCustomer.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Rejected By GM"){
-                setState(() {
-                  rejectedbyGM.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Rejected Trial"){
-                setState(() {
-                  rejectedTrial.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Samples Scheduled"){
-                setState(() {
-                  sampleScheduled.add(result[i]);
-                });
-              }else if(result[i].statusName == "Approved For Production"){
-                setState(() {
-                  productionApproved.add(result[i]);
-                });
-              }else if(result[i].statusName == "Rejected For Production"){
-                setState(() {
-                  productionRejected.add(result[i]);
-                });
-              }
-            }
-          });
-        }else if(claims["role"]=="Sales Manager"){
-          Network_Operations.getRequestByStatus(context, prefs.getString("token"),2).then((result){
-            for(int i=0; i<result.length;i++ ) {
-              if (result[i].statusName =="New Request"){
-                setState(() {
-                  newRequest.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Approved By GM"){
-                setState(() {
-                  approvebyGM.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Approved By Customer"){
-                setState(() {
-                  customerApproved.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Approved Trial"){
-                setState(() {
-                  approvedForTrial.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Rejected By Customer"){
-                setState(() {
-                  rejectedbyCustomer.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Rejected By GM"){
-                setState(() {
-                  rejectedbyGM.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Rejected Trial"){
-                setState(() {
-                  rejectedTrial.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Samples Scheduled"){
-                setState(() {
-                  sampleScheduled.add(result[i]);
-                });
-              }else if(result[i].statusName == "Approved For Production"){
-                setState(() {
-                  productionApproved.add(result[i]);
-                });
-              }else if(result[i].statusName == "Rejected For Production"){
-                setState(() {
-                  productionRejected.add(result[i]);
-                });
-              }
-            }
+   });
+    super.onResume();
+  }
+ @override
+  void initState() {
+    SharedPreferences.getInstance().then((prefs){
+      setState(() {
+        claims=Utils.parseJwt(prefs.getString("token"));
+        if(claims['role'].contains("General Manager")) {
+          Network_Operations.getRequestCount(context, prefs.getString("token")).then((requestCountMap){
+            setState(() {
+              this.requestCount=requestCountMap['statuses'];
+            });
           });
         }else{
-          Network_Operations.getRequest(context, prefs.getString("token")).then((result){
-            for(int i=0; i<result.length;i++ ) {
-              if (result[i].statusName =="New Request"){
-                setState(() {
-                  newRequest.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Approved By GM"){
-                setState(() {
-                  approvebyGM.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Approved By Customer"){
-                setState(() {
-                  customerApproved.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Approved Trial"){
-                setState(() {
-                  approvedForTrial.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Rejected By Customer"){
-                setState(() {
-                  rejectedbyCustomer.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Rejected By GM"){
-                setState(() {
-                  rejectedbyGM.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Rejected Trial"){
-                setState(() {
-                  rejectedTrial.add(result[i]);
-                });
-              }
-              if (result[i].statusName =="Samples Scheduled"){
-                setState(() {
-                  sampleScheduled.add(result[i]);
-                });
-              }else if(result[i].statusName == "Approved For Production"){
-                setState(() {
-                  productionApproved.add(result[i]);
-                });
-              }else if(result[i].statusName == "Rejected For Production"){
-                setState(() {
-                  productionRejected.add(result[i]);
-                });
-              }
-            }
+          Network_Operations.getRequestCountIndividualUser(context,prefs.getString("token")).then((requestCountMap){
+            setState(() {
+              this.requestCount=requestCountMap['statuses'];
+            });
           });
         }
       });
-    }
 
-    super.onResume();
-  }
-  @override
-  void initState() {
-    SharedPreferences.getInstance().then((prefs){
-       claims = Utils.parseJwt(prefs.getString("token"));
-      if(claims["role"].contains("General Manager")){
-        Network_Operations.getRequestForGM(context, prefs.getString("token")).then((result){
-          for(int i=0; i<result.length;i++ ) {
-            if (result[i].statusName =="New Request"){
-              setState(() {
-                newRequest.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Approved By GM"){
-              setState(() {
-                approvebyGM.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Approved By Customer"){
-              setState(() {
-                customerApproved.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Approved Trial"){
-              setState(() {
-                approvedForTrial.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Rejected By Customer"){
-              setState(() {
-                rejectedbyCustomer.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Rejected By GM"){
-              setState(() {
-                rejectedbyGM.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Rejected Trial"){
-              setState(() {
-                rejectedTrial.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Samples Scheduled"){
-              setState(() {
-                sampleScheduled.add(result[i]);
-              });
-            }else if(result[i].statusName == "Approved For Production"){
-              setState(() {
-                productionApproved.add(result[i]);
-              });
-            }else if(result[i].statusName == "Rejected For Production"){
-              setState(() {
-                productionRejected.add(result[i]);
-              });
-            }
-          }
-        });
-      }else if(claims["role"]=="Sales Manager"){
-        Network_Operations.getRequestByStatus(context, prefs.getString("token"),2).then((result){
-          for(int i=0; i<result.length;i++ ) {
-            if (result[i].statusName =="New Request"){
-              setState(() {
-                newRequest.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Approved By GM"){
-              setState(() {
-                approvebyGM.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Approved By Customer"){
-              setState(() {
-                customerApproved.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Approved Trial"){
-              setState(() {
-                approvedForTrial.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Rejected By Customer"){
-              setState(() {
-                rejectedbyCustomer.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Rejected By GM"){
-              setState(() {
-                rejectedbyGM.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Rejected Trial"){
-              setState(() {
-                rejectedTrial.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Samples Scheduled"){
-              setState(() {
-                sampleScheduled.add(result[i]);
-              });
-            }else if(result[i].statusName == "Approved For Production"){
-              setState(() {
-                productionApproved.add(result[i]);
-              });
-            }else if(result[i].statusName == "Rejected For Production"){
-              setState(() {
-                productionRejected.add(result[i]);
-              });
-            }
-          }
-        });
-      }else{
-        Network_Operations.getRequest(context, prefs.getString("token")).then((result){
-          for(int i=0; i<result.length;i++ ) {
-            if (result[i].statusName =="New Request"){
-              setState(() {
-                newRequest.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Approved By GM"){
-              setState(() {
-                approvebyGM.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Approved By Customer"){
-              setState(() {
-                customerApproved.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Approved Trial"){
-              setState(() {
-                approvedForTrial.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Rejected By Customer"){
-              setState(() {
-                rejectedbyCustomer.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Rejected By GM"){
-              setState(() {
-                rejectedbyGM.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Rejected Trial"){
-              setState(() {
-                rejectedTrial.add(result[i]);
-              });
-            }
-            if (result[i].statusName =="Samples Scheduled"){
-              setState(() {
-                sampleScheduled.add(result[i]);
-              });
-            }else if(result[i].statusName == "Approved For Production"){
-              setState(() {
-                productionApproved.add(result[i]);
-              });
-            }else if(result[i].statusName == "Rejected For Production"){
-              setState(() {
-                productionRejected.add(result[i]);
-              });
-            }
-          }
-        });
-      }
     });
     super.initState();
   }
@@ -432,7 +139,7 @@ class _DashboardState extends ResumableState<Dashboard> {
             children: <Widget>[
               InkWell(
                 onTap:(){
-                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(newRequest)));
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(1)));
                 },
                 child: Card(
                   elevation: 10,
@@ -467,7 +174,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text(newRequest!=null?newRequest.length.toString():'0', style: TextStyle(color:Color(0xFF004c4c),
+                              child: Text(requestCount!=null&&requestCount['New Request']!=null?requestCount['New Request'].toString():"0", style: TextStyle(color:Color(0xFF004c4c),
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold
                               ),
@@ -484,7 +191,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(approvebyGM)));
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(2)));
                 },
                 child: Card(
                   elevation: 10,
@@ -522,7 +229,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text(approvebyGM!=null?approvebyGM.length.toString():'0',
+                              child: Text(requestCount!=null&&requestCount['Approved By GM']!=null?requestCount['Approved By GM'].toString():"0",
                                 style: TextStyle(
                                     color:Colors.teal.shade800,
                                     //Color(0xFF004c4c),
@@ -546,8 +253,7 @@ class _DashboardState extends ResumableState<Dashboard> {
           ),
           InkWell(
             onTap: (){
-             push(context, MaterialPageRoute(builder: (context)=>ModelRequests(rejectedbyGM)));
-             // Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestList(null,null,customerId)));
+             push(context, MaterialPageRoute(builder: (context)=>ModelRequests(3)));
             },
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0,right:8.0),
@@ -586,7 +292,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           color: Color(0xFF004c4c),
                         ),
                         child: Container(margin: EdgeInsets.only(left: 10,top: 5),
-                          child: Text(rejectedbyGM!=null?rejectedbyGM.length.toString():'0',
+                          child: Text(requestCount!=null&&requestCount['Rejected By GM']!=null?requestCount['Rejected By GM'].toString():"0",
                             style: TextStyle(
                                 color:Colors.white,
                                 //Color(0xFF004c4c),
@@ -613,8 +319,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               //Today Deliveries
               InkWell(
                 onTap:(){
-                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(sampleScheduled)));
-                  // Navigator.push(context, MaterialPageRoute(builder: (context)=>DeliveryList((DateFormat("yyyy-MM-dd").format(DateTime.now())),customerId)));
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(4)));
                 },
                 child: Card(
                   elevation: 10,
@@ -649,7 +354,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text(sampleScheduled!=null?sampleScheduled.length.toString():'0', style: TextStyle(color:Color(0xFF004c4c),
+                              child: Text(requestCount!=null&&requestCount['Samples Scheduled']!=null?requestCount['Samples Scheduled'].toString():"0", style: TextStyle(color:Color(0xFF004c4c),
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold
                               ),
@@ -665,8 +370,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                 push(context, MaterialPageRoute(builder: (context)=>ModelRequests(approvedForTrial)));
-                  // Navigator.push(context, MaterialPageRoute(builder: (context)=>SalesOrdersList(DateFormat("yyyy-MM-dd").format(DateTime.now()),DateFormat("yyyy-MM-dd").format(DateTime.now().add(Duration(days: 30))),customerId,DateFormat.MMMM().format(DateTime.now()).toString()+' Deliveries')));
+                 push(context, MaterialPageRoute(builder: (context)=>ModelRequests(5)));
                 },
                 child: Card(
                   elevation: 10,
@@ -703,7 +407,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text(approvedForTrial!=null?approvedForTrial.length.toString():'0',
+                              child: Text(requestCount!=null&&requestCount['Approved Trial']!=null?requestCount['Approved Trial'].toString():"0",
                                 style: TextStyle(
                                     color:Colors.teal.shade800,
                                     //Color(0xFF004c4c),
@@ -726,8 +430,7 @@ class _DashboardState extends ResumableState<Dashboard> {
           ),
           InkWell(
             onTap: (){
-             push(context, MaterialPageRoute(builder: (context)=>ModelRequests(rejectedTrial)));
-              // Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestList(null,null,customerId)));
+            push(context, MaterialPageRoute(builder: (context)=>ModelRequests(6)));
             },
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0,right:8.0),
@@ -765,7 +468,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           color: Color(0xFF004c4c),
                         ),
                         child: Container(margin: EdgeInsets.only(left: 10,top: 5),
-                          child: Text(rejectedTrial!=null?rejectedTrial.length.toString():'0',
+                          child: Text(requestCount!=null&&requestCount['Rejected Trial']!=null?requestCount['Rejected Trial'].toString():"0",
                             style: TextStyle(
                                 color:Colors.white,
                                 //Color(0xFF004c4c),
@@ -790,8 +493,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               //Today Deliveries
               InkWell(
                 onTap:(){
-                 push(context, MaterialPageRoute(builder: (context)=>ModelRequests(customerApproved)));
-                  // Navigator.push(context, MaterialPageRoute(builder: (context)=>DeliveryList((DateFormat("yyyy-MM-dd").format(DateTime.now())),customerId)));
+                 push(context, MaterialPageRoute(builder: (context)=>ModelRequests(7)));
                 },
                 child: Card(
                   elevation: 10,
@@ -826,7 +528,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text(customerApproved!=null?customerApproved.length.toString():'0', style: TextStyle(color:Color(0xFF004c4c),
+                              child: Text(requestCount!=null&&requestCount['Approved By Customer']!=null?requestCount['Approved By Customer'].toString():"0", style: TextStyle(color:Color(0xFF004c4c),
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold
                               ),
@@ -842,8 +544,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(rejectedbyCustomer)));
-                  // Navigator.push(context, MaterialPageRoute(builder: (context)=>SalesOrdersList(DateFormat("yyyy-MM-dd").format(DateTime.now()),DateFormat("yyyy-MM-dd").format(DateTime.now().add(Duration(days: 30))),customerId,DateFormat.MMMM().format(DateTime.now()).toString()+' Deliveries')));
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(8)));
                 },
                 child: Card(
                   elevation: 10,
@@ -880,7 +581,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text(rejectedbyCustomer!=null?rejectedbyCustomer.length.toString():'0',
+                              child: Text(requestCount!=null&&requestCount['Rejected By Customer']!=null?requestCount['Rejected By Customer'].toString():"0",
                                 style: TextStyle(
                                     color:Colors.teal.shade800,
                                     //Color(0xFF004c4c),
@@ -907,8 +608,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               //Today Deliveries
               InkWell(
                 onTap:(){
-                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(productionApproved)));
-                  // Navigator.push(context, MaterialPageRoute(builder: (context)=>DeliveryList((DateFormat("yyyy-MM-dd").format(DateTime.now())),customerId)));
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(9)));
                 },
                 child: Card(
                   elevation: 10,
@@ -943,7 +643,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text(productionApproved!=null?productionApproved.length.toString():'0', style: TextStyle(color:Color(0xFF004c4c),
+                              child: Text(requestCount!=null&&requestCount['Approved For Production']!=null?requestCount['Approved For Production'].toString():"0", style: TextStyle(color:Color(0xFF004c4c),
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold
                               ),
@@ -959,8 +659,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(productionRejected)));
-                  // Navigator.push(context, MaterialPageRoute(builder: (context)=>SalesOrdersList(DateFormat("yyyy-MM-dd").format(DateTime.now()),DateFormat("yyyy-MM-dd").format(DateTime.now().add(Duration(days: 30))),customerId,DateFormat.MMMM().format(DateTime.now()).toString()+' Deliveries')));
+                 push(context, MaterialPageRoute(builder: (context)=>ModelRequests(10)));
                 },
                 child: Card(
                   elevation: 10,
@@ -997,7 +696,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text(productionRejected!=null?productionRejected.length.toString():'0',
+                              child: Text(requestCount!=null&&requestCount['Rejected For Production']!=null?requestCount['Rejected For Production'].toString():"0",
                                 style: TextStyle(
                                     color:Colors.teal.shade800,
                                     //Color(0xFF004c4c),

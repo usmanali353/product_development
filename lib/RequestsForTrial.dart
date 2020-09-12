@@ -2,10 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:productdevelopment/RequestImagesGallery.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
  class RequestsForTrial extends StatefulWidget {
@@ -34,6 +36,7 @@ RequestsForTrial(this.requestId);
            if(requests!=null){
              isVisible=true;
            }
+
          });
        });
      });
@@ -79,16 +82,43 @@ RequestsForTrial(this.requestId);
                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                            //crossAxisAlignment: CrossAxisAlignment.start,
                            children: <Widget>[
-                             Container(
-                               //color: Color(0xFF004c4c),
-                               height: 90,
-                               width: 90,
-                               decoration: BoxDecoration(
-                                   borderRadius: BorderRadius.circular(8),
-                                   image: DecorationImage(
-                                     image: NetworkImage(requests[index].image!=null?requests[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"), //MemoryImage(base64Decode(products[index]['image'])),
-                                     fit: BoxFit.cover,
-                                   )
+                             InkWell(
+                               onTap: (){
+                                 setState(() {
+                                   List<String> imageUrl=[];
+                                   for(int i=0;i<requests[index].multipleImages.length;i++){
+                                     if(requests[index].multipleImages[i]!=null){
+                                       imageUrl.add(requests[index].multipleImages[i]);
+                                     }
+                                   }
+                                   if(imageUrl.length>0){
+                                     Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(requests[index])));
+                                   }else{
+                                     showDialog(
+                                         context: context,
+                                         builder: (BuildContext context){
+                                           return Center(
+                                             child: PhotoView(
+                                               imageProvider: NetworkImage(requests[index].image),
+                                             ),
+                                           );
+                                         }
+                                     );
+                                   }
+                                 });
+
+                               },
+                               child: Container(
+                                 //color: Color(0xFF004c4c),
+                                 height: 90,
+                                 width: 90,
+                                 decoration: BoxDecoration(
+                                     borderRadius: BorderRadius.circular(8),
+                                     image: DecorationImage(
+                                       image: NetworkImage(requests[index].image!=null?requests[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"), //MemoryImage(base64Decode(products[index]['image'])),
+                                       fit: BoxFit.cover,
+                                     )
+                                 ),
                                ),
                              ),
                              //Padding(padding: EdgeInsets.only(top:2),),
@@ -108,56 +138,9 @@ RequestsForTrial(this.requestId);
                                            height: 10,
                                            width: 15,
                                          ),
-
                                        ],
                                      ),
                                    ),
-
-                                 // Container(
-                                 //   decoration: BoxDecoration(
-                                 //     borderRadius: BorderRadius.circular(2),
-                                 //     color: Colors.grey.shade300,
-                                 //     //color: Colors.teal,
-                                 //   ),
-                                 //   height: 10,
-                                 //   width: 15,
-                                 // ),
-                                 // Padding(
-                                 //   padding: EdgeInsets.only(left: 2, right: 2),
-                                 // ),
-                                 // Container(
-                                 //   decoration: BoxDecoration(
-                                 //     borderRadius: BorderRadius.circular(2),
-                                 //     color: Colors.brown.shade200,
-                                 //     //color: Colors.teal,
-                                 //   ),
-                                 //   height: 10,
-                                 //   width: 15,
-                                 // ),
-                                 // Padding(
-                                 //   padding: EdgeInsets.only(left: 2, right: 2),
-                                 // ),
-                                 // Container(
-                                 //   decoration: BoxDecoration(
-                                 //     borderRadius: BorderRadius.circular(2),
-                                 //     color: Colors.brown.shade500,
-                                 //     //color: Colors.teal,
-                                 //   ),
-                                 //   height: 10,
-                                 //   width: 15,
-                                 // ),
-                                 // Padding(
-                                 //   padding: EdgeInsets.only(left: 2, right: 2),
-                                 // ),
-                                 // Container(
-                                 //   decoration: BoxDecoration(
-                                 //     borderRadius: BorderRadius.circular(2),
-                                 //     color: Colors.orangeAccent.shade100,
-                                 //     //color: Colors.teal,
-                                 //   ),
-                                 //   height: 10,
-                                 //   width: 15,
-                                 // ),
                                ],
                              ):Container(),
                            ],
@@ -183,28 +166,28 @@ RequestsForTrial(this.requestId);
                                      //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                      children: <Widget>[
                                        Icon(
-                                         Icons.layers,
-                                         color: Colors.teal,
-                                       ),
-                                       Padding(
-                                         padding: EdgeInsets.only(left: 2, right: 2),
-                                       ),
-                                       Text(requests[index].surfaceName!=null?requests[index].surfaceName:'')
-                                     ],
-                                   ),
-                                   Padding(
-                                     padding: EdgeInsets.only(left: 50),
-                                   ),
-                                   Row(
-                                     children: <Widget>[
-                                       Icon(
                                          Icons.date_range,
                                          color: Colors.teal,
                                        ),
                                        Padding(
                                          padding: EdgeInsets.only(left: 2, right: 2),
                                        ),
-                                       Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(requests[index].date))),
+                                       Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(requests[index].date)))
+                                     ],
+                                   ),
+                                   Padding(
+                                     padding: EdgeInsets.only(left: 30),
+                                   ),
+                                   Row(
+                                     children: <Widget>[
+                                       Icon(
+                                         Icons.layers,
+                                         color: Colors.teal,
+                                       ),
+                                       Padding(
+                                         padding: EdgeInsets.only(left: 2, right: 2),
+                                       ),
+                                       Text(requests[index].surfaceName!=null?requests[index].surfaceName:''),
                                      ],
 
 

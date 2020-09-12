@@ -4,7 +4,6 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
-import 'package:productdevelopment/WebBrowser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class QRScanner extends StatefulWidget{

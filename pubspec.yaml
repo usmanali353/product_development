@@ -84,8 +84,6 @@ dependencies:
 
   http:
 
-  webview_flutter:
-
   share: ^0.6.5
 
   path_provider: ^1.6.14

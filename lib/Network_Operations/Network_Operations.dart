@@ -255,14 +255,15 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
     }
     return null;
   }
-  static Future<List<Request>> getRequestByStatus(BuildContext context,String token,int statusId) async{
+  static Future<List<Request>> getRequestByStatusGM(BuildContext context,String token,int statusId) async{
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         List<Request> requests=[];
-        for(int i=0;i<jsonDecode(response.body).length;i++){
-          requests.add(Request.fromMap(jsonDecode(response.body)[i]));
+        for(int i=0;i<jsonDecode(response.body)['allRequests'].length;i++){
+          requests.add(Request.fromMap(jsonDecode(response.body)['allRequests'][i]));
         }
+        print(requests[0].toJson());
         return requests;
       }
     }catch(e){
@@ -433,5 +434,42 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
       pd.hide();
       Utils.showError(context, e.toString());
     }
+  }
+  static Future<Map<String,dynamic>> getRequestCountIndividualUser(BuildContext context,String token)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestsCountForIndividual",headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        pd.hide();
+        print(response.body.toString());
+        return jsonDecode(response.body);
+      }else{
+        pd.hide();
+        Utils.showError(context,response.statusCode.toString());
+      }
+    }catch(e){
+      pd.hide();
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static Future<List<Request>> getRequestByStatusIndividualUser(BuildContext context,String token,int statusId) async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        List<Request> requests=[];
+        for(int i=0;i<jsonDecode(response.body).length;i++){
+          requests.add(Request.fromMap(jsonDecode(response.body)[i]));
+        }
+        return requests;
+      }else {
+        Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
   }
 }

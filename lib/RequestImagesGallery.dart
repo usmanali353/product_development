@@ -3,7 +3,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:productdevelopment/Model/Request.dart';
 class RequestImageGallery extends StatefulWidget {
-  Request request;
+  var request;
 
   RequestImageGallery(this.request);
 
@@ -12,7 +12,7 @@ class RequestImageGallery extends StatefulWidget {
 }
 
 class _RequestImageGalleryState extends State<RequestImageGallery> {
-  Request request;
+  var request;
    List<String> imageUrl=[];
   _RequestImageGalleryState(this.request);
   @override
@@ -34,9 +34,7 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
       appBar: AppBar(title: Text("Gallery"),),
       body: Center(
         child: Container(
-
           width: MediaQuery.of(context).size.width,
-          height:  MediaQuery.of(context).size.height/2,
           child: PhotoViewGallery.builder(itemCount: imageUrl.length, builder: (context,index){
             return PhotoViewGalleryPageOptions(
               imageProvider: NetworkImage(
@@ -44,13 +42,11 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
               ),
 
               heroAttributes: PhotoViewHeroAttributes(tag: request.multipleColorNames[index].colorName),
-              maxScale: PhotoViewComputedScale.contained*1,
-              minScale: PhotoViewComputedScale.covered*1,
             );
           },
             scrollPhysics: BouncingScrollPhysics(),
             backgroundDecoration: BoxDecoration(
-              color: Theme.of(context).canvasColor
+              color: Colors.black
             ),
             loadingBuilder: (context,e){
              return Center(

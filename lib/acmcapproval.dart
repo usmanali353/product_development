@@ -116,46 +116,40 @@ class _acmcApprovalState extends State<acmcApproval> {
                     ),
                   ),
                 ),
-                Visibility(
-                  visible: status=="Approve",
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16,right: 16),
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: FormBuilderTextField(
-                        attribute: "Model Name",
-                        controller: modelName,
-                        validators: [FormBuilderValidators.required()],
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(16),
-                            border: InputBorder.none,
-                            hintText: "Model Name"
-                        ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16,right: 16),
+                  child: Card(
+                    elevation: 10,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: FormBuilderTextField(
+                      attribute: "Model Name",
+                      controller: modelName,
+                      validators: [FormBuilderValidators.required()],
+                      decoration: InputDecoration(
+                          contentPadding: EdgeInsets.all(16),
+                          border: InputBorder.none,
+                          hintText: "Model Name"
                       ),
                     ),
                   ),
                 ),
-                Visibility(
-                  visible: status=="Approve",
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: FormBuilderTextField(
-                        attribute: "Model Code",
-                        controller: modelCode,
-                        validators: [FormBuilderValidators.required()],
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(16),
-                            border: InputBorder.none,
-                            hintText: "Model Code"
-                        ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Card(
+                    elevation: 10,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: FormBuilderTextField(
+                      attribute: "Model Code",
+                      controller: modelCode,
+                      validators: [FormBuilderValidators.required()],
+                      decoration: InputDecoration(
+                          contentPadding: EdgeInsets.all(16),
+                          border: InputBorder.none,
+                          hintText: "Model Code"
                       ),
                     ),
                   ),
@@ -167,7 +161,7 @@ class _acmcApprovalState extends State<acmcApproval> {
                     if(fbKey.currentState.validate()&&formState.currentState.validate()){
                       formState.currentState.save();
                       if(status=='Reject'){
-                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token," "," ").then((value){
+                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,modelName.text,modelCode.text).then((value){
                           Network_Operations.changeStatusOfRequest(context, token, request.requestId, 3);
                         });
                       }else{

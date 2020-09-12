@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:photo_view/photo_view.dart';
 import 'package:printing/printing.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -59,6 +60,17 @@ class _DetailPageState extends State<DetailPage>{
                 if(imageUrl.length>0) {
                   Navigator.push(context, MaterialPageRoute(
                       builder: (context) => RequestImageGallery(request)));
+                }else{
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context){
+                        return Center(
+                          child: PhotoView(
+                            imageProvider: NetworkImage(request.image),
+                          ),
+                        );
+                      }
+                  );
                 }
               },
               child: Container(
