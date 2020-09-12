@@ -527,11 +527,13 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Set"),
       onPressed: () {
         if(selectedPreference=="Approve"){
-          Navigator.push(context, MaterialPageRoute(builder: (context)=>ApproveForTrial(request)));
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>ApproveForTrial(request,'Approve')));
         }else if(selectedPreference=="Reject"){
-          Network_Operations.changeStatusOfRequest(context, token, request.requestId, 6);
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>ApproveForTrial(request,'Reject')));
         }
+        //   Network_Operations.changeStatusOfRequest(context, token, request.requestId, 6);
+        //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+        // }
       },
     );
     // set up the AlertDialog

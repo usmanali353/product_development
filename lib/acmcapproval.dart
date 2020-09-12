@@ -23,7 +23,7 @@ class _acmcApprovalState extends State<acmcApproval> {
   List<Dropdown> designer=[];
   List<dynamic> designers=[];
   Request request;
-  TextEditingController designerObservations,modelName,modelCode;
+  TextEditingController designerObservations,modelName,modelCode,remarks;
   String status,productId;
   int requestId;
   String token;
@@ -33,6 +33,7 @@ class _acmcApprovalState extends State<acmcApproval> {
     designerObservations=TextEditingController();
     modelName=TextEditingController();
     modelCode=TextEditingController();
+    remarks=TextEditingController();
     SharedPreferences.getInstance().then((prefs){
       token=prefs.getString("token");
       Network_Operations.getDesignerDropDowns(context, prefs.getString("token"), "Designer").then((designerDopDown){
@@ -105,7 +106,7 @@ class _acmcApprovalState extends State<acmcApproval> {
                     ),
                     child: FormBuilderTextField(
                       attribute: "Designer Observations",
-                      maxLines: 8,
+                      maxLines: 5,
                       controller: designerObservations,
                       validators: [FormBuilderValidators.required()],
                       decoration: InputDecoration(
@@ -154,6 +155,26 @@ class _acmcApprovalState extends State<acmcApproval> {
                     ),
                   ),
                 ),
+                Padding(
+                  padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
+                  child: Card(
+                    elevation: 10,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: FormBuilderTextField(
+                      attribute: "Remarks",
+                      controller: remarks,
+                      validators: [FormBuilderValidators.required()],
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                          hintText: "Remarks",
+                          contentPadding: EdgeInsets.all(16),
+                          border: InputBorder.none
+                      ),
+                    ),
+                  ),
+                ),
                 MaterialButton(
                   color: Color(0xFF004c4c),
                   child: Text("Proceed",style: TextStyle(color: Colors.white),),
@@ -161,12 +182,12 @@ class _acmcApprovalState extends State<acmcApproval> {
                     if(fbKey.currentState.validate()&&formState.currentState.validate()){
                       formState.currentState.save();
                       if(status=='Reject'){
-                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,modelName.text,modelCode.text).then((value){
-                          Network_Operations.changeStatusOfRequest(context, token, request.requestId, 3);
+                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,modelName.text,modelCode.text,remarks.text).then((value){
+                          Network_Operations.changeStatusWithRemarks(context, token, request.requestId, 3,remarks.text);
                         });
                       }else{
-                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,modelName.text,modelCode.text).then((value){
-                          Network_Operations.changeStatusOfRequest(context, token, request.requestId, 2);
+                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,modelName.text,modelCode.text,remarks.text).then((value){
+                          Network_Operations.changeStatusWithRemarks(context, token, request.requestId, 2,remarks.text);
                         });
                       }
 

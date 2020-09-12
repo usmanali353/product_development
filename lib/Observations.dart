@@ -2,13 +2,14 @@ import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
+import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class Observations extends StatefulWidget {
-  String status;
-  Request request;
+  int status;
+  var request;
   Observations(this.status,this.request);
   @override
   _ObservationsState createState() => _ObservationsState(status,request);
@@ -16,14 +17,14 @@ class Observations extends StatefulWidget {
 
 class _ObservationsState extends State<Observations> {
   String token;
-  String status;
-  Request request;
-  TextEditingController observation;
+  int status;
+  var request;
+  TextEditingController remarks;
   GlobalKey<FormBuilderState> fbKey=GlobalKey();
   _ObservationsState(this.status,this.request);
  @override
   void initState() {
-    observation=TextEditingController();
+    remarks=TextEditingController();
     SharedPreferences.getInstance().then((prefs){
       setState(() {
         token= prefs.getString("token");
@@ -49,12 +50,12 @@ class _ObservationsState extends State<Observations> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: FormBuilderTextField(
-                      attribute: "Commercial Observation",
-                      controller: observation,
+                      attribute: "Remarks",
+                      controller: remarks,
                       validators: [FormBuilderValidators.required()],
                       maxLines: 8,
                       decoration: InputDecoration(
-                        hintText: "Commercial Observation",
+                        hintText: "Remarks",
                         contentPadding: EdgeInsets.all(16),
                         border: InputBorder.none
                       ),
@@ -67,7 +68,15 @@ class _ObservationsState extends State<Observations> {
                     color: Color(0xFF004c4c),
                     onPressed: (){
                       if(fbKey.currentState.validate()){
-
+                       if(status==7){
+                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text);
+                       }else if(status==8){
+                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text);
+                       }else if(status==9){
+                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text);
+                       }else if(status==10){
+                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text);
+                       }
                       }
                     },
                   ),

@@ -161,7 +161,7 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
       Utils.showError(context, e.toString());
     }
   }
-  static Future<void> addDesignersAndObservationToRequest(BuildContext context,int requestId,List<dynamic> designers,String designerObservations,String token,String modelName,String modelCode) async{
+  static Future<void> addDesignersAndObservationToRequest(BuildContext context,int requestId,List<dynamic> designers,String designerObservations,String token,String modelName,String modelCode,String remarks) async{
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
@@ -170,7 +170,8 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
         "MultipleDesigners":designers,
         "DesignerObservation":designerObservations,
         "modelName":modelName,
-        "modelCode":modelCode
+        "modelCode":modelCode,
+        "Remarks":remarks
       },toEncodable: Utils.myEncode);
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestDesignerSave",body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
@@ -272,11 +273,12 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
     }
     return null;
   }
-  static Future<void> trialClient(BuildContext context,String token,List<dynamic> clientIds,int requestId)async{
+  static Future<void> trialClient(BuildContext context,String token,List<dynamic> clientIds,int requestId,String remarks)async{
     try{
       final body=jsonEncode({
        "requestId":requestId,
-        "MultipleClients":clientIds
+        "MultipleClients":clientIds,
+        "Remarks":remarks
       });
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestClientSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
@@ -471,5 +473,42 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
       Utils.showError(context, e.toString());
     }
     return null;
+  }
+  static Future<void> changeStatusWithRemarks(BuildContext context,String token,int requestId,int status,String remarks)async{
+    try{
+      final body=jsonEncode({
+        "StatusId":status,
+        "RequestId":requestId,
+        "Remarks":remarks,
+      },toEncodable: Utils.myEncode);
+      var response=await http.post(Utils.getBaseUrl()+"Request/SaveRequestRemark",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        Utils.showSuccess(context, "Status Changed");
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+      }else{
+        Utils.showError(context,response.statusCode.toString());
+      }
+    }catch(e){
+      Utils.showError(context, e.toString());
+    }
+  }
+  static Future<void> changeStatusClientWithRemarks(BuildContext context,String token,int requestId,int status,String remarks)async{
+    try{
+      final body=jsonEncode({
+        "StatusId":status,
+        "RequestClientId":requestId,
+        "Remarks":remarks,
+       // "RequestclientId":clientId
+      },toEncodable: Utils.myEncode);
+      var response=await http.post(Utils.getBaseUrl()+"Request/SaveRequestRemark",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        Utils.showSuccess(context, "Status Changed");
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+      }else{
+        Utils.showError(context,response.statusCode.toString());
+      }
+    }catch(e){
+      Utils.showError(context, e.toString());
+    }
   }
 }

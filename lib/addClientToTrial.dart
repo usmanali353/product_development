@@ -82,7 +82,7 @@ class _AddClientToTrialState extends State<AddClientToTrial> {
                   child: MaterialButton(
                     onPressed: (){
                       SharedPreferences.getInstance().then((prefs){
-                        Network_Operations.trialClient(context, prefs.getString("token"), myClients, requestId);
+                        Network_Operations.trialClient(context, prefs.getString("token"), myClients, requestId,'');
                       });
                     },
                     color: Color(0xFF004c4c),
