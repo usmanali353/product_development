@@ -124,149 +124,148 @@ class _ModelReState extends ResumableState<ModelRequests>{
         child: ListView.builder(
                 itemCount:products!=null?products.length:0, itemBuilder: (context,int index)
             {
-              return GestureDetector(
-                onTapDown: (TapDownDetails details)async{
-                  if(products[index].statusName=="New Request"){
+              return Card(
+                elevation: 6,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    //color: Colors.teal,
+                  ),
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.21,
 
-                    await showMenu(
-                      context: context,
-                      position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                      items: [
-                        PopupMenuItem<String>(
-                            child: const Text('Change Status'), value: 'changeStatus'),
-                        PopupMenuItem<String>(
-                            child: const Text('Add Images'), value: 'addImage'),
-                      ],
-                      elevation: 8.0,
-                    ).then((selectedItem){
-                       if(selectedItem=="changeStatus"){
-                         showAlertDialog(context,products[index]);
-                       }else if(selectedItem=="addImage"){
-                         Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
-                       }
-                    });
-
-                  }else if(products[index].statusName=="Approved By GM"){
-                    await showMenu(
-                      context: context,
-                      position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                      items: [
-                        PopupMenuItem<String>(
-                            child: const Text('Change Status'), value: 'changeStatus'),
-                        PopupMenuItem<String>(
-                            child: const Text('See Details'), value: 'Details'),
-                      ],
-                      elevation: 8.0,
-                    ).then((selectedItem){
-                      if(selectedItem=="changeStatus"){
-                        showDatePicker(helpText:"Select Target Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((startDate){
-                          if(startDate!=null){
-                            showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((endDate){
-                              if(endDate!=null){
-                                Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null,4);
-                              }
-                            });
-                          }
-                        });
-                      }else if(selectedItem=="Details"){
-                        Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailPage(products[index])));
-                      }
-                    });
-
-                  }else if(products[index].statusName=="Samples Scheduled"){
-                    showAlertChangeStatus(context,products[index]);
-                  }else if(products[index].statusName=="Approved Trial"){
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products[index].requestId)));
-                  }else {
-                    Navigator.push(context, MaterialPageRoute(
-                        builder: (context) => DetailPage(products[index])));
-                  }
-                },
-                child: Card(
-                  elevation: 6,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      //color: Colors.teal,
-                    ),
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.21,
-
-                    child: Padding(
-                      padding: const EdgeInsets.all(13.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              InkWell(
-                                onTap: (){
-                                  setState(() {
-                                    List<String> imageUrl=[];
-                                    for(int i=0;i<products[index].multipleImages.length;i++){
-                                      if(products[index].multipleImages[i]!=null){
-                                        imageUrl.add(products[index].multipleImages[i]);
-                                      }
+                  child: Padding(
+                    padding: const EdgeInsets.all(13.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            InkWell(
+                              onTap: (){
+                                setState(() {
+                                  List<String> imageUrl=[];
+                                  for(int i=0;i<products[index].multipleImages.length;i++){
+                                    if(products[index].multipleImages[i]!=null){
+                                      imageUrl.add(products[index].multipleImages[i]);
                                     }
-                                    if(imageUrl.length>0){
-                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
-                                    }else{
-                                      showDialog(
-                                          context: context,
-                                          builder: (BuildContext context){
-                                            return Center(
-                                              child: PhotoView(
-                                                imageProvider: NetworkImage(products[index].image),
-                                              ),
-                                            );
-                                          }
-                                      );
-                                    }
-                                  });
-                                },
-                                child: Container(
-                                  //color: Color(0xFF004c4c),
-                                  height: 90,
-                                  width: 90,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      image: DecorationImage(
-                                        image: NetworkImage(products[index].image!=null?products[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"), //MemoryImage(base64Decode(products[index]['image'])),
-                                        fit: BoxFit.cover,
-                                      )
-                                  ),
+                                  }
+                                  if(imageUrl.length>0){
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
+                                  }else{
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context){
+                                          return Center(
+                                            child: PhotoView(
+                                              imageProvider: NetworkImage(products[index].image),
+                                            ),
+                                          );
+                                        }
+                                    );
+                                  }
+                                });
+                              },
+                              child: Container(
+                                //color: Color(0xFF004c4c),
+                                height: 90,
+                                width: 90,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    image: DecorationImage(
+                                      image: NetworkImage(products[index].image!=null?products[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"), //MemoryImage(base64Decode(products[index]['image'])),
+                                      fit: BoxFit.cover,
+                                    )
                                 ),
                               ),
-                              //Padding(padding: EdgeInsets.only(top:2),),
-                              products[index].multipleColorNames!=null&&products[index].multipleColorNames.length>0?Row(
-                                children: <Widget>[
-                                  for(int i=0;i<products[index].multipleColorNames.length;i++)
-                                    Padding(
-                                      padding: const EdgeInsets.all(2),
-                                      child: Wrap(
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(2),
-                                              color: Color(Utils.getColorFromHex(products[index].multipleColorNames[i].colorCode)),
-                                              //color: Colors.teal,
-                                            ),
-                                            height: 10,
-                                            width: 15,
+                            ),
+                            //Padding(padding: EdgeInsets.only(top:2),),
+                            products[index].multipleColorNames!=null&&products[index].multipleColorNames.length>0?Row(
+                              children: <Widget>[
+                                for(int i=0;i<products[index].multipleColorNames.length;i++)
+                                  Padding(
+                                    padding: const EdgeInsets.all(2),
+                                    child: Wrap(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(2),
+                                            color: Color(Utils.getColorFromHex(products[index].multipleColorNames[i].colorCode)),
+                                            //color: Colors.teal,
                                           ),
+                                          height: 10,
+                                          width: 15,
+                                        ),
 
-                                        ],
-                                      ),
+                                      ],
                                     ),
+                                  ),
 
 
+                              ],
+                            ):Container(),
+                          ],
+                        ),
+                        VerticalDivider(color: Colors.grey,),
+                        GestureDetector(
+                          onTapDown: (details)async{
+                            if(products[index].statusName=="New Request"){
+                              await showMenu(
+                                context: context,
+                                position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                items: [
+                                  PopupMenuItem<String>(
+                                      child: const Text('Change Status'), value: 'changeStatus'),
+                                  PopupMenuItem<String>(
+                                      child: const Text('Add Images'), value: 'addImage'),
                                 ],
-                              ):Container(),
-                            ],
-                          ),
-                          VerticalDivider(color: Colors.grey,),
-                          Container(
+                                elevation: 8.0,
+                              ).then((selectedItem){
+                                if(selectedItem=="changeStatus"){
+                                  showAlertDialog(context,products[index]);
+                                }else if(selectedItem=="addImage"){
+                                  Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
+                                }
+                              });
+
+                            }else if(products[index].statusName=="Approved By GM"){
+                              await showMenu(
+                                context: context,
+                                position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                items: [
+                                  PopupMenuItem<String>(
+                                      child: const Text('Change Status'), value: 'changeStatus'),
+                                  PopupMenuItem<String>(
+                                      child: const Text('See Details'), value: 'Details'),
+                                ],
+                                elevation: 8.0,
+                              ).then((selectedItem){
+                                if(selectedItem=="changeStatus"){
+                                  showDatePicker(helpText:"Select Target Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((startDate){
+                                    if(startDate!=null){
+                                      showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((endDate){
+                                        if(endDate!=null){
+                                          Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null,4);
+                                        }
+                                      });
+                                    }
+                                  });
+                                }else if(selectedItem=="Details"){
+                                  Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailPage(products[index])));
+                                }
+                              });
+
+                            }else if(products[index].statusName=="Samples Scheduled"){
+                              showAlertChangeStatus(context,products[index]);
+                            }else if(products[index].statusName=="Approved Trial"){
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products[index].requestId)));
+                            }else {
+                              Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) => DetailPage(products[index])));
+                            }
+                          },
+                          child: Container(
                             width: MediaQuery.of(context).size.width * 0.62,
                             height: MediaQuery.of(context).size.height * 0.62,
                             color: Colors.white,
@@ -348,11 +347,11 @@ class _ModelReState extends ResumableState<ModelRequests>{
                               ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-
                   ),
+
                 ),
               );
             }),
