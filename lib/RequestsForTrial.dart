@@ -272,18 +272,9 @@ RequestsForTrial(this.requestId);
          Navigator.pop(context);
          if(selectedPreference=="Approve"){
            SharedPreferences.getInstance().then((prefs){
-             // Network_Operations.approveRequestClient(context, prefs.getString("token"), request.id, 7).then((value){
-             //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
-             // });
              Navigator.push(context, MaterialPageRoute(builder: (context)=>Observations(7,request)));
            });
-           //Network_Operations.approveRequestClient(context, token, request.requestId, 1);
          }else if(selectedPreference=="Reject"){
-           // SharedPreferences.getInstance().then((prefs){
-           //   Network_Operations.approveRequestClient(context, prefs.getString("token"), request.id, 8).then((value){
-           //     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
-           //   });
-           // });
            Navigator.push(context, MaterialPageRoute(builder: (context)=>Observations(8,request)));
          }
        },
@@ -356,20 +347,8 @@ RequestsForTrial(this.requestId);
          Navigator.pop(context);
          if(selectedPreference=="Approve"){
            Navigator.push(context, MaterialPageRoute(builder: (context)=>Observations(9,request)));
-           // SharedPreferences.getInstance().then((prefs){
-           //   Network_Operations.approveRequestClient(context, prefs.getString("token"), request.id, 9).then((value){
-           //     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
-           //   });
-           // });
-           //Network_Operations.approveRequestClient(context, token, request.requestId, 1);
          }else if(selectedPreference=="Reject"){
            Navigator.push(context, MaterialPageRoute(builder: (context)=>Observations(10,request)));
-           // SharedPreferences.getInstance().then((prefs){
-           //   Network_Operations.approveRequestClient(context, prefs.getString("token"), request.id, 10).then((value){
-           //     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
-           //   });
-           // });
-
          }
        },
      );

@@ -35,7 +35,7 @@ class _ObservationsState extends State<Observations> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Observations"),),
+      appBar: AppBar(title: Text("Remarks"),),
       body: ListView(
         children: <Widget>[
           FormBuilder(

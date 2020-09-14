@@ -511,4 +511,26 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
       Utils.showError(context, e.toString());
     }
   }
+  static Future<List<TrialRequests>> getClientRequestsByStatus(BuildContext context,String token,int statusId)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+        List<TrialRequests> requests=[];
+        for(int i=0;i<jsonDecode(response.body).length;i++){
+          requests.add(TrialRequests.fromJson(jsonDecode(response.body)[i]));
+        }
+        return requests;
+      }else{
+        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
 }

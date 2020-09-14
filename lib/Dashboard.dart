@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/Login.dart';
 import 'package:productdevelopment/Model/Request.dart';
+import 'package:productdevelopment/ProductionManagerPage.dart';
 import 'package:productdevelopment/scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ModelRequests.dart';
@@ -96,6 +97,18 @@ class _DashboardState extends ResumableState<Dashboard> {
                     },
                   ),
                   Divider(),
+                 claims!=null&&claims["role"].contains("Product Manager")?Column(
+                   children: [
+                     ListTile(
+                       title: Text("Production Requests"),
+                       leading: Icon(FontAwesomeIcons.industry),
+                       onTap: (){
+                         Navigator.push(context, MaterialPageRoute(builder: (context)=>ProductionManagerPage()));
+                       },
+                     ),
+                     Divider(),
+                   ],
+                 ):Container(),
                   ListTile(
                     title: Text("Sign Out"),
                     leading: Icon(FontAwesomeIcons.signOutAlt),
