@@ -16,7 +16,6 @@ class _ProductionManagerPageState extends State<ProductionManagerPage> {
             title:Text("Model Requests"),
             bottom: TabBar(
               tabs: <Widget>[
-
                 Tab(text: "Customer Approved",),
                 Tab(text: "Production Approved",),
                 Tab(text: "Production Rejected",),
