@@ -201,17 +201,20 @@ class _DetailPageState extends State<DetailPage>{
                                     ),),
                                   ),
 
-                                  for(int i=0;i<request.remarksHistory.length;i++)ExpansionTile(
-                                    initiallyExpanded: true,
-                                    title:Text(request.remarksHistory[i].statusName),
-                                    leading: Icon(Icons.history,size: 40,),
-                                    subtitle: Text(request.remarksHistory[i].remarkedByName!=null?request.remarksHistory[i].remarkedByName:""),
-                                    trailing: Text(request.remarksHistory[i].date!=null?DateFormat("yyyy-MM-dd").format(DateTime.parse(request.remarksHistory[i].date)):""),
-                                    children: [
-                                      ListTile(
-                                        title: Text(request.remarksHistory[i].remarks),
-                                      )
-                                    ],
+                                  for(int i=0;i<request.remarksHistory.length;i++)Padding(
+                                    padding: const EdgeInsets.only(top:16),
+                                    child: ExpansionTile(
+                                      initiallyExpanded: true,
+                                      title:Text(request.remarksHistory[i].statusName),
+                                      leading: Icon(Icons.history,size: 40,),
+                                      subtitle: Text(request.remarksHistory[i].remarkedByName!=null?request.remarksHistory[i].remarkedByName:""),
+                                      trailing: Text(request.remarksHistory[i].date!=null?DateFormat("yyyy-MM-dd").format(DateTime.parse(request.remarksHistory[i].date)):""),
+                                      children: [
+                                        ListTile(
+                                          title: Text(request.remarksHistory[i].remarks),
+                                        )
+                                      ],
+                                    ),
                                   )
                                 ],
                               )

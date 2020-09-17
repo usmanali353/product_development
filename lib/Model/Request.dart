@@ -10,7 +10,7 @@ class Request {
   DateTime dateTime;
   List<Colors> multipleColorNames;
   List<RemarksHistory> remarksHistory;
-  List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames,multipleImages;
+  List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames,multipleImages,currentLoggedInUserStatuses;
   Request({
     this.requestId,
     this.marketId,
@@ -140,6 +140,7 @@ class Request {
     clientName=data['clientName'];
     rangeImage=data['rangeImage'];
     multipleImages=data['multipleImages'];
+    currentLoggedInUserStatuses=data['currentLoggedInUserStatuses'];
   }
 
 }

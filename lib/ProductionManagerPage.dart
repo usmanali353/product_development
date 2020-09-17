@@ -24,9 +24,9 @@ class _ProductionManagerPageState extends State<ProductionManagerPage> {
         ),
         body: TabBarView(
           children: [
-            ProductionManagerRequests(7),
-            ProductionManagerRequests(9),
-            ProductionManagerRequests(10),
+            ProductionManagerRequests(7,null),
+            ProductionManagerRequests(9,null),
+            ProductionManagerRequests(10,null),
           ],
         ),
       ),

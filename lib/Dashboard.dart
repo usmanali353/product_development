@@ -8,6 +8,7 @@ import 'package:productdevelopment/scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ModelRequests.dart';
 import 'Network_Operations/Network_Operations.dart';
+import 'ProductionManagerRequests.dart';
 import 'Utils/Utils.dart';
 import 'request_Model_form/Assumptions.dart';
 class Dashboard extends StatefulWidget {
@@ -506,7 +507,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               //Today Deliveries
               InkWell(
                 onTap:(){
-                 push(context, MaterialPageRoute(builder: (context)=>ModelRequests(7)));
+                 push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(7,"Dashboard")));
                 },
                 child: Card(
                   elevation: 10,
@@ -557,7 +558,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(8)));
+                  push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(8,"Dashboard")));
                 },
                 child: Card(
                   elevation: 10,
@@ -621,7 +622,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               //Today Deliveries
               InkWell(
                 onTap:(){
-                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(9)));
+                  push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(9,"Dashboard")));
                 },
                 child: Card(
                   elevation: 10,
@@ -672,7 +673,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                 push(context, MaterialPageRoute(builder: (context)=>ModelRequests(10)));
+                 push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(10,"Dashboard")));
                 },
                 child: Card(
                   elevation: 10,

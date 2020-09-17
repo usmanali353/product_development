@@ -13,11 +13,11 @@ import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class ProductionManagerRequests extends StatefulWidget {
   int statusId;
-
-  ProductionManagerRequests(this.statusId);
+  String type;
+  ProductionManagerRequests(this.statusId,this.type);
 
   @override
-  _ProductionManagerRequestsState createState() => _ProductionManagerRequestsState(statusId);
+  _ProductionManagerRequestsState createState() => _ProductionManagerRequestsState(statusId,type);
 }
 
 class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
@@ -25,8 +25,8 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
   bool isVisible=false;
   var selectedPreference;
   int statusId;
-
-  _ProductionManagerRequestsState(this.statusId);
+  String type;
+  _ProductionManagerRequestsState(this.statusId,this.type);
 
   @override
   void initState() {
@@ -47,6 +47,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: type!=null?AppBar(title: Text("Model Requests"),):null,
       body: Visibility(
         visible: isVisible,
         child: ListView.builder(itemCount:requests!=null?requests.length:0,itemBuilder:(context,int index){
