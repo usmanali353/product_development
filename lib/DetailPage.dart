@@ -189,6 +189,34 @@ class _DetailPageState extends State<DetailPage>{
                                 Divider(),
                               ],
                             ):Container(),
+                           request.remarksHistory!=null? Padding(
+                              padding: EdgeInsets.only(top:10,bottom: 4),
+                              child:Column(
+                                children: [
+                                  Center(
+                                    child: Text("Remarks History", style:
+                                    TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20
+                                    ),),
+                                  ),
+
+                                  for(int i=0;i<request.remarksHistory.length;i++)ExpansionTile(
+                                    initiallyExpanded: true,
+                                    title:Text(request.remarksHistory[i].statusName),
+                                    leading: Icon(Icons.history,size: 40,),
+                                    subtitle: Text(request.remarksHistory[i].remarkedByName!=null?request.remarksHistory[i].remarkedByName:""),
+                                    trailing: Text(request.remarksHistory[i].date!=null?DateFormat("yyyy-MM-dd").format(DateTime.parse(request.remarksHistory[i].date)):""),
+                                    children: [
+                                      ListTile(
+                                        title: Text(request.remarksHistory[i].remarks),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              )
+
+                            ):Container(),
                             Padding(
                               padding: EdgeInsets.only(top: 4, bottom: 4),
                             ),

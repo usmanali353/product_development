@@ -40,8 +40,6 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
               imageProvider: NetworkImage(
                 imageUrl[index],
               ),
-
-              heroAttributes: PhotoViewHeroAttributes(tag: request.multipleColorNames[index].colorName),
             );
           },
             scrollPhysics: BouncingScrollPhysics(),

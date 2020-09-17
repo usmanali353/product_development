@@ -1,10 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:productdevelopment/Dashboard.dart';
-import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Observations.dart';

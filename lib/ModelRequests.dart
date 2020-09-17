@@ -11,6 +11,7 @@ import 'package:productdevelopment/ApproveForTrial.dart';
 import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:productdevelopment/Observations.dart';
 import 'package:productdevelopment/RequestImagesGallery.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -528,11 +529,8 @@ class _ModelReState extends ResumableState<ModelRequests>{
         if(selectedPreference=="Approve"){
           Navigator.push(context, MaterialPageRoute(builder: (context)=>ApproveForTrial(request,'Approve')));
         }else if(selectedPreference=="Reject"){
-          Navigator.push(context, MaterialPageRoute(builder: (context)=>ApproveForTrial(request,'Reject')));
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>Observations(6,request)));
         }
-        //   Network_Operations.changeStatusOfRequest(context, token, request.requestId, 6);
-        //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
-        // }
       },
     );
     // set up the AlertDialog

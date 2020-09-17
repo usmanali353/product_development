@@ -19,8 +19,7 @@ class ApproveForTrial extends StatefulWidget {
 
 class _ApproveForTrialState extends State<ApproveForTrial> {
   GlobalKey<FormBuilderState> fbKey=GlobalKey();
-  DateTime startDate = DateTime.now();
-  DateTime endDate =DateTime.now();
+  DateTime clientVisitDate = DateTime.now();
   TextEditingController remarks;
   List myClients;
   List<dynamic> clients=[];
@@ -66,37 +65,15 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                        borderRadius: BorderRadius.circular(15),
                      ),
                      child: FormBuilderDateTimePicker(
-                       attribute: "Actual Start Date",
+                       attribute: "Client Visit Date",
                        style: Theme.of(context).textTheme.bodyText1,
                        inputType: InputType.date,
                        validators: [FormBuilderValidators.required()],
                        format: DateFormat("MM-dd-yyyy"),
-                       decoration: InputDecoration(hintText: "Actual Production Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                       decoration: InputDecoration(hintText: "Client Visit Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                        onChanged: (value){
                          setState(() {
-                           this.startDate=value;
-                         });
-                       },
-                     ),
-                   ),
-                 ),
-                 Padding(
-                   padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
-                   child:Card(
-                     elevation: 10,
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(15),
-                     ),
-                     child: FormBuilderDateTimePicker(
-                       attribute: "Actual End Date",
-                       style: Theme.of(context).textTheme.bodyText1,
-                       inputType: InputType.date,
-                       validators: [FormBuilderValidators.required()],
-                       format: DateFormat("MM-dd-yyyy"),
-                       decoration: InputDecoration(hintText: "Actual Production End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
-                       onChanged: (value){
-                         setState(() {
-                           this.endDate=value;
+                           this.clientVisitDate=value;
                          });
                        },
                      ),
@@ -162,23 +139,10 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                            if(fbKey.currentState.validate()){
                              if(status=="Approve"){
                                SharedPreferences.getInstance().then((prefs){
-                                 Network_Operations.addRequestSchedule(context, prefs.getString("token"), request.requestId,DateTime.parse(request.targetStartDate) ,DateTime.parse(request.targetEndDate) , startDate, endDate,5).then((value){
-                                   Network_Operations.trialClient(context, prefs.getString("token"), myClients, request.requestId,remarks.text);
-                                 });
+                                 Network_Operations.trialClient(context, prefs.getString("token"), myClients, request.requestId,remarks.text,clientVisitDate);
                                });
-                             }else if(status=="Reject"){
-                               SharedPreferences.getInstance().then((prefs){
-                                 Network_Operations.addRequestSchedule(context, prefs.getString("token"), request.requestId,DateTime.parse(request.targetStartDate) ,DateTime.parse(request.targetEndDate) , startDate, endDate,5).then((value){
-                                   Network_Operations.changeStatusWithRemarks(context, prefs.getString("token"), request.requestId, 6, remarks.text).then((value){
-                                     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
-                                   });
-                                 });
-
-                               });
-
                              }
                            }
-
                          },
                          color: Color(0xFF004c4c),
                          child: Text("Proceed",style: TextStyle(color: Colors.white),),

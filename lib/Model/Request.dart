@@ -1,4 +1,5 @@
 import 'package:productdevelopment/Model/Colors.dart';
+import 'package:productdevelopment/Model/RemarksHistory.dart';
 
 class Request {
   int requestId, marketId, statusId, classificationId, rangeId, technologyId,
@@ -8,6 +9,7 @@ class Request {
   var image;
   DateTime dateTime;
   List<Colors> multipleColorNames;
+  List<RemarksHistory> remarksHistory;
   List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames,multipleImages;
   Request({
     this.requestId,
@@ -84,6 +86,7 @@ class Request {
     map['rangeImage']=rangeImage;
     map['multipleImages']=multipleImages;
     map['multipleColorNames'] = List<dynamic>.from(multipleColorNames.map((x) => x.toJson()));
+   // map['allRequestRemarks'] = List<dynamic>.from(remarksHistory.map((x) => x.toJson()));
     return map;
   }
   Request.fromMap(Map<String,dynamic> data){
@@ -114,6 +117,7 @@ class Request {
     multipleSizeNames=data['multipleSizeNames'];
     multipleDesignTopoligyNames=data['multipleDesignTopoligyNames'];
     multipleColorNames=List<Colors>.from(data["multipleColorNames"].map((x) => Colors.fromJson(x)));
+    remarksHistory=data['allRequestRemarks']!=null?List<RemarksHistory>.from(data["allRequestRemarks"].map((x) => RemarksHistory.fromJson(x))):data["allRequestRemarks"];
     multipleSuitabilityNames=data['multipleSuitabilityNames'];
     multipleDesignerNames=data['multipleDesignerNames'];
     classificationName=data['classificationName'];
