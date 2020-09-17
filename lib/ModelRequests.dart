@@ -19,11 +19,12 @@ import 'addImagetoColor.dart';
 class ModelRequests extends StatefulWidget {
 
   int statusId;
+  var currentUserRoles;
+  ModelRequests(this.statusId,this.currentUserRoles);
 
-  ModelRequests(this.statusId);
 
   @override
-  _ModelReState createState() => _ModelReState(statusId);
+  _ModelReState createState() => _ModelReState(statusId,currentUserRoles);
 }
 
 class _ModelReState extends ResumableState<ModelRequests>{
@@ -32,7 +33,8 @@ class _ModelReState extends ResumableState<ModelRequests>{
   GlobalKey<RefreshIndicatorState> refreshIndicatorKey=GlobalKey();
   var selectedPreference,selectedStatus;
   int statusId;
-  _ModelReState(this.statusId);
+  var currentUserRoles;
+  _ModelReState(this.statusId,this.currentUserRoles);
  bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false,isListVisible=false;
  bool isColorsVisible=false;
   String token;
@@ -44,6 +46,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
   // }
   @override
   void initState() {
+    print(currentUserRoles);
     SharedPreferences.getInstance().then((prefs) {
       setState(() {
         claims = Utils.parseJwt(prefs.getString("token"));
@@ -207,58 +210,70 @@ class _ModelReState extends ResumableState<ModelRequests>{
                         GestureDetector(
                           onTapDown: (details)async{
                             if(products[index].statusName=="New Request"){
-                              await showMenu(
-                                context: context,
-                                position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                items: [
-                                  PopupMenuItem<String>(
-                                      child: const Text('Change Status'), value: 'changeStatus'),
-                                  PopupMenuItem<String>(
-                                      child: const Text('Add Images'), value: 'addImage'),
-                                ],
-                                elevation: 8.0,
-                              ).then((selectedItem){
-                                if(selectedItem=="changeStatus"){
-                                  showAlertDialog(context,products[index]);
-                                }else if(selectedItem=="addImage"){
-                                  Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
-                                }
-                              });
-
+                              if(currentUserRoles["1"]!=null) {
+                                await showMenu(
+                                  context: context,
+                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                  items: [
+                                    PopupMenuItem<String>(
+                                        child: const Text('Change Status'), value: 'changeStatus'),
+                                  ],
+                                  elevation: 8.0,
+                                ).then((selectedItem){
+                                  if(selectedItem=="changeStatus"){
+                                    showAlertDialog(context,products[index]);
+                                  }else if(selectedItem=="addImage"){
+                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
+                                  }
+                                });
+                              }else{
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
+                              }
                             }else if(products[index].statusName=="Approved By GM"){
-                              await showMenu(
-                                context: context,
-                                position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                items: [
-                                  PopupMenuItem<String>(
-                                      child: const Text('Change Status'), value: 'changeStatus'),
-                                  PopupMenuItem<String>(
-                                      child: const Text('See Details'), value: 'Details'),
-                                ],
-                                elevation: 8.0,
-                              ).then((selectedItem){
-                                if(selectedItem=="changeStatus"){
-                                  showDatePicker(helpText:"Select Target Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((startDate){
-                                    if(startDate!=null){
-                                      showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((endDate){
-                                        if(endDate!=null){
-                                          Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null,4);
-                                        }
-                                      });
-                                    }
-                                  });
-                                }else if(selectedItem=="Details"){
-                                  Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailPage(products[index])));
-                                }
-                              });
+                             if(currentUserRoles["2"]!=null){
+                               await showMenu(
+                                 context: context,
+                                 position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                 items: [
+                                   PopupMenuItem<String>(
+                                       child: const Text('Change Status'), value: 'changeStatus'),
+                                   PopupMenuItem<String>(
+                                       child: const Text('See Details'), value: 'Details'),
+                                 ],
+                                 elevation: 8.0,
+                               ).then((selectedItem){
+                                 if(selectedItem=="changeStatus"){
+                                   showDatePicker(helpText:"Select Target Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((startDate){
+                                     if(startDate!=null){
+                                       showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((endDate){
+                                         if(endDate!=null){
+                                           Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null,4);
+                                         }
+                                       });
+                                     }
+                                   });
+                                 }else if(selectedItem=="Details"){
+                                   Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailPage(products[index])));
+                                 }
+                               });
+                             }else{
+                               Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
+                             }
 
                             }else if(products[index].statusName=="Samples Scheduled"){
-                              showAlertChangeStatus(context,products[index]);
+                              if(currentUserRoles["4"]){
+                                showAlertChangeStatus(context,products[index]);
+                              }else{
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
+                              }
                             }else if(products[index].statusName=="Approved Trial"){
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products[index].requestId)));
+                              if(currentUserRoles["5"]!=null){
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products[index].requestId,currentUserRoles)));
+                              }else{
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
+                              }
                             }else {
-                              Navigator.push(context, MaterialPageRoute(
-                                  builder: (context) => DetailPage(products[index])));
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
                             }
                           },
                           child: Container(

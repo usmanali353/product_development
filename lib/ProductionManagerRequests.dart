@@ -1,10 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:productdevelopment/Dashboard.dart';
-import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Observations.dart';
@@ -14,10 +10,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ProductionManagerRequests extends StatefulWidget {
   int statusId;
   String type;
-  ProductionManagerRequests(this.statusId,this.type);
+  var currentUserRole;
+  ProductionManagerRequests(this.statusId,this.type,this.currentUserRole);
 
   @override
-  _ProductionManagerRequestsState createState() => _ProductionManagerRequestsState(statusId,type);
+  _ProductionManagerRequestsState createState() => _ProductionManagerRequestsState(statusId,type,currentUserRole);
 }
 
 class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
@@ -26,7 +23,8 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
   var selectedPreference;
   int statusId;
   String type;
-  _ProductionManagerRequestsState(this.statusId,this.type);
+  var currentUserRole;
+  _ProductionManagerRequestsState(this.statusId,this.type,this.currentUserRole);
 
   @override
   void initState() {
@@ -54,9 +52,21 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
           return InkWell(
             onTap: (){
               if(requests[index].status=="Approved By Customer"){
-                showProductionApprovalDialog(context, requests[index]);
+                if(currentUserRole["9"]!=null) {
+                  showProductionApprovalDialog(context, requests[index]);
+                }else{
+                  SharedPreferences.getInstance().then((prefs){
+                    Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
+                  });
+                }
               }else if(requests[index].status=="Not Approved Nor Rejected"){
-                showTrialApprovalDialog(context, requests[index]);
+                if(currentUserRole["7"]!=null){
+                  showTrialApprovalDialog(context, requests[index]);
+                }else{
+                  SharedPreferences.getInstance().then((prefs){
+                    Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
+                  });
+                }
               }else{
                 SharedPreferences.getInstance().then((prefs){
                   Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);

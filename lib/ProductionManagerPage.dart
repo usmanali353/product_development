@@ -2,11 +2,19 @@ import 'package:flutter/material.dart';
 
 import 'ProductionManagerRequests.dart';
 class ProductionManagerPage extends StatefulWidget {
+  var currentUserRole;
+
+  ProductionManagerPage(this.currentUserRole);
+
   @override
-  _ProductionManagerPageState createState() => _ProductionManagerPageState();
+  _ProductionManagerPageState createState() => _ProductionManagerPageState(currentUserRole);
 }
 
 class _ProductionManagerPageState extends State<ProductionManagerPage> {
+  var currentUserRole;
+
+  _ProductionManagerPageState(this.currentUserRole);
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -24,9 +32,9 @@ class _ProductionManagerPageState extends State<ProductionManagerPage> {
         ),
         body: TabBarView(
           children: [
-            ProductionManagerRequests(7,null),
-            ProductionManagerRequests(9,null),
-            ProductionManagerRequests(10,null),
+            ProductionManagerRequests(7,null,currentUserRole),
+            ProductionManagerRequests(9,null,currentUserRole),
+            ProductionManagerRequests(10,null,currentUserRole),
           ],
         ),
       ),

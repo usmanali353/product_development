@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/Login.dart';
-import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/ProductionManagerPage.dart';
 import 'package:productdevelopment/scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -19,6 +18,7 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends ResumableState<Dashboard> {
  var claims;
  var requestCount;
+ var currentUserRoles;
  @override
   void onResume() {
    SharedPreferences.getInstance().then((prefs){
@@ -28,12 +28,14 @@ class _DashboardState extends ResumableState<Dashboard> {
          Network_Operations.getRequestCount(context, prefs.getString("token")).then((requestCountMap){
            setState(() {
              this.requestCount=requestCountMap['statuses'];
+             this.currentUserRoles=requestCountMap['currentLoggedInUserStatuses'];
            });
          });
        }else{
          Network_Operations.getRequestCountIndividualUser(context,prefs.getString("token")).then((requestCountMap){
            setState(() {
              this.requestCount=requestCountMap['statuses'];
+             this.currentUserRoles=requestCountMap['currentLoggedInUserStatuses'];
            });
          });
        }
@@ -51,12 +53,14 @@ class _DashboardState extends ResumableState<Dashboard> {
           Network_Operations.getRequestCount(context, prefs.getString("token")).then((requestCountMap){
             setState(() {
               this.requestCount=requestCountMap['statuses'];
+              this.currentUserRoles=requestCountMap['currentLoggedInUserStatuses'];
             });
           });
         }else{
           Network_Operations.getRequestCountIndividualUser(context,prefs.getString("token")).then((requestCountMap){
             setState(() {
               this.requestCount=requestCountMap['statuses'];
+              this.currentUserRoles=requestCountMap['currentLoggedInUserStatuses'];
             });
           });
         }
@@ -104,7 +108,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                        title: Text("Production Requests"),
                        leading: Icon(FontAwesomeIcons.industry),
                        onTap: (){
-                         Navigator.push(context, MaterialPageRoute(builder: (context)=>ProductionManagerPage()));
+                         Navigator.push(context, MaterialPageRoute(builder: (context)=>ProductionManagerPage(currentUserRoles)));
                        },
                      ),
                      Divider(),
@@ -153,7 +157,7 @@ class _DashboardState extends ResumableState<Dashboard> {
             children: <Widget>[
               InkWell(
                 onTap:(){
-                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(1)));
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(1,currentUserRoles)));
                 },
                 child: Card(
                   elevation: 10,
@@ -205,7 +209,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(2)));
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(2,currentUserRoles)));
                 },
                 child: Card(
                   elevation: 10,
@@ -267,7 +271,7 @@ class _DashboardState extends ResumableState<Dashboard> {
           ),
           InkWell(
             onTap: (){
-             push(context, MaterialPageRoute(builder: (context)=>ModelRequests(3)));
+             push(context, MaterialPageRoute(builder: (context)=>ModelRequests(3,currentUserRoles)));
             },
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0,right:8.0),
@@ -333,7 +337,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               //Today Deliveries
               InkWell(
                 onTap:(){
-                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(4)));
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(4,currentUserRoles)));
                 },
                 child: Card(
                   elevation: 10,
@@ -384,7 +388,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                 push(context, MaterialPageRoute(builder: (context)=>ModelRequests(5)));
+                 push(context, MaterialPageRoute(builder: (context)=>ModelRequests(5,currentUserRoles)));
                 },
                 child: Card(
                   elevation: 10,
@@ -444,7 +448,7 @@ class _DashboardState extends ResumableState<Dashboard> {
           ),
           InkWell(
             onTap: (){
-            push(context, MaterialPageRoute(builder: (context)=>ModelRequests(6)));
+            push(context, MaterialPageRoute(builder: (context)=>ModelRequests(6,currentUserRoles)));
             },
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0,right:8.0),
@@ -507,7 +511,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               //Today Deliveries
               InkWell(
                 onTap:(){
-                 push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(7,"Dashboard")));
+                 push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(7,"Dashboard",currentUserRoles)));
                 },
                 child: Card(
                   elevation: 10,
@@ -558,7 +562,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                  push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(8,"Dashboard")));
+                  push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(8,"Dashboard",currentUserRoles)));
                 },
                 child: Card(
                   elevation: 10,
@@ -622,7 +626,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               //Today Deliveries
               InkWell(
                 onTap:(){
-                  push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(9,"Dashboard")));
+                  push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(9,"Dashboard",currentUserRoles)));
                 },
                 child: Card(
                   elevation: 10,
@@ -673,7 +677,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                 push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(10,"Dashboard")));
+                 push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(10,"Dashboard",currentUserRoles)));
                 },
                 child: Card(
                   elevation: 10,

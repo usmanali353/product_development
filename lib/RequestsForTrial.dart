@@ -9,11 +9,11 @@ import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
  class RequestsForTrial extends StatefulWidget {
 int requestId;
-
-RequestsForTrial(this.requestId);
+var currentUserRole;
+RequestsForTrial(this.requestId,this.currentUserRole);
 
   @override
-   _RequestsForTrialState createState() => _RequestsForTrialState(requestId);
+   _RequestsForTrialState createState() => _RequestsForTrialState(requestId,currentUserRole);
  }
 
  class _RequestsForTrialState extends State<RequestsForTrial> {
@@ -21,8 +21,8 @@ RequestsForTrial(this.requestId);
    bool isVisible=false;
    var selectedPreference;
    int requestId;
-
-   _RequestsForTrialState(this.requestId);
+   var currentUserRole;
+   _RequestsForTrialState(this.requestId,this.currentUserRole);
 
   @override
   void initState() {
