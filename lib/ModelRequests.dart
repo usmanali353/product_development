@@ -226,7 +226,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                     showAlertDialog(context,products[index]);
                                   }else if(selectedItem=="Details"){
                                     Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
-                                  }else{
+                                  }else if(selectedItem=="addImage"){
                                     Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
                                   }
                                 });

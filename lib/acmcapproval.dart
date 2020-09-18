@@ -168,7 +168,7 @@ class _acmcApprovalState extends State<acmcApproval> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
+                  padding: status=="Approve"?EdgeInsets.only(left: 16,right: 16,bottom: 16):EdgeInsets.all(16),
                   child: Card(
                     elevation: 10,
                     shape: RoundedRectangleBorder(
