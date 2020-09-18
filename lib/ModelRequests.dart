@@ -217,12 +217,16 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                   items: [
                                     PopupMenuItem<String>(
                                         child: const Text('Change Status'), value: 'changeStatus'),
+                                    PopupMenuItem<String>(
+                                        child: const Text('See Details'), value: 'Details'),
                                   ],
                                   elevation: 8.0,
                                 ).then((selectedItem){
                                   if(selectedItem=="changeStatus"){
                                     showAlertDialog(context,products[index]);
-                                  }else if(selectedItem=="addImage"){
+                                  }else if(selectedItem=="Details"){
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
+                                  }else{
                                     Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
                                   }
                                 });

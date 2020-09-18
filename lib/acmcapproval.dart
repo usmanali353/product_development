@@ -67,6 +67,86 @@ class _acmcApprovalState extends State<acmcApproval> {
               children: <Widget>[
                 Form(
                   key: formState,
+                  child: Visibility(
+                    visible: status=="Approve",
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: MultiSelectFormField(
+                          autovalidate: false,
+                          hintText: "Select Designers",
+                          titleText: 'Select Designers',
+                          textField: 'display',
+                          valueField: 'value',
+                          okButtonLabel: 'OK',
+                          cancelButtonLabel: 'CANCEL',
+                          dataSource: designers,
+                          border: InputBorder.none,
+                          validator: (value) {
+                            return value == null || value.length == 0?'Please select one or more Designer':null;
+                          },
+                          onSaved: (value){
+                            if (value == null) return;
+                            setState(() {
+                              myDesigners = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: status=="Approve",
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
+                    child: Card(
+                      elevation: 10,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: FormBuilderTextField(
+                        attribute: "Designer Observations",
+                        maxLines: 5,
+                        controller: designerObservations,
+                        validators: [FormBuilderValidators.required()],
+                        decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(16),
+                            border: InputBorder.none,
+                            hintText: "Designer Observations"
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: status=="Approve",
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 16,right: 16),
+                    child: Card(
+                      elevation: 10,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: FormBuilderTextField(
+                        attribute: "Model Name",
+                        controller: modelName,
+                        validators: [FormBuilderValidators.required()],
+                        decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(16),
+                            border: InputBorder.none,
+                            hintText: "Model Name"
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: status=="Approve",
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Card(
@@ -74,83 +154,15 @@ class _acmcApprovalState extends State<acmcApproval> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: MultiSelectFormField(
-                        autovalidate: false,
-                        hintText: "Select Designers",
-                        titleText: 'Select Designers',
-                        textField: 'display',
-                        valueField: 'value',
-                        okButtonLabel: 'OK',
-                        cancelButtonLabel: 'CANCEL',
-                        dataSource: designers,
-                        border: InputBorder.none,
-                        validator: (value) {
-                          return value == null || value.length == 0?'Please select one or more Designer':null;
-                        },
-                        onSaved: (value){
-                          if (value == null) return;
-                          setState(() {
-                            myDesigners = value;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
-                  child: Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: FormBuilderTextField(
-                      attribute: "Designer Observations",
-                      maxLines: 5,
-                      controller: designerObservations,
-                      validators: [FormBuilderValidators.required()],
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.all(16),
-                          border: InputBorder.none,
-                          hintText: "Designer Observations"
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 16,right: 16),
-                  child: Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: FormBuilderTextField(
-                      attribute: "Model Name",
-                      controller: modelName,
-                      validators: [FormBuilderValidators.required()],
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.all(16),
-                          border: InputBorder.none,
-                          hintText: "Model Name"
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: FormBuilderTextField(
-                      attribute: "Model Code",
-                      controller: modelCode,
-                      validators: [FormBuilderValidators.required()],
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.all(16),
-                          border: InputBorder.none,
-                          hintText: "Model Code"
+                      child: FormBuilderTextField(
+                        attribute: "Model Code",
+                        controller: modelCode,
+                        validators: [FormBuilderValidators.required()],
+                        decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(16),
+                            border: InputBorder.none,
+                            hintText: "Model Code"
+                        ),
                       ),
                     ),
                   ),
@@ -182,9 +194,7 @@ class _acmcApprovalState extends State<acmcApproval> {
                     if(fbKey.currentState.validate()&&formState.currentState.validate()){
                       formState.currentState.save();
                       if(status=='Reject'){
-                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,modelName.text,modelCode.text,remarks.text).then((value){
-                          Network_Operations.changeStatusWithRemarks(context, token, request.requestId, 3,remarks.text);
-                        });
+                        Network_Operations.changeStatusWithRemarks(context, token, request.requestId, 3,remarks.text);
                       }else{
                         Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,modelName.text,modelCode.text,remarks.text).then((value){
                           Network_Operations.changeStatusWithRemarks(context, token, request.requestId, 2,remarks.text);
