@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../Dashboard.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
 
+import '../DetailsPage.dart';
+
  class Network_Operations{
   static void signIn(BuildContext context,String email,String password) async {
     ProgressDialog pd=ProgressDialog(context);
@@ -137,25 +139,6 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
          pd.hide();
          Utils.showError(context, response.statusCode.toString());
        }
-    }catch(e){
-      pd.hide();
-      Utils.showError(context, e.toString());
-    }
-  }
-  static Future<void> approveRequestClient(BuildContext context,String token,int requestId,int StatusId) async {
-    ProgressDialog pd=ProgressDialog(context);
-    pd.show();
-    try{
-      var response = await http.get(Utils.getBaseUrl()+"Request/ChangeStatusOfTrialRequest/$requestId?StatusId=$StatusId", headers: {"Content-Type":"application/json","Authorization": "Bearer " + token});
-      if (response.statusCode == 200) {
-        pd.hide();
-        Navigator.pop(context,"Refresh");
-        Utils.showSuccess(context, "Request Approved");
-      }else{
-        pd.hide();
-        print(response.statusCode);
-      //  Utils.showError(context,response.body.toString());
-      }
     }catch(e){
       pd.hide();
       Utils.showError(context, e.toString());
@@ -295,34 +278,6 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
       print(e.toString());
     }
   }
-  static Future<List<dynamic>> getClients(BuildContext context,String token)async{
-    ProgressDialog pd=ProgressDialog(context);
-    pd.show();
-    try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestClientsDropdown",headers: {"Content-Type":"application/json","Authorization":"Bearer "+token});
-      if(response.statusCode==200){
-        pd.hide();
-       var clientsMap= jsonDecode(response.body);
-       List<dynamic> clients=[];
-        for (var entry in clientsMap.entries) {
-          clients.add({
-            "display":entry.value,
-            "value":entry.key
-          });
-        }
-       print(clients);
-      return clients;
-      }else{
-        pd.hide();
-        Utils.showError(context, response.statusCode.toString());
-      }
-
-    }catch(e){
-      Utils.showError(context, e.toString());
-      print(e.toString());
-    }
-    return null;
-  }
   static Future<List<TrialRequests>> getTrialRequests(BuildContext context,String token,int requestId)async{
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
@@ -342,42 +297,6 @@ import 'package:productdevelopment/Model/TrialRequests.dart';
     }catch(e){
       print(e);
       Utils.showError(context, e.toString());
-    }
-    return null;
-  }
-  static Future<List<dynamic>> getAll(BuildContext context,String token,String endPoint)async{
-    ProgressDialog pd=ProgressDialog(context);
-    pd.show();
-    try{
-      var response=await http.get(Utils.getBaseUrl()+"configuration/GetAll$endPoint",headers:{"Authorization":"Bearer "+token});
-      if(response.statusCode==200){
-        pd.hide();
-        return jsonDecode(response.body);
-      }else{
-        pd.hide();
-        Utils.showError(context, response.statusCode.toString());
-      }
-    }catch(e){
-      pd.hide();
-     Utils.showError(context, e.toString());
-    }
-   return null;
-  }
-  static Future<Map<String,dynamic>> getRangeById(BuildContext context,String token,int rangeId)async{
-    ProgressDialog pd=ProgressDialog(context);
-    pd.show();
-    try{
-      var response=await http.get(Utils.getBaseUrl()+"configuration/GetRangeById/$rangeId",headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
-      if(response.statusCode==200){
-        pd.hide();
-       return jsonDecode(response.body);
-      }else{
-        pd.hide();
-        Utils.showError(context, "No Range Found against this Id");
-      }
-    }catch(e){
-      pd.hide();
-      print(e.toString());
     }
     return null;
   }

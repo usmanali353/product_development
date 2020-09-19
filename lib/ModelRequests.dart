@@ -11,6 +11,8 @@ import 'package:productdevelopment/RequestImagesGallery.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailPage.dart';
+import 'DetailPage.dart';
+import 'DetailPage.dart';
 import 'RequestsForTrial.dart';
 import 'acmcapproval.dart';
 import 'addImagetoColor.dart';
@@ -230,6 +232,24 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                     Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
                                   }
                                 });
+                              }else if(isClient){
+                                await showMenu(
+                                  context: context,
+                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                  items: [
+                                    PopupMenuItem<String>(
+                                        child: const Text('Add Additional Images'), value: 'addImage'),
+                                    PopupMenuItem<String>(
+                                        child: const Text('See Details'), value: 'Details'),
+                                  ],
+                                  elevation: 8.0,
+                                ).then((selectedItem){
+                                   if(selectedItem=="Details"){
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
+                                  }else if(selectedItem=="addImage"){
+                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
+                                  }
+                                });
                               }else{
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
                               }
@@ -265,7 +285,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                              }
 
                             }else if(products[index].statusName=="Samples Scheduled"){
-                              if(currentUserRoles["4"]){
+                              if(currentUserRoles["4"]!=null){
                                 showAlertChangeStatus(context,products[index]);
                               }else{
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
@@ -355,8 +375,6 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                       ),
                                       Text(products[index].statusName!=null?products[index].statusName:'')
                                     ],
-
-
                                   ),
                                 ),
                               ],

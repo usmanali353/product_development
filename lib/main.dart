@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:productdevelopment/HistoryPage.dart';
 
 import 'package:productdevelopment/Login.dart';
 
@@ -8,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Dashboard.dart';
 
+import 'DetailsPage.dart';
 import 'Utils/Utils.dart';
 
 void main() {
@@ -108,7 +110,7 @@ class _MyAppState extends State<MyApp> {
 
       ),
 
-      home: isLogin?Dashboard():Login(),
+      home: isLogin?DetailsPage():Login(),
 
     );
 

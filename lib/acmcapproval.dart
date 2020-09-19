@@ -13,9 +13,6 @@ class acmcApproval extends StatefulWidget {
   @override
   _acmcApprovalState createState() => _acmcApprovalState(status,request);
 }
-
-
-
 class _acmcApprovalState extends State<acmcApproval> {
   GlobalKey<FormBuilderState> fbKey=GlobalKey();
   GlobalKey<FormState> formState=GlobalKey();
@@ -196,9 +193,7 @@ class _acmcApprovalState extends State<acmcApproval> {
                       if(status=='Reject'){
                         Network_Operations.changeStatusWithRemarks(context, token, request.requestId, 3,remarks.text);
                       }else{
-                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,modelName.text,modelCode.text,remarks.text).then((value){
-                          Network_Operations.changeStatusWithRemarks(context, token, request.requestId, 2,remarks.text);
-                        });
+                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,modelName.text,modelCode.text,remarks.text);
                       }
 
                     }

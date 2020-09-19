@@ -49,9 +49,21 @@ RequestsForTrial(this.requestId,this.currentUserRole);
              return InkWell(
                onTap: (){
                  if(requests[index].status=="Approved By Customer"){
-                    showProductionApprovalDialog(context, requests[index]);
+                   if(currentUserRole["9"]!=null){
+                     showProductionApprovalDialog(context, requests[index]);
+                   }else{
+                     SharedPreferences.getInstance().then((prefs){
+                       Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
+                     });
+                   }
                  }else if(requests[index].status=="Not Approved Nor Rejected"){
-                   showTrialApprovalDialog(context, requests[index]);
+                   if(currentUserRole["7"]!=null) {
+                     showTrialApprovalDialog(context, requests[index]);
+                   }else{
+                     SharedPreferences.getInstance().then((prefs){
+                       Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
+                     });
+                   }
                  }else{
                    SharedPreferences.getInstance().then((prefs){
                      Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
