@@ -17,10 +17,6 @@ class _DetailsPageState extends State<DetailsPage> {
   int _page = 0;
   @override
   void initState() {
-//    sqlite_helper().getcount().then((value) {
-//      totalItems = value;
-//    });
-
     super.initState();
     _pageController = new PageController();
   }
@@ -60,7 +56,7 @@ class _DetailsPageState extends State<DetailsPage> {
       bottomNavigationBar: new Theme(
         data: Theme.of(context).copyWith(
           // sets the background color of the `BottomNavigationBar`
-          canvasColor: Colors.teal.shade700,
+          canvasColor: Color(0xFF004c4c),
 
         ), // sets the inactive color of the `BottomNavigationBar`
         child: Padding(

@@ -14,7 +14,6 @@ class _SchedulePageState extends State<SchedulePage> {
       appBar: AppBar(
         title: Text("Client's Schedules"),
         centerTitle: true,
-        backgroundColor: Colors.teal.shade800,
       ),
       body: ListView.builder(
         itemCount: 2,
