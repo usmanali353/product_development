@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:productdevelopment/DetailPage.dart';
 
 import 'HistoryPage.dart';
 import 'SchedulePage.dart';
@@ -8,13 +9,21 @@ import 'SchedulePage.dart';
 
 
 class DetailsPage extends StatefulWidget {
+  var request;
+
+  DetailsPage(this.request);
+
   @override
-  _DetailsPageState createState() => new _DetailsPageState();
+  _DetailsPageState createState() => new _DetailsPageState(request);
 }
 
 class _DetailsPageState extends State<DetailsPage> {
   PageController _pageController;
   int _page = 0;
+  var request;
+
+  _DetailsPageState(this.request);
+
   @override
   void initState() {
     super.initState();
@@ -46,8 +55,8 @@ class _DetailsPageState extends State<DetailsPage> {
     return  Scaffold(
       body:  PageView(
         children: [
-           HistoryPage(),
-           HistoryPage(),
+           DetailPage(request),
+           HistoryPage(request),
            SchedulePage(),
         ],
         onPageChanged: onPageChanged,

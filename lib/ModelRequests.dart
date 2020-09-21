@@ -10,9 +10,7 @@ import 'package:productdevelopment/Observations.dart';
 import 'package:productdevelopment/RequestImagesGallery.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'DetailPage.dart';
-import 'DetailPage.dart';
-import 'DetailPage.dart';
+import 'DetailsPage.dart';
 import 'RequestsForTrial.dart';
 import 'acmcapproval.dart';
 import 'addImagetoColor.dart';
@@ -227,7 +225,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                   if(selectedItem=="changeStatus"){
                                     showAlertDialog(context,products[index]);
                                   }else if(selectedItem=="Details"){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                                   }else if(selectedItem=="addImage"){
                                     Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
                                   }
@@ -245,13 +243,13 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                   elevation: 8.0,
                                 ).then((selectedItem){
                                    if(selectedItem=="Details"){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                                   }else if(selectedItem=="addImage"){
                                     Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
                                   }
                                 });
                               }else{
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                               }
                             }else if(products[index].statusName=="Approved By GM"){
                              if(currentUserRoles["2"]!=null){
@@ -277,27 +275,27 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                      }
                                    });
                                  }else if(selectedItem=="Details"){
-                                   Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailPage(products[index])));
+                                   Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
                                  }
                                });
                              }else{
-                               Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
+                               Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                              }
 
                             }else if(products[index].statusName=="Samples Scheduled"){
                               if(currentUserRoles["4"]!=null){
                                 showAlertChangeStatus(context,products[index]);
                               }else{
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                               }
                             }else if(products[index].statusName=="Approved Trial"){
                               if(currentUserRoles["5"]!=null){
                                 Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products[index].requestId,currentUserRoles)));
                               }else{
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                               }
                             }else {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage(products[index])));
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                             }
                           },
                           child: Container(
@@ -403,7 +401,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-       Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
+       Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
       },
     );
     Widget approveRejectButton = FlatButton(
@@ -480,7 +478,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
       },
     );
     Widget approveRejectButton = FlatButton(
@@ -552,7 +550,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
       },
     );
     Widget approveRejectButton = FlatButton(
@@ -624,7 +622,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
       },
     );
     Widget approveRejectButton = FlatButton(

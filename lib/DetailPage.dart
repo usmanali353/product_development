@@ -9,11 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/Request.dart';
-import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:share/share.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'RequestImagesGallery.dart';
 
 class DetailPage extends StatefulWidget {
@@ -180,7 +177,7 @@ class _DetailPageState extends State<DetailPage>{
                                 Divider(),
                               ],
                             ):Container(),
-                            request.multipleClientNames!=null?Column(
+                            request.multipleClientNames!=null&&request.multipleClientNames.length>0?Column(
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Clients",style: TextStyle(fontWeight: FontWeight.bold),),
@@ -188,37 +185,6 @@ class _DetailPageState extends State<DetailPage>{
                                 ),
                                 Divider(),
                               ],
-                            ):Container(),
-                           request.remarksHistory!=null? Padding(
-                              padding: EdgeInsets.only(top:10,bottom: 4),
-                              child:Column(
-                                children: [
-                                  Center(
-                                    child: Text("Remarks History", style:
-                                    TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20
-                                    ),),
-                                  ),
-
-                                  for(int i=0;i<request.remarksHistory.length;i++)Padding(
-                                    padding: const EdgeInsets.only(top:16),
-                                    child: ExpansionTile(
-                                      initiallyExpanded: true,
-                                      title:Text(request.remarksHistory[i].statusName),
-                                      leading: Icon(Icons.history,size: 40,),
-                                      subtitle: Text(request.remarksHistory[i].remarkedByName!=null?request.remarksHistory[i].remarkedByName:""),
-                                      trailing: Text(request.remarksHistory[i].date!=null?DateFormat("yyyy-MM-dd").format(DateTime.parse(request.remarksHistory[i].date)):""),
-                                      children: [
-                                        ListTile(
-                                          title: Text(request.remarksHistory[i].remarks),
-                                        )
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              )
-
                             ):Container(),
                             Padding(
                               padding: EdgeInsets.only(top: 4, bottom: 4),

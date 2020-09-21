@@ -13,7 +13,6 @@ class _SchedulePageState extends State<SchedulePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Client's Schedules"),
-        centerTitle: true,
       ),
       body: ListView.builder(
         itemCount: 2,

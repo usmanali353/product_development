@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:productdevelopment/DetailPage.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
@@ -210,7 +209,7 @@ import '../DetailsPage.dart';
         pd.hide();
         Request request;
         request=Request.fromMap(jsonDecode(response.body));
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
       }else{
         pd.hide();
         Utils.showError(context, "No Request Found against this Id");

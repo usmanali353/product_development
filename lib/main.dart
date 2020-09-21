@@ -110,7 +110,7 @@ class _MyAppState extends State<MyApp> {
 
       ),
 
-      home: isLogin?DetailsPage():Login(),
+      home: isLogin?Dashboard():Login(),
 
     );
 
