@@ -37,7 +37,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
           for(var c in cli){
             clients.add({
               "display":c.name,
-              "value":   c.id.toString()
+              "value": c.stringId
             });
           }
         });

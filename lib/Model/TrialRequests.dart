@@ -3,7 +3,7 @@ import 'package:productdevelopment/Model/Colors.dart';
 class TrialRequests{
   int id;
   int requestId;
-  int clientId;
+  String clientId;
   bool approved;
   String date;
   String surfaceName;

@@ -267,13 +267,11 @@ import '../DetailsPage.dart';
         "ClientVisitDate":ClientVisitDate,
         "Remarks":remarks
       },toEncodable: Utils.myEncode);
+      print(body);
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestClientSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
         Utils.showSuccess(context, "Request Saved Successfully");
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
-      }else if(response.body!=null){
-        print(response.body);
-        Utils.showError(context, response.body);
       }else{
         Utils.showError(context, response.statusCode.toString());
       }
