@@ -42,7 +42,7 @@ class _HistoryPageState extends State<HistoryPage> {
        child: ListView.builder(
          itemCount: remarksHistory!=null?remarksHistory.length:0,
          itemBuilder: (context, index) {
-           print(DateFormat("yyyy-MM-dd").parse(remarksHistory[index].date).toString());
+           print(remarksHistory[1].statusName.trim());
            return Card(
              elevation: 5,
              child: Container(
@@ -52,11 +52,10 @@ class _HistoryPageState extends State<HistoryPage> {
                   children: <Widget>[
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Padding(
                           padding: const EdgeInsets.only(left: 20, right: 5, top: 25),
-                          child: FaIcon(FontAwesomeIcons.history, color: Color(0xFF004c4c), size: 45,),
+                          child: FaIcon(FontAwesomeIcons.history, color: Color(0xFF004c4c), size: 40,),
                         ),
                         Padding(
                           padding: EdgeInsets.only(top: 5, bottom: 5),
@@ -70,7 +69,6 @@ class _HistoryPageState extends State<HistoryPage> {
                                 padding: EdgeInsets.only(left: 2, right: 2),
                               ),
                               Text("Undo", style: TextStyle(color: Color(0xFF004c4c),),),
-
                             ],
                           ),
                         ),
@@ -93,9 +91,9 @@ class _HistoryPageState extends State<HistoryPage> {
                             Padding(
                               padding: EdgeInsets.only(left: 5, right: 5),
                             ),
-                            Text(remarksHistory[index].statusName),
+                            Text(remarksHistory[index].statusName.trim()),
                             Padding(
-                              padding: EdgeInsets.only(left: 128, right: 5),
+                              padding: EdgeInsets.only(left: 100, right: 5),
                             ),
 
                           ],
@@ -130,7 +128,7 @@ class _HistoryPageState extends State<HistoryPage> {
                             Padding(
                               padding: EdgeInsets.only(left: 5, right: 5),
                             ),
-                            Text("Remarks:", maxLines:2,),
+                            Text("Remarks:"),
                           ],
                         ),
                         Padding(

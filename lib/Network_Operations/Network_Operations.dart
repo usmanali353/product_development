@@ -26,8 +26,12 @@ import '../DetailsPage.dart';
        });
        Utils.showSuccess(context, "Login Successful");
        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+     }else if(response.body!=null){
+       pd.hide();
+       Utils.showError(context, response.body);
      }else{
        pd.hide();
+       Utils.showError(context, response.statusCode.toString());
      }
     }catch(e) {
       pd.hide();
@@ -44,7 +48,7 @@ import '../DetailsPage.dart';
         Utils.showSuccess(context, "User Registration successful");
       }else{
         pd.hide();
-        Utils.showError(context, response.body.toString());
+        Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
       pd.hide();
@@ -134,6 +138,9 @@ import '../DetailsPage.dart';
          pd.hide();
          Utils.showSuccess(context, "Request Saved Successfully");
          Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+       }else if(response.body!=null){
+         pd.hide();
+         Utils.showError(context, response.body.toString());
        }else{
          pd.hide();
          Utils.showError(context, response.statusCode.toString());
@@ -163,7 +170,6 @@ import '../DetailsPage.dart';
       }else{
         pd.hide();
         Utils.showError(context, response.body.toString());
-        print(response.body.toString());
       }
     }catch(e){
       pd.hide();
@@ -229,7 +235,6 @@ import '../DetailsPage.dart';
         for(int i=0;i<req['allRequests'].length;i++){
           requests.add(Request.fromMap(req['allRequests'][i]));
         }
-        print(requests[0].toJson());
         return requests;
       }
     }catch(e){
@@ -246,7 +251,6 @@ import '../DetailsPage.dart';
         for(int i=0;i<jsonDecode(response.body)['allRequests'].length;i++){
           requests.add(Request.fromMap(jsonDecode(response.body)['allRequests'][i]));
         }
-        print(requests[0].toJson());
         return requests;
       }
     }catch(e){

@@ -221,6 +221,20 @@ class _DetailPageState extends State<DetailPage>{
                                 Divider(),
                               ],
                             ):Container(),
+                           request.remarksHistory!=null&&request.remarksHistory.length>0&&request.remarksHistory[0].newModelName!=null&&request.remarksHistory[0].newModelCode!=null?Column(
+                             children: [
+                               ListTile(
+                                 title: Text("Customer Given Model Name",style: TextStyle(fontWeight: FontWeight.bold),),
+                                 subtitle: Text(request.remarksHistory[0].newModelName!=null?request.remarksHistory[0].newModelName:''),
+                               ),
+                               Divider(),
+                               ListTile(
+                                 title: Text("Customer Given Model Code",style: TextStyle(fontWeight: FontWeight.bold),),
+                                 subtitle: Text(request.remarksHistory[0].newModelCode!=null?request.remarksHistory[0].newModelCode:''),
+                               ),
+                               Divider(),
+                             ],
+                           ):Container(),
                            ListTile(
                               title: Text("Surface", style: TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -264,7 +278,7 @@ class _DetailPageState extends State<DetailPage>{
                               ],
                             ):Container(),
                             ListTile(
-                              title: Text("Material", style: TextStyle(
+                              title: Text("Design Topology", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                               ),),
                               subtitle: Text(request.multipleDesignTopoligyNames.toString().replaceAll("[", "").replaceAll("]", "")),
