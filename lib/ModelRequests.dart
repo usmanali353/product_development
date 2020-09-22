@@ -4,10 +4,12 @@ import 'package:intl/intl.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:productdevelopment/ApproveForTrial.dart';
+import 'package:productdevelopment/DetailsPage.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Observations.dart';
 import 'package:productdevelopment/RequestImagesGallery.dart';
+import 'package:productdevelopment/SchedulePage.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailsPage.dart';
@@ -265,15 +267,16 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                  elevation: 8.0,
                                ).then((selectedItem){
                                  if(selectedItem=="changeStatus"){
-                                   showDatePicker(helpText:"Select Target Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((startDate){
-                                     if(startDate!=null){
-                                       showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((endDate){
-                                         if(endDate!=null){
-                                           Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null,4);
-                                         }
-                                       });
-                                     }
-                                   });
+                                   // showDatePicker(helpText:"Select Target Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((startDate){
+                                   //   if(startDate!=null){
+                                   //     showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((endDate){
+                                   //       if(endDate!=null){
+                                   //         Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null,4);
+                                   //       }
+                                   //     });
+                                   //   }
+                                   // });
+                                   Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products[index])));
                                  }else if(selectedItem=="Details"){
                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
                                  }

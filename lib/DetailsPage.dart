@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:productdevelopment/DetailPage.dart';
 
 import 'HistoryPage.dart';
-import 'SchedulePage.dart';
+import 'ScheduleListPage.dart';
 
 
 
@@ -57,7 +57,7 @@ class _DetailsPageState extends State<DetailsPage> {
         children: [
            DetailPage(request),
            HistoryPage(request),
-           SchedulePage(),
+           ScheduleListPage(),
         ],
         onPageChanged: onPageChanged,
         controller: _pageController,

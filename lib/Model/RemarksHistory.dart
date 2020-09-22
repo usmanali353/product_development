@@ -12,7 +12,8 @@ class RemarksHistory{
   String newModelCode;
   String remarkedByName;
   String statusName;
-
+  dynamic undo;
+  String clientName;
   RemarksHistory({
     this.id,
     this.requestId,
@@ -25,6 +26,8 @@ class RemarksHistory{
     this.newModelCode,
     this.remarkedByName,
     this.statusName,
+    this.undo,
+    this.clientName
   });
  factory RemarksHistory.fromJson(Map<String, dynamic> json) => RemarksHistory(
    id: json["id"],
@@ -38,6 +41,8 @@ class RemarksHistory{
    newModelCode: json["newModelCode"],
    remarkedByName: json["remarkedByName"],
    statusName: json["statusName"],
+   undo: json["undo"],
+   clientName: json["clientName"],
  );
 
  Map<String, dynamic> toJson() => {
@@ -52,5 +57,7 @@ class RemarksHistory{
    "newModelCode": newModelCode,
    "remarkedByName": remarkedByName,
    "statusName": statusName,
+   "undo":undo,
+   "clientName":clientName
  };
 }

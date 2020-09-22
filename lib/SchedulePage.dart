@@ -1,93 +1,165 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import 'Network_Operations/Network_Operations.dart';
 class SchedulePage extends StatefulWidget {
+  var request;
+
+  SchedulePage(this.request);
+
   @override
-  _SchedulePageState createState() => _SchedulePageState();
+  _SchedulePageState createState() => _SchedulePageState(request);
 }
 
 class _SchedulePageState extends State<SchedulePage> {
+  var request;
+   GlobalKey<FormBuilderState> fbKey=GlobalKey();
+  _SchedulePageState(this.request);
+  TextEditingController remarks;
+  DateTime targetStartDate,targetEndDate,actualStartDate,actualEndDate;
+@override
+  void initState() {
+   remarks=TextEditingController();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Client's Schedules"),
+        title: Text("Schedule Request"),
       ),
-      body: ListView.builder(
-        itemCount: 2,
-        itemBuilder: (context, index) {
-          return Card(
-            elevation: 5,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.18,
-              child: Row(
-                children: <Widget>[
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 5, top: 10),
-                        child: FaIcon(FontAwesomeIcons.calendarCheck, color: Colors.teal.shade800, size: 45,),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 5, bottom: 5),
-                      ),
-
-                    ],
+      body: ListView(
+        children: [
+          FormBuilder(
+            key: fbKey,
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(16),
+                  child:Card(
+                    elevation: 10,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: FormBuilderDateTimePicker(
+                      attribute: "Target Start Date",
+                      style: Theme.of(context).textTheme.bodyText1,
+                      inputType: InputType.date,
+                      validators: [FormBuilderValidators.required()],
+                      format: DateFormat("MM-dd-yyyy"),
+                      decoration: InputDecoration(hintText: "Target Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                      onChanged: (value){
+                        setState(() {
+                          this.targetStartDate=value;
+                        });
+                      },
+                    ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: VerticalDivider(color: Colors.grey.shade300,),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 16,right: 16),
+                  child:Card(
+                    elevation: 10,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: FormBuilderDateTimePicker(
+                      attribute: "Target End Date",
+                      style: Theme.of(context).textTheme.bodyText1,
+                      inputType: InputType.date,
+                      validators: [FormBuilderValidators.required()],
+                      format: DateFormat("MM-dd-yyyy"),
+                      decoration: InputDecoration(hintText: "Target End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                      onChanged: (value){
+                        setState(() {
+                          this.targetEndDate=value;
+                        });
+                      },
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(padding: EdgeInsets.only(top: 30),),
-
-
-                      Row(
-                        children: <Widget>[
-                          FaIcon(FontAwesomeIcons.userTie, color: Colors.teal.shade800, size: 25,),
-                          Padding(
-                            padding: EdgeInsets.only(left: 5, right: 5),
-                          ),
-                          Text("Client Name"),
-                          Padding(
-                            padding: EdgeInsets.only(left: 50, right: 5),
-                          ),
-
-                        ],
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20),
-                      ),
-                      Row(
-                        children: <Widget>[
-                          FaIcon(FontAwesomeIcons.calendarAlt, color: Colors.teal.shade800, size: 25,),
-                          Padding(
-                            padding: EdgeInsets.only(left: 5, right: 5),
-                          ),
-                          Text("Date:"),
-                        ],
-                      ),
-                    ],
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 16,right: 16,top: 16),
+                  child:Card(
+                    elevation: 10,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: FormBuilderDateTimePicker(
+                      attribute: "Actual Start Date",
+                      style: Theme.of(context).textTheme.bodyText1,
+                      inputType: InputType.date,
+                      validators: [FormBuilderValidators.required()],
+                      format: DateFormat("MM-dd-yyyy"),
+                      decoration: InputDecoration(hintText: "Actual Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                      onChanged: (value){
+                        setState(() {
+                          this.actualStartDate=value;
+                        });
+                      },
+                    ),
                   ),
-
-                ],
-
-              ),
-//             child: ListTile(
-//               leading: Padding(
-//                 padding: const EdgeInsets.only(top: 50, bottom: 50),
-//                 child: FaIcon(FontAwesomeIcons.history, color: Colors.teal.shade800, size: 40,),
-//               ),
-//             ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(16),
+                  child:Card(
+                    elevation: 10,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: FormBuilderDateTimePicker(
+                      attribute: "Actual End Date",
+                      style: Theme.of(context).textTheme.bodyText1,
+                      inputType: InputType.date,
+                      validators: [FormBuilderValidators.required()],
+                      format: DateFormat("MM-dd-yyyy"),
+                      decoration: InputDecoration(hintText: "Actual End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                      onChanged: (value){
+                        setState(() {
+                          this.actualEndDate=value;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
+                  child: Card(
+                    elevation: 10,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: FormBuilderTextField(
+                      attribute: "Remarks",
+                      controller: remarks,
+                      validators: [FormBuilderValidators.required()],
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                          hintText: "Remarks",
+                          contentPadding: EdgeInsets.all(16),
+                          border: InputBorder.none
+                      ),
+                    ),
+                  ),
+                ),
+                MaterialButton(
+                  color: Color(0xFF004c4c),
+                  child: Text("Proceed",style: TextStyle(color: Colors.white),),
+                  onPressed: (){
+                    if(fbKey.currentState.validate()){
+                      SharedPreferences.getInstance().then((prefs){
+                        Network_Operations.addRequestSchedule(context,prefs.getString("token"), request.requestId, targetStartDate, targetEndDate, actualStartDate, actualEndDate,4,remarks.text);
+                      });
+                    }
+                  },
+                ),
+              ],
             ),
-          );
-        },
+          )
+        ],
       ),
     );
   }

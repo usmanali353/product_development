@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/RemarksHistory.dart';
+import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HistoryPage extends StatefulWidget {
   var request;
@@ -16,7 +18,7 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   var request;
   var isVisible=false;
-  List<RemarksHistory> remarksHistory=[];
+  List<RemarksHistory> remarksHistory=[],undoableList=[];
   _HistoryPageState(this.request);
   @override
   void initState() {
@@ -24,6 +26,14 @@ class _HistoryPageState extends State<HistoryPage> {
       setState(() {
         this.remarksHistory=request.remarksHistory;
         if(remarksHistory.length>0){
+          if(request.allRequestClientRemarks!=null&&request.allRequestClientRemarks.length>0){
+            remarksHistory.addAll(request.allRequestClientRemarks);
+          }
+          for(RemarksHistory history in remarksHistory){
+            if(history.undo==null){
+              undoableList.add(history);
+            }
+          }
           isVisible=true;
         }
       });
@@ -42,7 +52,6 @@ class _HistoryPageState extends State<HistoryPage> {
        child: ListView.builder(
          itemCount: remarksHistory!=null?remarksHistory.length:0,
          itemBuilder: (context, index) {
-           print(remarksHistory[1].statusName.trim());
            return Card(
              elevation: 5,
              child: Container(
@@ -60,16 +69,27 @@ class _HistoryPageState extends State<HistoryPage> {
                         Padding(
                           padding: EdgeInsets.only(top: 5, bottom: 5),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Row(
-                            children: <Widget>[
-                              FaIcon(FontAwesomeIcons.undoAlt, color: Color(0xFF004c4c), size: 15,),
-                              Padding(
-                                padding: EdgeInsets.only(left: 2, right: 2),
+                        Visibility(
+                          visible: undoableList!=null&&undoableList.length>0&&index==undoableList.length-1,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: InkWell(
+                              onTap: (){
+                                SharedPreferences.getInstance().then((prefs){
+                                  Network_Operations.undoStatus(context,prefs.getString("token"),undoableList[undoableList.length-1].id);
+                                });
+
+                              },
+                              child: Row(
+                                children: <Widget>[
+                                  FaIcon(FontAwesomeIcons.undoAlt, color: Color(0xFF004c4c), size: 15,),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 2, right: 2),
+                                  ),
+                                  Text("Undo", style: TextStyle(color: Color(0xFF004c4c),),),
+                                ],
                               ),
-                              Text("Undo", style: TextStyle(color: Color(0xFF004c4c),),),
-                            ],
+                            ),
                           ),
                         ),
                       ],
@@ -140,29 +160,10 @@ class _HistoryPageState extends State<HistoryPage> {
                                 child: Text(remarksHistory[index].remarks,maxLines: 2,overflow: TextOverflow.ellipsis,)),
                           ),
                         ),
-//                      Padding(
-//                        padding: const EdgeInsets.only(right: 170),
-//                        child: Card(
-//                          child: Container(
-//                            color: Colors.teal,
-//                            //width: MediaQuery.of(context).size.height / 8,
-//                            child: Text("Remarks hello thsoin mndm,masmk frhrtyhred dkjkjdlkdld"),
-//                          ),
-//                        ),
-//                      )
-
                       ],
                     ),
-
                   ],
-
                 ),
-//             child: ListTile(
-//               leading: Padding(
-//                 padding: const EdgeInsets.only(top: 50, bottom: 50),
-//                 child: FaIcon(FontAwesomeIcons.history, color: Colors.teal.shade800, size: 40,),
-//               ),
-//             ),
              ),
            );
          },

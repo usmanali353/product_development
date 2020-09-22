@@ -63,7 +63,7 @@ import '../DetailsPage.dart';
         List<Dropdown> list=List();
         list.clear();
         for(int i=0;i<data.length;i++){
-          list.add(Dropdown(data[i]["id"],data[i]["name"],data[i]["name"]));
+          list.add(Dropdown(data[i]["id"],data[i]["name"],data[i]["stringId"]));
         }
         print(data.toString());
         return list;
@@ -138,9 +138,6 @@ import '../DetailsPage.dart';
          pd.hide();
          Utils.showSuccess(context, "Request Saved Successfully");
          Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
-       }else if(response.body!=null){
-         pd.hide();
-         Utils.showError(context, response.body.toString());
        }else{
          pd.hide();
          Utils.showError(context, response.statusCode.toString());
@@ -177,7 +174,7 @@ import '../DetailsPage.dart';
     }
 
   }
-  static Future<void> addRequestSchedule(BuildContext context,String token,int requestId,DateTime startDate,DateTime endDate,DateTime actualStartDate,DateTime actualEndDate,int statusId) async{
+  static Future<void> addRequestSchedule(BuildContext context,String token,int requestId,DateTime startDate,DateTime endDate,DateTime actualStartDate,DateTime actualEndDate,int statusId,String remarks) async{
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
@@ -187,17 +184,19 @@ import '../DetailsPage.dart';
         "TargetEndDate":endDate,
         "ActualStartDate": actualStartDate,
         "ActualEndDate": actualEndDate,
+        "Remarks":remarks
       },toEncodable: Utils.myEncode);
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestSetSchedule",body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.hide();
         Utils.showSuccess(context, response.body.toString());
-        changeStatusOfRequest(context, token, requestId, statusId).then((value){
-          Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
-        });
+        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+        // changeStatusWithRemarks(context, token, requestId, statusId,remarks).then((value){
+        //
+        // });
       }else{
         pd.hide();
-        Utils.showError(context, response.body.toString());
+        Utils.showError(context, response.statusCode.toString());
         print(response.body.toString());
       }
     }catch(e){
@@ -450,6 +449,25 @@ import '../DetailsPage.dart';
           requests.add(TrialRequests.fromJson(jsonDecode(response.body)[i]));
         }
         return requests;
+      }else{
+        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static void undoStatus(BuildContext context,String token,int remarkId) async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/ClientVisibility/$remarkId",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+        Utils.showSuccess(context,"Status Reverted");
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
       }else{
         pd.hide();
         Utils.showError(context, response.statusCode.toString());

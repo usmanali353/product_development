@@ -9,7 +9,7 @@ class Request {
   var image;
   DateTime dateTime;
   List<Colors> multipleColorNames;
-  List<RemarksHistory> remarksHistory;
+  List<RemarksHistory> remarksHistory,allRequestClientRemarks;
   List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames,multipleImages,currentLoggedInUserStatuses;
   Request({
     this.requestId,
@@ -118,6 +118,7 @@ class Request {
     multipleDesignTopoligyNames=data['multipleDesignTopoligyNames'];
     multipleColorNames=List<Colors>.from(data["multipleColorNames"].map((x) => Colors.fromJson(x)));
     remarksHistory=data['allRequestRemarks']!=null?List<RemarksHistory>.from(data["allRequestRemarks"].map((x) => RemarksHistory.fromJson(x))):data["allRequestRemarks"];
+    allRequestClientRemarks=data['allRequestClientRemarks']!=null?List<RemarksHistory>.from(data["allRequestClientRemarks"].map((x) => RemarksHistory.fromJson(x))):data["allRequestClientRemarks"];
     multipleSuitabilityNames=data['multipleSuitabilityNames'];
     multipleDesignerNames=data['multipleDesignerNames'];
     classificationName=data['classificationName'];
