@@ -70,7 +70,7 @@ class _HistoryPageState extends State<HistoryPage> {
                           padding: EdgeInsets.only(top: 5, bottom: 5),
                         ),
                         Visibility(
-                          visible: undoableList!=null&&undoableList.length>0&&index==undoableList.length-1,
+                          visible: remarksHistory!=null&&remarksHistory.length>0&&undoableList!=null&&undoableList.length>0&&index==remarksHistory.indexOf(undoableList[undoableList.length-1]),
                           child: Padding(
                             padding: const EdgeInsets.all(10),
                             child: InkWell(
