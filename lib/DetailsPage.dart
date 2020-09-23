@@ -57,7 +57,7 @@ class _DetailsPageState extends State<DetailsPage> {
         children: [
            DetailPage(request),
            HistoryPage(request),
-           ScheduleListPage(),
+           ScheduleListPage(request),
         ],
         onPageChanged: onPageChanged,
         controller: _pageController,

@@ -19,6 +19,7 @@ class _ObservationsState extends State<Observations> {
   String token;
   int status;
   var request;
+  DateTime visitDate=DateTime.now();
   TextEditingController remarks,modelName,modelCode;
   GlobalKey<FormBuilderState> fbKey=GlobalKey();
   _ObservationsState(this.status,this.request);
@@ -111,22 +112,22 @@ class _ObservationsState extends State<Observations> {
                 Visibility(
                   visible: status==7||status==8,
                   child: Padding(
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
                     child:Card(
                       elevation: 10,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: FormBuilderDateTimePicker(
-                        attribute: "Client Visit Date",
+                        attribute: "Visit Date",
                         style: Theme.of(context).textTheme.bodyText1,
                         inputType: InputType.date,
                         validators: [FormBuilderValidators.required()],
                         format: DateFormat("MM-dd-yyyy"),
-                        decoration: InputDecoration(hintText: "Client Visit Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                        decoration: InputDecoration(hintText: "Visit Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                         onChanged: (value){
                           setState(() {
-                            this.clientVisitDate=value;
+                            this.visitDate=value;
                           });
                         },
                       ),
@@ -142,9 +143,9 @@ class _ObservationsState extends State<Observations> {
                         if(status==6){
                             Network_Operations.changeStatusWithRemarks(context,token, request.requestId, status, remarks.text);
                         }else if(status==7){
-                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text,modelName.text,modelCode.text,);
+                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text,modelName.text,modelCode.text,visitDate);
                        }else if(status==8){
-                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text,null,null);
+                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text,null,null,visitDate);
                        }else if(status==9){
                          Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text,null,null,null);
                        }else if(status==10){

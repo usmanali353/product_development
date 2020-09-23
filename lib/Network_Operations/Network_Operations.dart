@@ -214,7 +214,7 @@ import '../DetailsPage.dart';
         pd.hide();
         Request request;
         request=Request.fromMap(jsonDecode(response.body));
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
       }else{
         pd.hide();
         Utils.showError(context, "No Request Found against this Id");
