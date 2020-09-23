@@ -19,7 +19,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
   GlobalKey<FormBuilderState> fbKey=GlobalKey();
   DateTime clientVisitDate = DateTime.now(),actualStartDate=DateTime.now(),actualEndDate=DateTime.now();
   TextEditingController remarks;
-  List myClients;
+  List myClients=[];
   List<dynamic> clients=[];
   List<Dropdown> clientsDropdown=[];
   List<String> clientNames=[];
@@ -66,28 +66,6 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                        borderRadius: BorderRadius.circular(15),
                      ),
                      child: FormBuilderDateTimePicker(
-                       attribute: "Client Visit Date",
-                       style: Theme.of(context).textTheme.bodyText1,
-                       inputType: InputType.date,
-                       validators: [FormBuilderValidators.required()],
-                       format: DateFormat("MM-dd-yyyy"),
-                       decoration: InputDecoration(hintText: "Client Visit Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
-                       onChanged: (value){
-                         setState(() {
-                           this.clientVisitDate=value;
-                         });
-                       },
-                     ),
-                   ),
-                 ),
-                 Padding(
-                   padding: EdgeInsets.only(left: 16,right: 16),
-                   child:Card(
-                     elevation: 10,
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(15),
-                     ),
-                     child: FormBuilderDateTimePicker(
                        attribute: "Actual Start Date",
                        style: Theme.of(context).textTheme.bodyText1,
                        inputType: InputType.date,
@@ -103,7 +81,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                    ),
                  ),
                  Padding(
-                   padding: EdgeInsets.all(16),
+                   padding: EdgeInsets.only(left: 16,right: 16),
                    child:Card(
                      elevation: 10,
                      shape: RoundedRectangleBorder(
@@ -119,6 +97,28 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                        onChanged: (value){
                          setState(() {
                            this.actualEndDate=value;
+                         });
+                       },
+                     ),
+                   ),
+                 ),
+                 Padding(
+                   padding: EdgeInsets.all(16),
+                   child:Card(
+                     elevation: 10,
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(15),
+                     ),
+                     child: FormBuilderDateTimePicker(
+                       attribute: "Client Visit Date",
+                       style: Theme.of(context).textTheme.bodyText1,
+                       inputType: InputType.date,
+                       validators: [FormBuilderValidators.required()],
+                       format: DateFormat("MM-dd-yyyy"),
+                       decoration: InputDecoration(hintText: "Client Visit Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                       onChanged: (value){
+                         setState(() {
+                           this.clientVisitDate=value;
                          });
                        },
                      ),
@@ -244,7 +244,12 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                            if(fbKey.currentState.validate()){
                              if(status=="Approve"){
                                SharedPreferences.getInstance().then((prefs){
-                                 Network_Operations.trialClient(context, prefs.getString("token"),request.marketId!=2?myClients:clientId, request.requestId,remarks.text,clientVisitDate);
+                                 setState(() {
+                                   if(request.marketId==2){
+                                     myClients.add(clientId);
+                                   }
+                                 });
+                                 Network_Operations.trialClient(context, prefs.getString("token"),myClients, request.requestId,remarks.text,clientVisitDate,actualStartDate,actualEndDate);
                                });
                              }
                            }

@@ -220,6 +220,8 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                     PopupMenuItem<String>(
                                         child: const Text('Change Status'), value: 'changeStatus'),
                                     PopupMenuItem<String>(
+                                        child: const Text('Add Images'), value: 'addImage'),
+                                    PopupMenuItem<String>(
                                         child: const Text('See Details'), value: 'Details'),
                                   ],
                                   elevation: 8.0,
@@ -238,7 +240,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                   position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
                                   items: [
                                     PopupMenuItem<String>(
-                                        child: const Text('Add Additional Images'), value: 'addImage'),
+                                        child: const Text('Add Images'), value: 'addImage'),
                                     PopupMenuItem<String>(
                                         child: const Text('See Details'), value: 'Details'),
                                   ],

@@ -125,7 +125,7 @@ class _HistoryPageState extends State<HistoryPage> {
                             Padding(
                               padding: EdgeInsets.only(left: 5, right: 5),
                             ),
-                            Text(remarksHistory[index].remarkedByName),
+                            Text(remarksHistory[index].clientName!=null?remarksHistory[index].clientName:remarksHistory[index].remarkedByName),
                             Padding(
                               padding: EdgeInsets.only(left: 20, right: 5),
                             ),

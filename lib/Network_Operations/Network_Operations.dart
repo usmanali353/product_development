@@ -258,12 +258,14 @@ import '../DetailsPage.dart';
     }
     return null;
   }
-  static Future<void> trialClient(BuildContext context,String token,List<dynamic> clientIds,int requestId,String remarks,DateTime ClientVisitDate)async{
+  static Future<void> trialClient(BuildContext context,String token,List<dynamic> clientIds,int requestId,String remarks,DateTime ClientVisitDate,DateTime actualStartDate,DateTime actualEndDate)async{
     try{
       final body=jsonEncode({
        "requestId":requestId,
         "MultipleClients":clientIds,
         "ClientVisitDate":ClientVisitDate,
+        "ActualStartDate": actualStartDate,
+        "ActualEndDate": actualEndDate,
         "Remarks":remarks
       },toEncodable: Utils.myEncode);
       print(body);
@@ -415,14 +417,15 @@ import '../DetailsPage.dart';
       Utils.showError(context, e.toString());
     }
   }
-  static Future<void> changeStatusClientWithRemarks(BuildContext context,String token,int requestId,int status,String remarks,String NewModelName,String NewModelCode)async{
+  static Future<void> changeStatusClientWithRemarks(BuildContext context,String token,int requestId,int status,String remarks,String NewModelName,String NewModelCode,DateTime ActualClientVisitDate)async{
     try{
       final body=jsonEncode({
         "StatusId":status,
         "RequestClientId":requestId,
         "Remarks":remarks,
         "NewModelName":NewModelName,
-        "NewModelCode":NewModelCode
+        "NewModelCode":NewModelCode,
+        "ActualClientVisitDate":ActualClientVisitDate
       },toEncodable: Utils.myEncode);
       var response=await http.post(Utils.getBaseUrl()+"Request/SaveRequestRemark",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
