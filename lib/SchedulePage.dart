@@ -18,7 +18,7 @@ class _SchedulePageState extends State<SchedulePage> {
    GlobalKey<FormBuilderState> fbKey=GlobalKey();
   _SchedulePageState(this.request);
   TextEditingController remarks;
-  DateTime targetStartDate,targetEndDate,actualStartDate,actualEndDate;
+  DateTime targetStartDate,targetEndDate;
 @override
   void initState() {
    remarks=TextEditingController();
@@ -82,51 +82,7 @@ class _SchedulePageState extends State<SchedulePage> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(left: 16,right: 16,top: 16),
-                  child:Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: FormBuilderDateTimePicker(
-                      attribute: "Actual Start Date",
-                      style: Theme.of(context).textTheme.bodyText1,
-                      inputType: InputType.date,
-                      validators: [FormBuilderValidators.required()],
-                      format: DateFormat("MM-dd-yyyy"),
-                      decoration: InputDecoration(hintText: "Actual Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
-                      onChanged: (value){
-                        setState(() {
-                          this.actualStartDate=value;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-                Padding(
                   padding: EdgeInsets.all(16),
-                  child:Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: FormBuilderDateTimePicker(
-                      attribute: "Actual End Date",
-                      style: Theme.of(context).textTheme.bodyText1,
-                      inputType: InputType.date,
-                      validators: [FormBuilderValidators.required()],
-                      format: DateFormat("MM-dd-yyyy"),
-                      decoration: InputDecoration(hintText: "Actual End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
-                      onChanged: (value){
-                        setState(() {
-                          this.actualEndDate=value;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
                   child: Card(
                     elevation: 10,
                     shape: RoundedRectangleBorder(
@@ -151,7 +107,7 @@ class _SchedulePageState extends State<SchedulePage> {
                   onPressed: (){
                     if(fbKey.currentState.validate()){
                       SharedPreferences.getInstance().then((prefs){
-                        Network_Operations.addRequestSchedule(context,prefs.getString("token"), request.requestId, targetStartDate, targetEndDate, actualStartDate, actualEndDate,4,remarks.text);
+                        Network_Operations.addRequestSchedule(context,prefs.getString("token"), request.requestId, targetStartDate, targetEndDate, null,null,4,remarks.text);
                       });
                     }
                   },

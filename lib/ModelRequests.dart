@@ -267,15 +267,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                  elevation: 8.0,
                                ).then((selectedItem){
                                  if(selectedItem=="changeStatus"){
-                                   // showDatePicker(helpText:"Select Target Date for Starting Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((startDate){
-                                   //   if(startDate!=null){
-                                   //     showDatePicker(helpText:"Select Target Date for Ending Sample Production",context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime.now().add(Duration(days: 365))).then((endDate){
-                                   //       if(endDate!=null){
-                                   //         Network_Operations.addRequestSchedule(context, token, products[index].requestId, startDate, endDate, null, null,4);
-                                   //       }
-                                   //     });
-                                   //   }
-                                   // });
+
                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products[index])));
                                  }else if(selectedItem=="Details"){
                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));

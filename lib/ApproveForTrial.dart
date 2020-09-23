@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
-import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'Model/Dropdown.dart';
 import 'Network_Operations/Network_Operations.dart';
 class ApproveForTrial extends StatefulWidget {
@@ -19,13 +17,15 @@ class ApproveForTrial extends StatefulWidget {
 
 class _ApproveForTrialState extends State<ApproveForTrial> {
   GlobalKey<FormBuilderState> fbKey=GlobalKey();
-  DateTime clientVisitDate = DateTime.now();
+  DateTime clientVisitDate = DateTime.now(),actualStartDate=DateTime.now(),actualEndDate=DateTime.now();
   TextEditingController remarks;
   List myClients;
   List<dynamic> clients=[];
   List<Dropdown> clientsDropdown=[];
+  List<String> clientNames=[];
   Request request;
   String status;
+  var clientId;
   _ApproveForTrialState(this.request,this.status);
   @override
   void initState() {
@@ -35,6 +35,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
         setState(() {
           this.clientsDropdown=cli;
           for(var c in cli){
+            clientNames.add(c.name);
             clients.add({
               "display":c.name,
               "value": c.stringId
@@ -79,8 +80,52 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                      ),
                    ),
                  ),
+                 Padding(
+                   padding: EdgeInsets.only(left: 16,right: 16),
+                   child:Card(
+                     elevation: 10,
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(15),
+                     ),
+                     child: FormBuilderDateTimePicker(
+                       attribute: "Actual Start Date",
+                       style: Theme.of(context).textTheme.bodyText1,
+                       inputType: InputType.date,
+                       validators: [FormBuilderValidators.required()],
+                       format: DateFormat("MM-dd-yyyy"),
+                       decoration: InputDecoration(hintText: "Actual Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                       onChanged: (value){
+                         setState(() {
+                           this.actualStartDate=value;
+                         });
+                       },
+                     ),
+                   ),
+                 ),
+                 Padding(
+                   padding: EdgeInsets.all(16),
+                   child:Card(
+                     elevation: 10,
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(15),
+                     ),
+                     child: FormBuilderDateTimePicker(
+                       attribute: "Actual End Date",
+                       style: Theme.of(context).textTheme.bodyText1,
+                       inputType: InputType.date,
+                       validators: [FormBuilderValidators.required()],
+                       format: DateFormat("MM-dd-yyyy"),
+                       decoration: InputDecoration(hintText: "Actual End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                       onChanged: (value){
+                         setState(() {
+                           this.actualEndDate=value;
+                         });
+                       },
+                     ),
+                   ),
+                 ),
                  Visibility(
-                   visible: status=="Approve",
+                   visible: status=="Approve"&&request.marketId!=2,
                    child: Padding(
                      padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
                      child: Card(
@@ -111,6 +156,66 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                      ),
                    ),
                  ),
+                 Visibility(
+                   visible: status=="Approve"&&request.marketId==2,
+                   child: Padding(
+
+                     padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
+
+                     child: Card(
+
+                       elevation: 10,
+
+                       shape: RoundedRectangleBorder(
+
+                         borderRadius: BorderRadius.circular(15),
+
+                       ),
+
+                       child: FormBuilderDropdown(
+
+                         attribute: "Client",
+
+                         validators: [FormBuilderValidators.required()],
+
+                         hint: Text("Select Client"),
+
+                         items:clientNames!=null?clientNames.map((horse)=>DropdownMenuItem(
+
+                           child: Text(horse),
+
+                           value: horse,
+
+                         )).toList():[""].map((name) => DropdownMenuItem(
+
+                             value: name, child: Text("$name")))
+
+                             .toList(),
+
+                         style: Theme.of(context).textTheme.bodyText1,
+
+                         decoration: InputDecoration(
+
+                           border: InputBorder.none,
+
+                           contentPadding: EdgeInsets.all(16),
+
+                         ),
+
+                         onChanged: (value){
+
+                           setState(() {
+                             this.clientId =clientsDropdown[clientNames.indexOf(value)].stringId;
+                           });
+
+                         },
+
+                       ),
+
+                     ),
+
+                   ),
+                 ),
                  Padding(
                    padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
                    child: Card(
@@ -139,7 +244,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                            if(fbKey.currentState.validate()){
                              if(status=="Approve"){
                                SharedPreferences.getInstance().then((prefs){
-                                 Network_Operations.trialClient(context, prefs.getString("token"), myClients, request.requestId,remarks.text,clientVisitDate);
+                                 Network_Operations.trialClient(context, prefs.getString("token"),request.marketId!=2?myClients:clientId, request.requestId,remarks.text,clientVisitDate);
                                });
                              }
                            }

@@ -78,7 +78,6 @@ class _HistoryPageState extends State<HistoryPage> {
                                 SharedPreferences.getInstance().then((prefs){
                                   Network_Operations.undoStatus(context,prefs.getString("token"),undoableList[undoableList.length-1].id);
                                 });
-
                               },
                               child: Row(
                                 children: <Widget>[
@@ -96,7 +95,7 @@ class _HistoryPageState extends State<HistoryPage> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(5.0),
-                      child: VerticalDivider(color: Colors.grey.shade300),
+                      child: VerticalDivider(color: Colors.grey.shade400),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
