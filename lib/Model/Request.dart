@@ -10,7 +10,7 @@ class Request {
   DateTime dateTime;
   List<Colors> multipleColorNames;
   List<RemarksHistory> remarksHistory,allRequestClientRemarks;
-  List<dynamic> multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames,multipleImages,currentLoggedInUserStatuses;
+  List<dynamic> allRequestClients,multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames,multipleImages,currentLoggedInUserStatuses;
   Request({
     this.requestId,
     this.marketId,
@@ -85,6 +85,7 @@ class Request {
     map['clientName']=clientName;
     map['rangeImage']=rangeImage;
     map['multipleImages']=multipleImages;
+    map['allRequestClients']=allRequestClients;
     map['multipleColorNames'] = List<dynamic>.from(multipleColorNames.map((x) => x.toJson()));
    // map['allRequestRemarks'] = List<dynamic>.from(remarksHistory.map((x) => x.toJson()));
     return map;
@@ -142,6 +143,7 @@ class Request {
     rangeImage=data['rangeImage'];
     multipleImages=data['multipleImages'];
     currentLoggedInUserStatuses=data['currentLoggedInUserStatuses'];
+    allRequestClients=data['allRequestClients'];
   }
 
 }

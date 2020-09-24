@@ -428,7 +428,7 @@ import '../DetailsPage.dart';
         "Remarks":remarks,
         "NewModelName":NewModelName,
         "NewModelCode":NewModelCode,
-        "actualClientVisitDate":ActualClientVisitDate,
+        //"actualClientVisitDate":ActualClientVisitDate,
         "ActualClientVisitDate":ActualClientVisitDate
 
       },toEncodable: Utils.myEncode);

@@ -18,21 +18,12 @@ class ScheduleListPage extends StatefulWidget {
 
 class _ScheduleListPageState extends State<ScheduleListPage> {
   var request;
-  List<TrialRequests> trialrequests;
   var isVisible=false;
   _ScheduleListPageState(this.request);
  @override
   void initState() {
-   SharedPreferences.getInstance().then((prefs){
-     Network_Operations.getTrialRequests(context, prefs.getString("token"),request.requestId).then((trialRequests){
-       setState(() {
-         this.trialrequests=trialRequests;
-         if(trialrequests!=null&&trialRequests.length>0){
-           isVisible=true;
-         }
-       });
-     });
-   });
+    print(request.allRequestClients.length);
+    print(request.allRequestClients[0]['actualClientVisitDate']);
     super.initState();
   }
   @override
@@ -41,72 +32,69 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
       appBar: AppBar(
         title: Text("Client's Schedules"),
       ),
-      body: Visibility(
-        visible: isVisible,
-        child: ListView.builder(
-          itemCount:trialrequests!=null?trialrequests.length:0,
-          itemBuilder: (context, index) {
-            return Card(
-              elevation: 5,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.18,
-                child: Row(
-                  children: <Widget>[
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 5, top: 10),
-                          child: FaIcon(FontAwesomeIcons.calendarCheck, color: Colors.teal.shade800, size: 45,),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 5, bottom: 5),
-                        ),
+      body: ListView.builder(
+        itemCount:request.allRequestClients!=null?request.allRequestClients.length:0,
+        itemBuilder: (context, index) {
+          return Card(
+            elevation: 5,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.18,
+              child: Row(
+                children: <Widget>[
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 5, top: 10),
+                        child: FaIcon(FontAwesomeIcons.calendarCheck, color: Colors.teal.shade800, size: 45,),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 5, bottom: 5),
+                      ),
 
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: VerticalDivider(color: Colors.grey.shade300,),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(padding: EdgeInsets.only(top: 30),),
-                        Row(
-                          children: <Widget>[
-                            FaIcon(FontAwesomeIcons.userTie, color: Colors.teal.shade800, size: 25,),
-                            Padding(
-                              padding: EdgeInsets.only(left: 5, right: 5),
-                            ),
-                            Text(trialrequests[index].clientName),
-                            Padding(
-                              padding: EdgeInsets.only(left: 50, right: 5),
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 20),
-                        ),
-                        Row(
-                          children: <Widget>[
-                            FaIcon(FontAwesomeIcons.calendarAlt, color: Colors.teal.shade800, size: 25,),
-                            Padding(
-                              padding: EdgeInsets.only(left: 5, right: 5),
-                            ),
-                            Text(trialrequests[index].actualClientVisitDate!=null?"Visit Date: "+DateFormat("yyyy-MM-dd").format(DateTime.parse(trialrequests[index].actualClientVisitDate.toString())):"Target Visit Date: "+DateFormat("yyyy-MM-dd").format(DateTime.parse(trialrequests[index].clientVisitDate.toString()))),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: VerticalDivider(color: Colors.grey.shade300,),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(padding: EdgeInsets.only(top: 30),),
+                      Row(
+                        children: <Widget>[
+                          FaIcon(FontAwesomeIcons.userTie, color: Colors.teal.shade800, size: 25,),
+                          Padding(
+                            padding: EdgeInsets.only(left: 5, right: 5),
+                          ),
+                          Text(request.allRequestClients[index]['clientName']),
+                          Padding(
+                            padding: EdgeInsets.only(left: 50, right: 5),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20),
+                      ),
+                      Row(
+                        children: <Widget>[
+                          FaIcon(FontAwesomeIcons.calendarAlt, color: Colors.teal.shade800, size: 25,),
+                          Padding(
+                            padding: EdgeInsets.only(left: 5, right: 5),
+                          ),
+                          Text(request.allRequestClients[index]['actualClientVisitDate']!=null?"Visit Date: "+DateFormat("yyyy-MM-dd").format(DateTime.parse(request.allRequestClients[index]['actualClientVisitDate'].toString())):"Target Visit Date: "+DateFormat("yyyy-MM-dd").format(DateTime.parse(request.allRequestClients[index]['clientVisitDate'].toString()))),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

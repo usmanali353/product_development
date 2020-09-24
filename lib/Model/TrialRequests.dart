@@ -15,7 +15,7 @@ class TrialRequests{
   String modelName;
   dynamic clientVisitDate;
   dynamic actualClientVisitDate;
-  List<dynamic> multipleClients;
+  List<dynamic> multipleClients,allRequestClients;
   List<Colors> multipleColors;
   List<String> multipleSizeNames;
   List<dynamic> multipleImages;
@@ -37,7 +37,7 @@ class TrialRequests{
     this.multipleSizeNames,
     this.multipleImages,
     this.clientVisitDate,
-    this.actualClientVisitDate
+    this.actualClientVisitDate,this.allRequestClients
   });
   factory TrialRequests.fromJson(Map<String, dynamic> json) => TrialRequests(
     id: json["id"],
@@ -57,7 +57,8 @@ class TrialRequests{
     multipleSizeNames: List<String>.from(json["multipleSizeNames"].map((x) => x)),
     multipleImages: List<dynamic>.from(json["multipleImages"].map((x) => x)),
     clientVisitDate:json["clientVisitDate"],
-    actualClientVisitDate: json["actualClientVisitDate"]
+    actualClientVisitDate: json["actualClientVisitDate"],
+    allRequestClients:json["allRequestClients"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -78,6 +79,7 @@ class TrialRequests{
     "multipleSizeNames": List<dynamic>.from(multipleSizeNames.map((x) => x)),
     "multipleImages": List<dynamic>.from(multipleImages.map((x) => x)),
     "clientVisitDate":clientVisitDate,
-    "actualClientVisitDate":actualClientVisitDate
+    "actualClientVisitDate":actualClientVisitDate,
+    "allRequestClients":allRequestClients
   };
 }
