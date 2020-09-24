@@ -8,14 +8,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Suitability.dart';
 class designTopology extends StatefulWidget {
-  var market,clientId,event,other,size,surfaceId,thickness,classification,color;
+  var market,event,other,size,surfaceId,thickness,classification,color;
   List<dynamic> sizesList=[],colorsList=[];
 
-  designTopology(this.market, this.clientId, this.event, this.sizesList,
+  designTopology(this.market, this.event, this.sizesList,
       this.surfaceId, this.thickness, this.classification, this.colorsList);
 
   @override
-  _designTopologyState createState() => _designTopologyState(market,clientId,event,sizesList,surfaceId,thickness,classification,colorsList);
+  _designTopologyState createState() => _designTopologyState(market,event,sizesList,surfaceId,thickness,classification,colorsList);
 }
 
 class _designTopologyState extends ResumableState<designTopology> {
@@ -26,13 +26,12 @@ class _designTopologyState extends ResumableState<designTopology> {
  List<Dropdown> designTopology=[], range=[], material=[],structure=[], edge=[],technology=[];
  List<String> designTopologyName=[], rangeName=[], materialName=[],structureName=[], edgeName=[],technologyName=[];
  List<dynamic> designTopologies=[],sizesList=[],colorsList=[];
- var market,clientId,event,other,size,surfaceId,name,thickness,classification,color;
+ var market,event,other,size,surfaceId,name,thickness,classification,color;
 String selected_technology, selected_structure, selected_edge,selected_range, selected_material;
 GlobalKey<FormBuilderState> fbkey=GlobalKey();
 int range_id, material_id,technology_id, structure_id, edge_id;
  _designTopologyState(
       this.market,
-      this.clientId,
       this.event,
       this.sizesList,
       this.surfaceId,
@@ -325,7 +324,6 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                           print( range_id.toString());
                           push(context, MaterialPageRoute(builder: (context)=>Suitability(
                               market,
-                              clientId,
                               event,
                               sizesList,
                               surfaceId,

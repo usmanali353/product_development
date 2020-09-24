@@ -244,11 +244,10 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                            if(fbKey.currentState.validate()){
                              if(status=="Approve"){
                                SharedPreferences.getInstance().then((prefs){
-                                 setState(() {
                                    if(request.marketId==2){
+                                     myClients.clear();
                                      myClients.add(clientId);
                                    }
-                                 });
                                  Network_Operations.trialClient(context, prefs.getString("token"),myClients, request.requestId,remarks.text,clientVisitDate,actualStartDate,actualEndDate);
                                });
                              }

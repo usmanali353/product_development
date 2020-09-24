@@ -7,16 +7,16 @@ import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/request_Model_form/designTopology.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class Specifications extends StatefulWidget {
-  var market,clientId,event,other;
+  var market,event,other;
 
-  Specifications(this.market, this.clientId, this.event);
+  Specifications(this.market, this.event);
 
   @override
-  _SpecificationsState createState() => _SpecificationsState(market,clientId,event);
+  _SpecificationsState createState() => _SpecificationsState(market,event);
 }
 
 class _SpecificationsState extends ResumableState<Specifications> {
-  var market,clientId,event,other;
+  var market,event,other;
   TextEditingController thickness;
   List<dynamic> sizes=[],colors=[];
   bool classificationDropDownVisible=false,surfaceDropDownVisible=false,sizeDropDownVisible=false,colorDropDownVisible=false;
@@ -26,7 +26,7 @@ class _SpecificationsState extends ResumableState<Specifications> {
 
   String selected_product_name, selected_surface, selected_size,selected_classification;
   int product_name_id, surface_id, size_id,classification_id;
-  _SpecificationsState(this.market, this.clientId, this.event);
+  _SpecificationsState(this.market, this.event);
   List _myActivities,selectedSizes;
   String _myActivitiesResult;
   final formKey = new GlobalKey<FormState>();
@@ -298,7 +298,7 @@ class _SpecificationsState extends ResumableState<Specifications> {
                           setState(() {
                             _myActivitiesResult = _myActivities.toString();
                           });
-                          push(context, MaterialPageRoute(builder: (context)=>designTopology(market,clientId,event,selectedSizes,surface_id,thickness.text,classification_id,_myActivities)));
+                          push(context, MaterialPageRoute(builder: (context)=>designTopology(market,event,selectedSizes,surface_id,thickness.text,classification_id,_myActivities)));
                         }
                       },
                     ),

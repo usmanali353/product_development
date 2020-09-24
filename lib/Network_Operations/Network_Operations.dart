@@ -274,6 +274,9 @@ import '../DetailsPage.dart';
         Utils.showSuccess(context, "Request Saved Successfully");
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
       }else{
+        if(response.body!=null){
+          print(response.body);
+        }
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
@@ -425,7 +428,9 @@ import '../DetailsPage.dart';
         "Remarks":remarks,
         "NewModelName":NewModelName,
         "NewModelCode":NewModelCode,
+        "actualClientVisitDate":ActualClientVisitDate,
         "ActualClientVisitDate":ActualClientVisitDate
+
       },toEncodable: Utils.myEncode);
       var response=await http.post(Utils.getBaseUrl()+"Request/SaveRequestRemark",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
@@ -445,6 +450,28 @@ import '../DetailsPage.dart';
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+        List<TrialRequests> requests=[];
+        for(int i=0;i<jsonDecode(response.body).length;i++){
+          requests.add(TrialRequests.fromJson(jsonDecode(response.body)[i]));
+        }
+        return requests;
+      }else{
+        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static Future<List<TrialRequests>> getClientRequests(BuildContext context,String token)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.hide();
         List<TrialRequests> requests=[];

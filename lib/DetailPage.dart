@@ -72,7 +72,7 @@ class _DetailPageState extends State<DetailPage>{
               },
               child: Container(
                 //color: Color(0xFF004c4c),
-                height: MediaQuery.of(context).size.height/3,
+                height: MediaQuery.of(context).size.height/5,
                 width: MediaQuery.of(context).size.width,
                decoration: BoxDecoration(
                  image: DecorationImage(

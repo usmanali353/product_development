@@ -28,17 +28,13 @@ class _AssumptionsState extends ResumableState<Assumptions> {
 
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey();
 
-  bool marketDropdownVisible=false,clientDropDownVisible=false;
+  bool marketDropdownVisible=false;
 
   int marketId;
 
   List<Dropdown> markets=[];
 
-  List<Dropdown> clients=[];
-
   List<String> marketNames=[];
-
-  List<String> clientNames=[];
 
   String selectedMarket,selectedClient="Client 1";
 
@@ -77,19 +73,6 @@ class _AssumptionsState extends ResumableState<Assumptions> {
            marketDropdownVisible=true;
          }
 
-       });
-       Network_Operations.getDropDowns(context,prefs.getString("token"),"Clients").then((clientDropDown){
-         setState(() {
-           if(clients!=null){
-             this.clients=clientDropDown;
-             for(var c in clients){
-               clientNames.add(c.name);
-             }
-             if(clientNames.length>0){
-               clientDropDownVisible=true;
-             }
-           }
-         });
        });
      });
 
@@ -197,7 +180,7 @@ class _AssumptionsState extends ResumableState<Assumptions> {
 
                 Padding(
 
-                  padding: EdgeInsets.only(top: 16,left: 16,right: 16),
+                  padding: EdgeInsets.only(top: 16,left: 16,right: 16,bottom: 16),
 
                   child: Card(
 
@@ -231,71 +214,7 @@ class _AssumptionsState extends ResumableState<Assumptions> {
 
                 ),
 
-                // Client Dropdown
 
-                Visibility(
-                  visible: clientDropDownVisible,
-                  child: Padding(
-
-                    padding: const EdgeInsets.only(top: 16,left: 16,right:16),
-
-                    child: Card(
-
-                      elevation: 10,
-
-                      shape: RoundedRectangleBorder(
-
-                        borderRadius: BorderRadius.circular(15),
-
-                      ),
-
-                      child: FormBuilderDropdown(
-
-                        attribute: "Client",
-
-                        validators: [FormBuilderValidators.required()],
-
-                        hint: Text("Select Client"),
-
-                        items:clientNames!=null?clientNames.map((horse)=>DropdownMenuItem(
-
-                          child: Text(horse),
-
-                          value: horse,
-
-                        )).toList():[""].map((name) => DropdownMenuItem(
-
-                            value: name, child: Text("$name")))
-
-                            .toList(),
-
-                        style: Theme.of(context).textTheme.bodyText1,
-
-                        decoration: InputDecoration(
-
-                          border: InputBorder.none,
-
-                          contentPadding: EdgeInsets.all(16),
-
-                        ),
-
-                        onChanged: (value){
-
-                          setState(() {
-
-                            this.selectedClient=value;
-
-                            this.clientId = clientNames.indexOf(value);
-                          });
-
-                        },
-
-                      ),
-
-                    ),
-
-                  ),
-                ),
 
                 Padding(
                   padding: const EdgeInsets.all(16),
@@ -311,7 +230,7 @@ class _AssumptionsState extends ResumableState<Assumptions> {
 
                         if(_fbKey.currentState.validate()){
 
-                          push(context, MaterialPageRoute(builder: (context)=>Specifications(marketId,selectedClient,event.text)));
+                          push(context, MaterialPageRoute(builder: (context)=>Specifications(marketId,event.text)));
 
                         }
 
