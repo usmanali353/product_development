@@ -6,7 +6,8 @@ class Request {
       structureId, edgeId, surfaceId,id;
   String technicalConcentration, event,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId,classificationName,marketName,technologyName,structureName,edgeName,rangeName,client,targetStartDate,targetEndDate,actualStartDate,actualEndDate,status,qrcodeImage,clientName,rangeImage;
   double thickness;
-  var image;
+
+  var image,hasNext,hasPrevious;
   DateTime dateTime;
   List<Colors> multipleColorNames;
   List<RemarksHistory> remarksHistory,allRequestClientRemarks;
@@ -86,6 +87,8 @@ class Request {
     map['rangeImage']=rangeImage;
     map['multipleImages']=multipleImages;
     map['allRequestClients']=allRequestClients;
+    map["hasNext"]=hasNext;
+    map["hasPrevious"]=hasPrevious;
     map['multipleColorNames'] = List<dynamic>.from(multipleColorNames.map((x) => x.toJson()));
    // map['allRequestRemarks'] = List<dynamic>.from(remarksHistory.map((x) => x.toJson()));
     return map;
@@ -144,6 +147,8 @@ class Request {
     multipleImages=data['multipleImages'];
     currentLoggedInUserStatuses=data['currentLoggedInUserStatuses'];
     allRequestClients=data['allRequestClients'];
+    hasNext=data['hasNext'];
+    hasPrevious=data['hasPrevious'];
   }
 
 }
