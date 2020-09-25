@@ -103,20 +103,8 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                     imageUrl.add(requests[index].multipleImages[i]);
                                   }
                                 }
-                                if(imageUrl.length>0){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(requests[index])));
-                                }else{
-                                  showDialog(
-                                      context: context,
-                                      builder: (BuildContext context){
-                                        return Center(
-                                          child: PhotoView(
-                                            imageProvider: NetworkImage(requests[index].image),
-                                          ),
-                                        );
-                                      }
-                                  );
-                                }
+                                imageUrl.add(requests[index].image);
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(requests[index])));
                               });
 
                             },

@@ -8,18 +8,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Suitability.dart';
 class designTopology extends StatefulWidget {
-  var market,event,other,size,surfaceId,thickness,classification,color;
+  var market,event,other,size,surfaceId,thickness,classification,color,myClients;
   List<dynamic> sizesList=[],colorsList=[];
 
   designTopology(this.market, this.event, this.sizesList,
-      this.surfaceId, this.thickness, this.classification, this.colorsList);
+      this.surfaceId, this.thickness, this.classification, this.colorsList,this.myClients);
 
   @override
-  _designTopologyState createState() => _designTopologyState(market,event,sizesList,surfaceId,thickness,classification,colorsList);
+  _designTopologyState createState() => _designTopologyState(market,event,sizesList,surfaceId,thickness,classification,colorsList,myClients);
 }
 
 class _designTopologyState extends ResumableState<designTopology> {
-  List _myMaterials;
+  List _myMaterials,myClients;
   bool designTopologyDropDownVisible=false;
   final formKey = new GlobalKey<FormState>();
   bool rangeDropdownVisible=false,technologyDropdownVisible=false,edgeDropdownVisible=false,structureDropdownVisible=false;
@@ -37,7 +37,9 @@ int range_id, material_id,technology_id, structure_id, edge_id;
       this.surfaceId,
       this.thickness,
       this.classification,
-      this.colorsList);
+      this.colorsList,
+      this.myClients
+     );
  @override
   void onResume() {
    if(resume.data.toString()=='Close') {
@@ -334,7 +336,9 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                               structure_id,
                               edge_id,
                               range_id,
-                              _myMaterials)));
+                              _myMaterials,
+                              myClients
+                          )));
 
                         }
                       },

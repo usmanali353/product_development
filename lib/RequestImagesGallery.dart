@@ -18,11 +18,13 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
   @override
   void initState() {
     setState(() {
+      imageUrl.add(request.image);
       for(int i=0;i<request.multipleImages.length;i++){
         if(request.multipleImages[i]!=null){
           imageUrl.add(request.multipleImages[i]);
         }
       }
+      print(imageUrl.length);
     });
 
     super.initState();

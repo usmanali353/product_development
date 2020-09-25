@@ -46,12 +46,18 @@ class _SchedulePageState extends State<SchedulePage> {
                     ),
                     child: FormBuilderDateTimePicker(
                       attribute: "Target Start Date",
+                      initialValue: request.statusId==4?DateTime.parse(request.targetStartDate.toString()):null,
                       style: Theme.of(context).textTheme.bodyText1,
                       inputType: InputType.date,
                       validators: [FormBuilderValidators.required()],
                       format: DateFormat("MM-dd-yyyy"),
                       decoration: InputDecoration(hintText: "Target Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                       onChanged: (value){
+                        setState(() {
+                          this.targetStartDate=value;
+                        });
+                      },
+                      onSaved:(value){
                         setState(() {
                           this.targetStartDate=value;
                         });
@@ -68,6 +74,7 @@ class _SchedulePageState extends State<SchedulePage> {
                     ),
                     child: FormBuilderDateTimePicker(
                       attribute: "Target End Date",
+                      initialValue: request.statusId==4?DateTime.parse(request.targetEndDate.toString()):null,
                       style: Theme.of(context).textTheme.bodyText1,
                       inputType: InputType.date,
                       validators: [FormBuilderValidators.required()],
@@ -77,6 +84,9 @@ class _SchedulePageState extends State<SchedulePage> {
                         setState(() {
                           this.targetEndDate=value;
                         });
+                      },
+                      onSaved: (value){
+                        this.targetEndDate=value;
                       },
                     ),
                   ),
@@ -106,6 +116,7 @@ class _SchedulePageState extends State<SchedulePage> {
                   child: Text("Proceed",style: TextStyle(color: Colors.white),),
                   onPressed: (){
                     if(fbKey.currentState.validate()){
+                      fbKey.currentState.save();
                       SharedPreferences.getInstance().then((prefs){
                         Network_Operations.addRequestSchedule(context,prefs.getString("token"), request.requestId, targetStartDate, targetEndDate, null,null,4,remarks.text);
                       });

@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:need_resume/need_resume.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:productdevelopment/ApproveForTrial.dart';
 import 'package:productdevelopment/DetailsPage.dart';
 import 'package:productdevelopment/Model/Request.dart';
@@ -40,12 +39,6 @@ class _ModelReState extends ResumableState<ModelRequests>{
  bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false,isListVisible=false;
  bool isColorsVisible=false;
   String token;
-  // @override
-  // void onResume() {
-  //   print(resume.data.toString());
-  //    Navigator.pop(context,'Refresh');
-  //   super.onResume();
-  // }
   @override
   void initState() {
     print(currentUserRoles);
@@ -152,20 +145,8 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                       imageUrl.add(products[index].multipleImages[i]);
                                     }
                                   }
-                                  if(imageUrl.length>0){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
-                                  }else{
-                                    showDialog(
-                                        context: context,
-                                        builder: (BuildContext context){
-                                          return Center(
-                                            child: PhotoView(
-                                              imageProvider: NetworkImage(products[index].image),
-                                            ),
-                                          );
-                                        }
-                                    );
-                                  }
+                                  imageUrl.add(products[index].image);
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
                                 });
                               },
                               child: Container(
@@ -256,7 +237,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                               }
                             }else if(products[index].statusName=="Approved By GM"){
-                             if(currentUserRoles["2"]!=null){
+                             if(currentUserRoles["2"]!=null||currentUserRoles["3"]!=null){
                                await showMenu(
                                  context: context,
                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
@@ -269,7 +250,6 @@ class _ModelReState extends ResumableState<ModelRequests>{
                                  elevation: 8.0,
                                ).then((selectedItem){
                                  if(selectedItem=="changeStatus"){
-
                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products[index])));
                                  }else if(selectedItem=="Details"){
                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
@@ -281,12 +261,33 @@ class _ModelReState extends ResumableState<ModelRequests>{
 
                             }else if(products[index].statusName=="Samples Scheduled"){
                               if(currentUserRoles["4"]!=null){
-                                showAlertChangeStatus(context,products[index]);
+                                await showMenu(
+                                  context: context,
+                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                  items: [
+                                    PopupMenuItem<String>(
+                                        child: const Text('Change Status'), value: 'changeStatus'),
+                                    PopupMenuItem<String>(
+                                        child: const Text('Update Schedule'), value: 'updateschedule'),
+                                    PopupMenuItem<String>(
+                                        child: const Text('See Details'), value: 'Details'),
+                                  ],
+                                  elevation: 8.0,
+                                ).then((selectedItem){
+                                  if(selectedItem=="changeStatus"){
+                                    showAlertChangeStatus(context,products[index]);
+                                  }else if(selectedItem=="Details"){
+                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
+                                  }else if(selectedItem=="updateschedule"){
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products[index])));
+                                  }
+                                });
+
                               }else{
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                               }
                             }else if(products[index].statusName=="Approved Trial"){
-                              if(currentUserRoles["5"]!=null){
+                              if(currentUserRoles["5"]!=null||currentUserRoles["6"]!=null){
                                 Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products[index].requestId,currentUserRoles)));
                               }else{
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));

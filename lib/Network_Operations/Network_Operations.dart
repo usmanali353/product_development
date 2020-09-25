@@ -79,7 +79,7 @@ import '../DetailsPage.dart';
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequests",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         List<Request> requests=[];
-        for(int i=0;i<jsonDecode(response.body).length;i++){
+        for(int i=0;i<jsonDecode(response.body)['response'].length;i++){
           requests.add(Request.fromMap(jsonDecode(response.body)[i]));
         }
         return requests;
@@ -225,15 +225,16 @@ import '../DetailsPage.dart';
     }
 
   }
-  static Future<List<Request>> getRequestForGM(BuildContext context,String token)async{
+  static Future<List<Request>> getRequestForGM(BuildContext context,String token,int PageSize,int PageNumber)async{
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         var req=jsonDecode(response.body);
         List<Request> requests=[];
-        for(int i=0;i<req['allRequests'].length;i++){
-          requests.add(Request.fromMap(req['allRequests'][i]));
+        for(int i=0;i<req["response"]['allRequests'].length;i++){
+          requests.add(Request.fromMap(req["response"]['allRequests'][i]));
         }
+
         return requests;
       }
     }catch(e){

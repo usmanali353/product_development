@@ -44,6 +44,7 @@ class _DetailPageState extends State<DetailPage>{
          imageUrl.add(request.multipleImages[i]);
        }
      }
+     imageUrl.add(request.image);
    });
     super.initState();
   }
@@ -57,21 +58,7 @@ class _DetailPageState extends State<DetailPage>{
           children: <Widget>[
             InkWell(
               onTap: (){
-                if(imageUrl.length>0) {
-                  Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => RequestImageGallery(request)));
-                }else{
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context){
-                        return Center(
-                          child: PhotoView(
-                            imageProvider: NetworkImage(request.image),
-                          ),
-                        );
-                      }
-                  );
-                }
+                Navigator.push(context, MaterialPageRoute(builder: (context) => RequestImageGallery(request)));
               },
               child: Container(
                 //color: Color(0xFF004c4c),

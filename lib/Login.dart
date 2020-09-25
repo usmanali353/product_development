@@ -35,6 +35,7 @@ class _LoginState extends State<Login> {
             Column(
               children: <Widget>[
                 Image.asset('Assets/img/login.png',width: 230,height: 230,),
+
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: TextField(
@@ -121,16 +122,17 @@ class _LoginState extends State<Login> {
                         padding: EdgeInsets.all(16),
                         minWidth: MediaQuery.of(context).size.width,
                         onPressed: (){
-//                          if(username.text==null){
-//                            Utils.showError(context, "Enter Email");
-//                          }else if(Utils.validateEmail(username.text)) {
-//                           Utils.showError(context, "Invalid Email");
-//                          }else if(password.text!=null){
-//                            Utils.showError(context, "Enter Password");
-//                          }else if(Utils.validateStructure(password.text)){
-//                            Utils.showError(context, "Invalid Password");
-//                          }else {
-                            Network_Operations.signIn(context, username.text, password.text);
+                         if(username.text==null||username.text.isEmpty){
+                           Utils.showError(context, "Enter Email");
+                         }else if(!Utils.validateEmail(username.text)) {
+                          Utils.showError(context, "Invalid Email");
+                         }else if(password.text==null||password.text.isEmpty){
+                           Utils.showError(context, "Enter Password");
+                         }else if(!Utils.validatePassword(password.text)){
+                           Utils.showError(context, "Invalid Password");
+                         }else {
+                           Network_Operations.signIn(context, username.text, password.text);
+                         }
                         },
                         color: Colors.white,
                         child: Text("SIGN IN",style: TextStyle(

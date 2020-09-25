@@ -15,7 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Suitability extends StatefulWidget{
 
-  var market,event,size,surface,thickness,classification,color,technologyId,structureId, edge,range,material;
+  var market,event,size,surface,thickness,classification,color,technologyId,structureId, edge,range,material,myClient;
   List<dynamic> designTopologies=[],sizesList=[],colorsList=[];
   Suitability(
     this.market,
@@ -29,15 +29,17 @@ class Suitability extends StatefulWidget{
     this.structureId,
     this.edge,
     this.range,
-    this.designTopologies);
+    this.designTopologies,
+      this.myClient
+      );
   @override
   State<StatefulWidget> createState() {
-    return _Suitability_State(market,event,sizesList,surface,thickness,classification,colorsList,technologyId, structureId, edge,range,designTopologies);
+    return _Suitability_State(market,event,sizesList,surface,thickness,classification,colorsList,technologyId, structureId, edge,range,designTopologies,myClient);
   }
 }
 
 class _Suitability_State extends ResumableState<Suitability> {
-  List _myActivities;
+  List _myActivities,myClient;
   var base64EncodedImage;
   final formKey = new GlobalKey<FormState>();
   final fbKey = new GlobalKey<FormBuilderState>();
@@ -86,7 +88,9 @@ class _Suitability_State extends ResumableState<Suitability> {
       this.structureId,
       this.edge,
       this.range,
-      this.designTopologies);
+      this.designTopologies,
+      this.myClient
+      );
 
   Uint8List picked_image;
   File _image;

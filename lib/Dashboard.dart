@@ -5,6 +5,7 @@ import 'package:productdevelopment/Login.dart';
 import 'package:productdevelopment/ProductionManagerPage.dart';
 import 'package:productdevelopment/scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'AllRequestsList.dart';
 import 'ModelRequests.dart';
 import 'Network_Operations/Network_Operations.dart';
 import 'ProductionManagerRequests.dart';
@@ -151,7 +152,68 @@ class _DashboardState extends ResumableState<Dashboard> {
           Padding(
             padding: EdgeInsets.only(top: 15),
           ),
-          //Delivery Cards
+          InkWell(
+            onTap: (){
+              push(context, MaterialPageRoute(builder: (context)=>AllRequestList()));
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0,right:8.0),
+              child: Card(
+                elevation: 10,
+                child: Container(
+                  // margin: EdgeInsets.only(left: 12.5,right: 12.5),
+                  height: 130,
+                  width: 20,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(left: 12),
+                        child: Text("All Requests",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ),
+                      Container(
+                        //margin: EdgeInsets.only(left: 10, top: 5,bottom: 5),
+                        height: 30,
+                        width: MediaQuery.of(context).size.width *0.35,
+                        //width: 145,
+                        decoration: BoxDecoration(
+
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(15),
+                              bottomLeft: Radius.circular(15)
+                          ),
+                          color: Color(0xFF004c4c),
+                        ),
+                        child: Container(margin: EdgeInsets.only(left: 10,top: 5),
+                          child: Text(requestCount!=null&&requestCount['All Requests Count']!=null?requestCount['All Requests Count'].toString():"0",
+                            style: TextStyle(
+                                color:Colors.white,
+                                //Color(0xFF004c4c),
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold
+                            ),
+
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 15),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -174,7 +236,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                       children: <Widget>[
                         Container(
                           //margin: EdgeInsets.only(left: 12),
-                          child: Text("Requested",
+                          child: Text("New Requests",
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold
@@ -209,7 +271,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(2,currentUserRoles)));
+                  push(context, MaterialPageRoute(builder: (context)=>ModelRequests(3,currentUserRoles)));
                 },
                 child: Card(
                   elevation: 10,
@@ -227,7 +289,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                       children: <Widget>[
                         Container(
                           //margin: EdgeInsets.only(left: 12),
-                          child: Text('ACMC Approved',
+                          child: Text('ACMC Rejected',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold
@@ -247,7 +309,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text(requestCount!=null&&requestCount['Approved By GM']!=null?requestCount['Approved By GM'].toString():"0",
+                              child: Text(requestCount!=null&&requestCount['Rejected By GM']!=null?requestCount['Rejected By GM'].toString():"0",
                                 style: TextStyle(
                                     color:Colors.teal.shade800,
                                     //Color(0xFF004c4c),
@@ -271,7 +333,7 @@ class _DashboardState extends ResumableState<Dashboard> {
           ),
           InkWell(
             onTap: (){
-             push(context, MaterialPageRoute(builder: (context)=>ModelRequests(3,currentUserRoles)));
+             push(context, MaterialPageRoute(builder: (context)=>ModelRequests(2,currentUserRoles)));
             },
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0,right:8.0),
@@ -290,7 +352,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                     children: <Widget>[
                       Container(
                         margin: EdgeInsets.only(left: 12),
-                        child: Text("ACMC Rejected",
+                        child: Text("ACMC Approved",
                           style: TextStyle(
                               fontWeight: FontWeight.bold
                           ),
@@ -310,7 +372,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           color: Color(0xFF004c4c),
                         ),
                         child: Container(margin: EdgeInsets.only(left: 10,top: 5),
-                          child: Text(requestCount!=null&&requestCount['Rejected By GM']!=null?requestCount['Rejected By GM'].toString():"0",
+                          child: Text(requestCount!=null&&requestCount['Approved By GM']!=null?requestCount['Approved By GM'].toString():"0",
                             style: TextStyle(
                                 color:Colors.white,
                                 //Color(0xFF004c4c),
@@ -388,7 +450,7 @@ class _DashboardState extends ResumableState<Dashboard> {
               // Weekly Deliveries
               InkWell(
                 onTap: (){
-                 push(context, MaterialPageRoute(builder: (context)=>ModelRequests(5,currentUserRoles)));
+                 push(context, MaterialPageRoute(builder: (context)=>ModelRequests(6,currentUserRoles)));
                 },
                 child: Card(
                   elevation: 10,
@@ -406,7 +468,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                       children: <Widget>[
                         Container(
                           //margin: EdgeInsets.only(left: 12),
-                          child: Text('Approved for Trial',
+                          child: Text('Rejected Models',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold
@@ -425,7 +487,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text(requestCount!=null&&requestCount['Approved Trial']!=null?requestCount['Approved Trial'].toString():"0",
+                              child: Text(requestCount!=null&&requestCount['Rejected Trial']!=null?requestCount['Rejected Trial'].toString():"0",
                                 style: TextStyle(
                                     color:Colors.teal.shade800,
                                     //Color(0xFF004c4c),
@@ -448,7 +510,7 @@ class _DashboardState extends ResumableState<Dashboard> {
           ),
           InkWell(
             onTap: (){
-            push(context, MaterialPageRoute(builder: (context)=>ModelRequests(6,currentUserRoles)));
+            push(context, MaterialPageRoute(builder: (context)=>ModelRequests(5,currentUserRoles)));
             },
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0,right:8.0),
@@ -466,7 +528,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                     children: <Widget>[
                       Container(
                         margin: EdgeInsets.only(left: 12),
-                        child: Text("Rejected for Trial",
+                        child: Text("Approved Models",
                           style: TextStyle(
                               fontWeight: FontWeight.bold
                           ),
@@ -486,7 +548,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           color: Color(0xFF004c4c),
                         ),
                         child: Container(margin: EdgeInsets.only(left: 10,top: 5),
-                          child: Text(requestCount!=null&&requestCount['Rejected Trial']!=null?requestCount['Rejected Trial'].toString():"0",
+                          child: Text(requestCount!=null&&requestCount['Approved Trial']!=null?requestCount['Approved Trial'].toString():"0",
                             style: TextStyle(
                                 color:Colors.white,
                                 //Color(0xFF004c4c),
