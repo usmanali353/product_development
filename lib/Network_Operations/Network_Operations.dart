@@ -174,7 +174,7 @@ import '../DetailsPage.dart';
     }
 
   }
-  static Future<void> addRequestSchedule(BuildContext context,String token,int requestId,DateTime startDate,DateTime endDate,DateTime actualStartDate,DateTime actualEndDate,int statusId,String remarks) async{
+  static Future<void> addRequestSchedule(BuildContext context,String token,int requestId,DateTime startDate,DateTime endDate,bool IsUpdateMode,String remarks) async{
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
@@ -182,8 +182,7 @@ import '../DetailsPage.dart';
         "requestId":requestId,
         "TargetStartDate":startDate,
         "TargetEndDate":endDate,
-        "ActualStartDate": actualStartDate,
-        "ActualEndDate": actualEndDate,
+         "IsUpdateMode":IsUpdateMode,
         "Remarks":remarks
       },toEncodable: Utils.myEncode);
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestSetSchedule",body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
@@ -234,7 +233,25 @@ import '../DetailsPage.dart';
         for(int i=0;i<req["response"]['allRequests'].length;i++){
           requests.add(Request.fromMap(req["response"]['allRequests'][i]));
         }
-
+         print(requests.length);
+        return requests;
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static Future<List<Request>> getRequestForGMSearchable(BuildContext context,String token,int PageSize,int PageNumber,String searchQuery)async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        var req=jsonDecode(response.body);
+        List<Request> requests=[];
+        for(int i=0;i<req["response"]['allRequests'].length;i++){
+          requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+        }
+        print(requests.length);
         return requests;
       }
     }catch(e){
@@ -248,8 +265,8 @@ import '../DetailsPage.dart';
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         List<Request> requests=[];
-        for(int i=0;i<jsonDecode(response.body)['allRequests'].length;i++){
-          requests.add(Request.fromMap(jsonDecode(response.body)['allRequests'][i]));
+        for(int i=0;i<jsonDecode(response.body)['response']['allRequests'].length;i++){
+          requests.add(Request.fromMap(jsonDecode(response.body)['response']['allRequests'][i]));
         }
         return requests;
       }
@@ -292,8 +309,8 @@ import '../DetailsPage.dart';
       if(response.statusCode==200){
         pd.hide();
         List<TrialRequests> requests=[];
-        for(int i=0;i<jsonDecode(response.body).length;i++){
-          requests.add(TrialRequests.fromJson(jsonDecode(response.body)[i]));
+        for(int i=0;i<jsonDecode(response.body)['response'].length;i++){
+          requests.add(TrialRequests.fromJson(jsonDecode(response.body)['response'][i]));
         }
         return requests;
       }else{
@@ -454,8 +471,8 @@ import '../DetailsPage.dart';
       if(response.statusCode==200){
         pd.hide();
         List<TrialRequests> requests=[];
-        for(int i=0;i<jsonDecode(response.body).length;i++){
-          requests.add(TrialRequests.fromJson(jsonDecode(response.body)[i]));
+        for(int i=0;i<jsonDecode(response.body)['response'].length;i++){
+          requests.add(TrialRequests.fromJson(jsonDecode(response.body)['response'][i]));
         }
         return requests;
       }else{

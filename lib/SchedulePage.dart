@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'Network_Operations/Network_Operations.dart';
 class SchedulePage extends StatefulWidget {
   var request;
@@ -118,7 +117,7 @@ class _SchedulePageState extends State<SchedulePage> {
                     if(fbKey.currentState.validate()){
                       fbKey.currentState.save();
                       SharedPreferences.getInstance().then((prefs){
-                        Network_Operations.addRequestSchedule(context,prefs.getString("token"), request.requestId, targetStartDate, targetEndDate, null,null,4,remarks.text);
+                        Network_Operations.addRequestSchedule(context,prefs.getString("token"), request.requestId, targetStartDate, targetEndDate,request.statusId==4?true:null,remarks.text);
                       });
                     }
                   },

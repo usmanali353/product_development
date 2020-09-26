@@ -27,6 +27,7 @@ class _DetailsPageState extends State<DetailsPage> {
   @override
   void initState() {
     super.initState();
+    print("Request id "+request.statusId.toString());
     _pageController = new PageController();
   }
 
@@ -82,10 +83,10 @@ class _DetailsPageState extends State<DetailsPage> {
                     icon: FaIcon(FontAwesomeIcons.history, size: 15,),
                     title:  Text('History')
                 ),
-                 BottomNavigationBarItem(
+                if(request.statusId>=5) BottomNavigationBarItem(
                     icon: FaIcon(FontAwesomeIcons.calendarCheck, size: 15,),
                     title: Text('Schedule')
-                ),
+                )
               ],
               onTap: navigationTapped,
               currentIndex: _page,

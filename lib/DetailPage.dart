@@ -100,7 +100,7 @@ class _DetailPageState extends State<DetailPage>{
                             Divider(),
                             ListTile(
                               title: Text("Request Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                              subtitle: Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(request.date))??''),
+                              subtitle: Text(DateFormat("dd MMMM yyyy").format(DateTime.parse(request.date))??''),
                             ),
                             Divider(),
                             ListTile(
@@ -140,7 +140,7 @@ class _DetailPageState extends State<DetailPage>{
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Target Start Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  subtitle: Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(request.targetStartDate))),
+                                  subtitle: Text(DateFormat("dd MMMM yyyy").format(DateTime.parse(request.targetStartDate))),
                                 ),
                                 Divider(),
                               ],
@@ -149,7 +149,7 @@ class _DetailPageState extends State<DetailPage>{
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Target End Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  subtitle: Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(request.targetEndDate))),
+                                  subtitle: Text(DateFormat("dd MMMM yyyy").format(DateTime.parse(request.targetEndDate))),
                                 ),
                                 Divider(),
                               ],
@@ -158,7 +158,7 @@ class _DetailPageState extends State<DetailPage>{
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Actual Start Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  subtitle: Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(request.actualStartDate))),
+                                  subtitle: Text(DateFormat("dd MMMM yyyy").format(DateTime.parse(request.actualStartDate))),
                                 ),
                                 Divider(),
                               ],
@@ -167,7 +167,7 @@ class _DetailPageState extends State<DetailPage>{
                               children: <Widget>[
                                 ListTile(
                                   title: Text("Actual End Date",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  subtitle: Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(request.actualEndDate))),
+                                  subtitle: Text(DateFormat("dd MMMM yyyy").format(DateTime.parse(request.actualEndDate))),
                                 ),
                                 Divider(),
                               ],

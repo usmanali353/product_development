@@ -13,6 +13,7 @@ class RequestImageGallery extends StatefulWidget {
 
 class _RequestImageGalleryState extends State<RequestImageGallery> {
   var request;
+  int num=1;
    List<String> imageUrl=[];
   _RequestImageGalleryState(this.request);
   @override
@@ -24,7 +25,6 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
           imageUrl.add(request.multipleImages[i]);
         }
       }
-      print(imageUrl.length);
     });
 
     super.initState();
@@ -33,7 +33,7 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(title: Text("Gallery"),),
+      appBar: AppBar(title: Text("Gallery ("+num.toString()+"/"+imageUrl.length.toString()+")")),
       body: Center(
         child: Container(
           width: MediaQuery.of(context).size.width,
@@ -52,6 +52,11 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
              return Center(
                child: CircularProgressIndicator(),
              );
+            },
+            onPageChanged: (pageno){
+            setState(() {
+              this.num=pageno+1;
+            });
             },
           ),
         ),
