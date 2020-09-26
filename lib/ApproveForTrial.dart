@@ -18,7 +18,7 @@ class ApproveForTrial extends StatefulWidget {
 class _ApproveForTrialState extends State<ApproveForTrial> {
   GlobalKey<FormBuilderState> fbKey=GlobalKey();
   DateTime clientVisitDate = DateTime.now(),actualStartDate=DateTime.now(),actualEndDate=DateTime.now();
-  TextEditingController remarks;
+  TextEditingController remarks,modelName,modelCode;
   List myClients=[];
   List<dynamic> clients=[];
   List<Dropdown> clientsDropdown=[];
@@ -30,6 +30,8 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
   @override
   void initState() {
     remarks=TextEditingController();
+    modelName=TextEditingController();
+    modelCode=TextEditingController();
     SharedPreferences.getInstance().then((prefs){
       Network_Operations.getDropDowns(context, prefs.getString("token"),"Clients").then((cli){
         setState(() {
@@ -121,6 +123,50 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                            this.clientVisitDate=value;
                          });
                        },
+                     ),
+                   ),
+                 ),
+                 Visibility(
+                   visible: status=="Approve",
+                   child: Padding(
+                     padding: const EdgeInsets.only(left: 16,right: 16),
+                     child: Card(
+                       elevation: 10,
+                       shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(15),
+                       ),
+                       child: FormBuilderTextField(
+                         attribute: "Model Name",
+                         controller: modelName,
+                         validators: [FormBuilderValidators.required()],
+                         decoration: InputDecoration(
+                             contentPadding: EdgeInsets.all(16),
+                             border: InputBorder.none,
+                             hintText: "Model Name"
+                         ),
+                       ),
+                     ),
+                   ),
+                 ),
+                 Visibility(
+                   visible: status=="Approve",
+                   child: Padding(
+                     padding: const EdgeInsets.all(16),
+                     child: Card(
+                       elevation: 10,
+                       shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(15),
+                       ),
+                       child: FormBuilderTextField(
+                         attribute: "Model Code",
+                         controller: modelCode,
+                         validators: [FormBuilderValidators.required()],
+                         decoration: InputDecoration(
+                             contentPadding: EdgeInsets.all(16),
+                             border: InputBorder.none,
+                             hintText: "Model Code"
+                         ),
+                       ),
                      ),
                    ),
                  ),
@@ -248,7 +294,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                                      myClients.clear();
                                      myClients.add(clientId);
                                    }
-                                 Network_Operations.trialClient(context, prefs.getString("token"),myClients, request.requestId,remarks.text,clientVisitDate,actualStartDate,actualEndDate);
+                                 Network_Operations.trialClient(context, prefs.getString("token"),myClients, request.requestId,remarks.text,clientVisitDate,actualStartDate,actualEndDate,modelName.text,modelCode.text);
                                });
                              }
                            }

@@ -6,10 +6,20 @@ import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'ApproveForTrial.dart';
+import 'DetailsPage.dart';
+import 'Observations.dart';
 import 'RequestImagesGallery.dart';
+import 'RequestsForTrial.dart';
+import 'SchedulePage.dart';
 import 'Utils/Utils.dart';
+import 'acmcapproval.dart';
+import 'addImagetoColor.dart';
 
 class AllRequestList extends StatefulWidget{
+  var currentUserRoles;
+
+  AllRequestList(this.currentUserRoles);
 
   @override
   State<StatefulWidget> createState() {
@@ -24,14 +34,55 @@ class _AllRequestListState extends State<AllRequestList> {
       ScaffoldState>();
   TextEditingController _searchQuery;
   bool _isSearching = false;
+  var claims;
+  var selectedPreference,selectedStatus;
+  String token;
   String searchQuery = "Search query";
-  ScrollController _scrollController = new ScrollController();
+  bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false;
+  bool isColorsVisible=false;
+  ScrollController _scrollController =  ScrollController();
 
   bool isLoading = false;
   @override
   void initState() {
     _searchQuery = TextEditingController();
-
+    SharedPreferences.getInstance().then((prefs) {
+      setState(() {
+        claims = Utils.parseJwt(prefs.getString("token"));
+        token = prefs.getString("token");
+        print(claims);
+        //Checking Roles
+        if (claims['role'].contains('General Manager')) {
+          setState(() {
+            isGm = true;
+          });
+        } else if (claims['role'].contains('Sales Manager')) {
+          setState(() {
+            isSaleManager = true;
+          });
+        } else if (claims['role'].contains('Designer')) {
+          setState(() {
+            isFDesigner = true;
+          });
+        } else if (claims['role'].contains('Lab Incharge')) {
+          setState(() {
+            isLabIncharge = true;
+          });
+        } else if (claims['role'].contains('Marketing Manager')) {
+          setState(() {
+            isMarketingManager = true;
+          });
+        } else if (claims['role'].contains('Product Manager')) {
+          setState(() {
+            isProductManager = true;
+          });
+        } else {
+          setState(() {
+            isClient = true;
+          });
+        }
+      });
+    });
     SharedPreferences.getInstance().then((prefs) {
       Network_Operations.getRequestForGM(
           context, prefs.getString("token"), 10, 1).then((allRequests) {
@@ -163,107 +214,214 @@ class _AllRequestListState extends State<AllRequestList> {
                           ],
                         ),
                         VerticalDivider(color: Colors.grey,),
-                        Container(
-                          width: MediaQuery
-                              .of(context)
-                              .size
-                              .width * 0.62,
-                          height: MediaQuery
-                              .of(context)
-                              .size
-                              .height * 0.62,
-                          color: Colors.white,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(left: 6, top: 8),
-                                child: Text(allRequests[index].modelName != null
-                                    ? allRequests[index].modelName
-                                    : '', style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15),),
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                //mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: <Widget>[
-                                  Row(
-                                    //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: <Widget>[
-                                      Icon(
-                                        Icons.date_range,
-                                        color: Colors.teal,
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                            left: 2, right: 2),
-                                      ),
-                                      Text(DateFormat("yyyy-MM-dd").format(
-                                          DateTime.parse(
-                                              allRequests[index].date)))
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 30),
-                                    child: Row(
+                        GestureDetector(
+                          onTapDown: (details)async{
+                            if(allRequests[index].statusName=="New Request"){
+                              if(widget.currentUserRoles["1"]!=null) {
+                                await showMenu(
+                                  context: context,
+                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                  items: [
+                                    PopupMenuItem<String>(
+                                        child: const Text('Change Status'), value: 'changeStatus'),
+                                    PopupMenuItem<String>(
+                                        child: const Text('Add Images'), value: 'addImage'),
+                                    PopupMenuItem<String>(
+                                        child: const Text('See Details'), value: 'Details'),
+                                  ],
+                                  elevation: 8.0,
+                                ).then((selectedItem){
+                                  if(selectedItem=="changeStatus"){
+                                    showAlertDialog(context,allRequests[index]);
+                                  }else if(selectedItem=="Details"){
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                  }else if(selectedItem=="addImage"){
+                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(allRequests[index])));
+                                  }
+                                });
+                              }else if(isClient){
+                                await showMenu(
+                                  context: context,
+                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                  items: [
+                                    PopupMenuItem<String>(
+                                        child: const Text('Add Images'), value: 'addImage'),
+                                    PopupMenuItem<String>(
+                                        child: const Text('See Details'), value: 'Details'),
+                                  ],
+                                  elevation: 8.0,
+                                ).then((selectedItem){
+                                  if(selectedItem=="Details"){
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                  }else if(selectedItem=="addImage"){
+                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(allRequests[index])));
+                                  }
+                                });
+                              }else{
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                              }
+                            }else if(allRequests[index].statusName=="Approved By GM"){
+                              if(widget.currentUserRoles["2"]!=null||widget.currentUserRoles["3"]!=null){
+                                await showMenu(
+                                  context: context,
+                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                  items: [
+                                    PopupMenuItem<String>(
+                                        child: const Text('Change Status'), value: 'changeStatus'),
+                                    PopupMenuItem<String>(
+                                        child: const Text('See Details'), value: 'Details'),
+                                  ],
+                                  elevation: 8.0,
+                                ).then((selectedItem){
+                                  if(selectedItem=="changeStatus"){
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(allRequests[index])));
+                                  }else if(selectedItem=="Details"){
+                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests[index])));
+                                  }
+                                });
+                              }else{
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                              }
+
+                            }else if(allRequests[index].statusName=="Samples Scheduled"){
+                              if(widget.currentUserRoles["4"]!=null){
+                                await showMenu(
+                                  context: context,
+                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                  items: [
+                                    PopupMenuItem<String>(
+                                        child: const Text('Change Status'), value: 'changeStatus'),
+                                    PopupMenuItem<String>(
+                                        child: const Text('Update Schedule'), value: 'updateschedule'),
+                                    PopupMenuItem<String>(
+                                        child: const Text('See Details'), value: 'Details'),
+                                  ],
+                                  elevation: 8.0,
+                                ).then((selectedItem){
+                                  if(selectedItem=="changeStatus"){
+                                    showAlertChangeStatus(context,allRequests[index]);
+                                  }else if(selectedItem=="Details"){
+                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests[index])));
+                                  }else if(selectedItem=="updateschedule"){
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(allRequests[index])));
+                                  }
+                                });
+
+                              }else{
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                              }
+                            }else if(allRequests[index].statusName=="Approved Trial"){
+                              if(widget.currentUserRoles["5"]!=null||widget.currentUserRoles["6"]!=null){
+                                Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(allRequests[index].requestId,widget.currentUserRoles)));
+                              }else{
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                              }
+                            }else {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                            }
+                          },
+                          child: Container(
+                            width: MediaQuery
+                                .of(context)
+                                .size
+                                .width * 0.62,
+                            height: MediaQuery
+                                .of(context)
+                                .size
+                                .height * 0.62,
+                            color: Colors.white,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 6, top: 8),
+                                  child: Text(allRequests[index].modelName != null
+                                      ? allRequests[index].modelName
+                                      : '', style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15),),
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  //mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    Row(
+                                      //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: <Widget>[
                                         Icon(
-                                          Icons.layers,
+                                          Icons.date_range,
                                           color: Colors.teal,
                                         ),
                                         Padding(
                                           padding: EdgeInsets.only(
                                               left: 2, right: 2),
                                         ),
-                                        Text(allRequests[index].surfaceName !=
-                                            null ? allRequests[index]
-                                            .surfaceName : '')
+                                        Text(DateFormat("yyyy-MM-dd").format(
+                                            DateTime.parse(
+                                                allRequests[index].date)))
                                       ],
-
                                     ),
-                                  ),
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 30),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.layers,
+                                            color: Colors.teal,
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                left: 2, right: 2),
+                                          ),
+                                          Text(allRequests[index].surfaceName !=
+                                              null ? allRequests[index]
+                                              .surfaceName : '')
+                                        ],
 
-                                ],
-                              ),
-                              Row(
-                                children: <Widget>[
-                                  Icon(
-                                    Icons.zoom_out_map,
-                                    color: Colors.teal,
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 2, right: 2),
-                                  ),
-                                  Text(allRequests[index].multipleSizeNames
-                                      .toString()
-                                      .replaceAll("[", "")
-                                      .replaceAll("]", "")
-                                      .replaceAll(".00", "")),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 1),
-                                child: Row(
-                                  //crossAxisAlignment: CrossAxisAlignment.start,
+                                      ),
+                                    ),
+
+                                  ],
+                                ),
+                                Row(
                                   children: <Widget>[
                                     Icon(
-                                      Icons.done_all,
-                                      //size: 14,
+                                      Icons.zoom_out_map,
                                       color: Colors.teal,
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.only(
-                                          left: 3, right: 3),
+                                      padding: EdgeInsets.only(left: 2, right: 2),
                                     ),
-                                    Text(allRequests[index].statusName != null
-                                        ? allRequests[index].statusName
-                                        : '')
+                                    Text(allRequests[index].multipleSizeNames
+                                        .toString()
+                                        .replaceAll("[", "")
+                                        .replaceAll("]", "")
+                                        .replaceAll(".00", "")),
                                   ],
                                 ),
-                              ),
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 1),
+                                  child: Row(
+                                    //crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.done_all,
+                                        //size: 14,
+                                        color: Colors.teal,
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            left: 3, right: 3),
+                                      ),
+                                      Text(allRequests[index].statusName != null
+                                          ? allRequests[index].statusName
+                                          : '')
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -415,6 +573,154 @@ class _AllRequestListState extends State<AllRequestList> {
           child: new CircularProgressIndicator(),
         ),
       ),
+    );
+  }
+
+  showAlertChangeStatus(BuildContext context,Request request){
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget detailsPage = FlatButton(
+      child: Text("Go to Details"),
+      onPressed: () {
+        Navigator.pop(context);
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
+      },
+    );
+    Widget approveRejectButton = FlatButton(
+      child: Text("Set"),
+      onPressed: () {
+        if(selectedPreference=="Approve"){
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>ApproveForTrial(request,'Approve')));
+        }else if(selectedPreference=="Reject"){
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>Observations(6,request)));
+        }
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Approve/Reject Model for Trial"),
+      content: StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              RadioListTile(
+                title: Text("Approve"),
+                value: 'Approve',
+                groupValue: selectedPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("Reject"),
+                value: 'Reject',
+                groupValue: selectedPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedPreference = choice;
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      ),
+      actions: [
+        cancelButton,
+        detailsPage,
+        approveRejectButton
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+  showAlertDialog(BuildContext context,Request request) {
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget detailsPage = FlatButton(
+      child: Text("Go to Details"),
+      onPressed: () {
+        Navigator.pop(context);
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
+      },
+    );
+    Widget approveRejectButton = FlatButton(
+      child: Text("Set"),
+      onPressed: () {
+        if(selectedPreference=="Approve"){
+          Navigator.pop(context);
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,request)));
+        }else if(selectedPreference=="Reject"){
+          Navigator.pop(context);
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,request)));
+        }
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Approve/Reject Model Request"),
+      content: StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              RadioListTile(
+                title: Text("Approve"),
+                value: 'Approve',
+                groupValue: selectedPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("Reject"),
+                value: 'Reject',
+                groupValue: selectedPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedPreference = choice;
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      ),
+      actions: [
+        cancelButton,
+        detailsPage,
+        approveRejectButton
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }

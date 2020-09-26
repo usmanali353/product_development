@@ -4,14 +4,14 @@ import 'package:productdevelopment/Model/RemarksHistory.dart';
 class Request {
   int requestId, marketId, statusId, classificationId, rangeId, technologyId,
       structureId, edgeId, surfaceId,id;
-  String technicalConcentration, event,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId,classificationName,marketName,technologyName,structureName,edgeName,rangeName,client,targetStartDate,targetEndDate,actualStartDate,actualEndDate,status,qrcodeImage,clientName,rangeImage;
+  String technicalConcentration, event,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId,classificationName,marketName,technologyName,structureName,edgeName,rangeName,client,targetStartDate,targetEndDate,actualStartDate,actualEndDate,status,qrcodeImage,clientName,rangeImage,newModelName,newModelCode;
   double thickness;
 
   var image,hasNext,hasPrevious;
   DateTime dateTime;
   List<Colors> multipleColorNames;
   List<RemarksHistory> remarksHistory,allRequestClientRemarks;
-  List<dynamic> allRequestClients,multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames,multipleImages,currentLoggedInUserStatuses;
+  List<dynamic> multipleClients, allRequestClients,multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames,multipleImages,currentLoggedInUserStatuses;
   Request({
     this.requestId,
     this.marketId,
@@ -34,7 +34,7 @@ class Request {
     this.designerObservation,
     this.customerObservation,
     this.userId,
-    this.client
+    this.multipleClients,
   });
   Map<String, dynamic> toJson() {
     var map = new Map<String, dynamic>();
@@ -89,6 +89,8 @@ class Request {
     map['allRequestClients']=allRequestClients;
     map["hasNext"]=hasNext;
     map["hasPrevious"]=hasPrevious;
+    map['newModelName']=newModelName;
+    map['newModelCode']=newModelCode;
     map['multipleColorNames'] = List<dynamic>.from(multipleColorNames.map((x) => x.toJson()));
    // map['allRequestRemarks'] = List<dynamic>.from(remarksHistory.map((x) => x.toJson()));
     return map;
@@ -149,6 +151,8 @@ class Request {
     allRequestClients=data['allRequestClients'];
     hasNext=data['hasNext'];
     hasPrevious=data['hasPrevious'];
+    newModelName=data['newModelName'];
+    newModelCode=data['newModelCode'];
   }
 
 }

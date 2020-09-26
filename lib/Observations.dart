@@ -20,14 +20,13 @@ class _ObservationsState extends State<Observations> {
   int status;
   var request;
   DateTime visitDate=DateTime.now();
-  TextEditingController remarks,modelName,modelCode;
+  TextEditingController remarks;
   GlobalKey<FormBuilderState> fbKey=GlobalKey();
   _ObservationsState(this.status,this.request);
  @override
   void initState() {
     remarks=TextEditingController();
-    modelName=TextEditingController();
-    modelCode=TextEditingController();
+
     SharedPreferences.getInstance().then((prefs){
       setState(() {
         token= prefs.getString("token");
@@ -66,50 +65,6 @@ class _ObservationsState extends State<Observations> {
                   ),
                 ),
                 Visibility(
-                  visible: status==7,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16,right: 16),
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: FormBuilderTextField(
-                        attribute: "Model Name",
-                        controller: modelName,
-                        validators: [FormBuilderValidators.required()],
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(16),
-                            border: InputBorder.none,
-                            hintText: "Model Name"
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Visibility(
-                  visible: status==7,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: FormBuilderTextField(
-                        attribute: "Model Code",
-                        controller: modelCode,
-                        validators: [FormBuilderValidators.required()],
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(16),
-                            border: InputBorder.none,
-                            hintText: "Model Code"
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Visibility(
                   visible: status==7||status==8,
                   child: Padding(
                     padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
@@ -143,13 +98,13 @@ class _ObservationsState extends State<Observations> {
                         if(status==6){
                             Network_Operations.changeStatusWithRemarks(context,token, request.requestId, status, remarks.text);
                         }else if(status==7){
-                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text,modelName.text,modelCode.text,visitDate);
+                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text,visitDate);
                        }else if(status==8){
-                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text,null,null,visitDate);
+                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text,visitDate);
                        }else if(status==9){
-                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text,null,null,null);
+                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text,null);
                        }else if(status==10){
-                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text,null,null,null);
+                         Network_Operations.changeStatusClientWithRemarks(context, token, request.id, status, remarks.text,null);
                        }
                       }
                     },

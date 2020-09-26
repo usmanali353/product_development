@@ -130,7 +130,7 @@ import '../DetailsPage.dart';
         "multipleDesigners": request.multipleDesigners,
         "designerObservation": request.designerObservation,
         "customerObservation": request.customerObservation,
-        "client":request.client
+        "multipleClients":request.multipleClients
       }, toEncodable: Utils.myEncode);
        print(body);
        var response =await http.post(Utils.getBaseUrl()+"Request/RequestSave",body: body,headers:{"Content-Type": "application/json", "Authorization": "Bearer " + token});
@@ -276,7 +276,7 @@ import '../DetailsPage.dart';
     }
     return null;
   }
-  static Future<void> trialClient(BuildContext context,String token,List<dynamic> clientIds,int requestId,String remarks,DateTime ClientVisitDate,DateTime actualStartDate,DateTime actualEndDate)async{
+  static Future<void> trialClient(BuildContext context,String token,List<dynamic> clientIds,int requestId,String remarks,DateTime ClientVisitDate,DateTime actualStartDate,DateTime actualEndDate,String newModelName,String newModelCode)async{
     try{
       final body=jsonEncode({
        "requestId":requestId,
@@ -284,6 +284,8 @@ import '../DetailsPage.dart';
         "ClientVisitDate":ClientVisitDate,
         "ActualStartDate": actualStartDate,
         "ActualEndDate": actualEndDate,
+        "newModelName":newModelName,
+        "newModelCode": newModelCode,
         "Remarks":remarks
       },toEncodable: Utils.myEncode);
       print(body);
@@ -438,15 +440,12 @@ import '../DetailsPage.dart';
       Utils.showError(context, e.toString());
     }
   }
-  static Future<void> changeStatusClientWithRemarks(BuildContext context,String token,int requestId,int status,String remarks,String NewModelName,String NewModelCode,DateTime ActualClientVisitDate)async{
+  static Future<void> changeStatusClientWithRemarks(BuildContext context,String token,int requestId,int status,String remarks,DateTime ActualClientVisitDate)async{
     try{
       final body=jsonEncode({
         "StatusId":status,
         "RequestClientId":requestId,
         "Remarks":remarks,
-        "NewModelName":NewModelName,
-        "NewModelCode":NewModelCode,
-        //"actualClientVisitDate":ActualClientVisitDate,
         "ActualClientVisitDate":ActualClientVisitDate
 
       },toEncodable: Utils.myEncode);

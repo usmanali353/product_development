@@ -154,7 +154,7 @@ class _DashboardState extends ResumableState<Dashboard> {
           ),
           InkWell(
             onTap: (){
-              push(context, MaterialPageRoute(builder: (context)=>AllRequestList()));
+              push(context, MaterialPageRoute(builder: (context)=>AllRequestList(currentUserRoles)));
             },
             child: Padding(
               padding: const EdgeInsets.only(left: 8.0,right:8.0),
@@ -487,7 +487,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           child: Center(
                             child: Container(
                               //margin: EdgeInsets.only(left: 10,top: 5),
-                              child: Text(requestCount!=null&&requestCount['Rejected Trial']!=null?requestCount['Rejected Trial'].toString():"0",
+                              child: Text(requestCount!=null&&requestCount['Model Rejected']!=null?requestCount['Model Rejected'].toString():"0",
                                 style: TextStyle(
                                     color:Colors.teal.shade800,
                                     //Color(0xFF004c4c),
@@ -548,7 +548,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                           color: Color(0xFF004c4c),
                         ),
                         child: Container(margin: EdgeInsets.only(left: 10,top: 5),
-                          child: Text(requestCount!=null&&requestCount['Approved Trial']!=null?requestCount['Approved Trial'].toString():"0",
+                          child: Text(requestCount!=null&&requestCount['Model Approved']!=null?requestCount['Model Approved'].toString():"0",
                             style: TextStyle(
                                 color:Colors.white,
                                 //Color(0xFF004c4c),

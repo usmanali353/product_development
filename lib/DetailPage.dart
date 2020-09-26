@@ -184,7 +184,7 @@ class _DetailPageState extends State<DetailPage>{
                             request.modelName!=null?Column(
                               children: <Widget>[
                                 ListTile(
-                                  title: Text("Model Name",style: TextStyle(fontWeight: FontWeight.bold),),
+                                  title: Text("Samples Model Name",style: TextStyle(fontWeight: FontWeight.bold),),
                                   subtitle: Text(request.modelName),
                                 ),
                                 Divider(),
@@ -193,39 +193,24 @@ class _DetailPageState extends State<DetailPage>{
                             request.modelCode!=null?Column(
                               children: <Widget>[
                                 ListTile(
-                                  title: Text("Model Code",style: TextStyle(fontWeight: FontWeight.bold),),
+                                  title: Text("Samples Model Code",style: TextStyle(fontWeight: FontWeight.bold),),
                                   subtitle: Text(request.modelCode!=null?request.modelCode:''),
                                 ),
                                 Divider(),
                               ],
                             ):Container(),
-                            request.allRequestClients!=null&&request.allRequestClients.length>0?Column(
+                            request.newModelName!=null&&request.newModelCode!=null?Column(
                               children: [
-                                Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8),
-                                    child: Text("Customer Model Name/Code",style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20),
-                                    ),
-                                  ),
+                                ListTile(
+                                  title: Text("Production Model Name",style: TextStyle(fontWeight: FontWeight.bold),),
+                                  subtitle: Text(request.newModelName),
                                 ),
-                                for(int i=0;i<request.allRequestClients.length;i++)ExpansionTile(
-                                  initiallyExpanded: true,
-                                  title: Text(request.allRequestClients[i]['clientName']),
-                                  children: [
-                                    ListTile(
-                                      title: Text("Customer Model Name",style: TextStyle(fontWeight: FontWeight.bold),),
-                                      subtitle: Text(request.allRequestClients[i]['newModelName']!=null?request.allRequestClients[i]['newModelName']:''),
-                                    ),
-                                    Divider(),
-                                    ListTile(
-                                      title: Text("Customer Model Code",style: TextStyle(fontWeight: FontWeight.bold),),
-                                      subtitle: Text(request.allRequestClients[i]['newModelCode']!=null?request.allRequestClients[i]['newModelCode']:''),
-                                    ),
-                                    Divider(),
-                                  ],
-                                ),Divider(),
+                                Divider(),
+                                ListTile(
+                                  title: Text("Production Model Code",style: TextStyle(fontWeight: FontWeight.bold),),
+                                  subtitle: Text(request.newModelCode),
+                                ),
+                                Divider(),
                               ],
                             ):Container(),
                             Padding(

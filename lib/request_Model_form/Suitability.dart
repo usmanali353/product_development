@@ -220,6 +220,7 @@ class _Suitability_State extends ResumableState<Suitability> {
                                   Network_Operations.saveRequest(context,prefs.getString("token") ,Request(
                                     requestId: 0,
                                     marketId: market,
+                                    multipleClients: myClient,
                                     event: event,
                                     userId: claims['nameid'],
                                     technicalConcentration: technical_consideration.text,

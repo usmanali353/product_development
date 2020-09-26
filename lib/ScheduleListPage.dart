@@ -2,10 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:productdevelopment/Model/TrialRequests.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'Network_Operations/Network_Operations.dart';
 
 class ScheduleListPage extends StatefulWidget {
   var request;
@@ -31,10 +27,10 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text((){
-          if(request.modelName!=null){
-            return "Schedule for "+request.modelName;
-          }else if(request.newModelName!=null){
+          if(request.newModelName!=null){
             return "Schedule for "+request.newModelName;
+          }else if(request.modelName!=null){
+            return "Schedule for "+request.modelName;
           }
         }()),
       ),
