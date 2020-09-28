@@ -149,64 +149,70 @@ class _DashboardState extends ResumableState<Dashboard> {
               ],
             ),
           ),
-          Padding(
-            padding: EdgeInsets.only(top: 15),
-          ),
-          InkWell(
-            onTap: (){
-              push(context, MaterialPageRoute(builder: (context)=>AllRequestList(currentUserRoles)));
-            },
+          Visibility(
+            visible: claims!=null&&!claims['role'].contains("Client"),
             child: Padding(
-              padding: const EdgeInsets.only(left: 8.0,right:8.0),
-              child: Card(
-                elevation: 10,
-                child: Container(
-                  // margin: EdgeInsets.only(left: 12.5,right: 12.5),
-                  height: 130,
-                  width: 20,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+              padding: EdgeInsets.only(top: 15),
+            ),
+          ),
+          Visibility(
+            visible: claims!=null&&!claims['role'].contains("Client"),
+            child: InkWell(
+              onTap: (){
+                push(context, MaterialPageRoute(builder: (context)=>AllRequestList(currentUserRoles)));
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0,right:8.0),
+                child: Card(
+                  elevation: 10,
+                  child: Container(
+                    // margin: EdgeInsets.only(left: 12.5,right: 12.5),
+                    height: 130,
+                    width: 20,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
 
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.only(left: 12),
-                        child: Text("All Requests",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold
-                          ),
-                        ),
-                      ),
-                      Container(
-                        //margin: EdgeInsets.only(left: 10, top: 5,bottom: 5),
-                        height: 30,
-                        width: MediaQuery.of(context).size.width *0.35,
-                        //width: 145,
-                        decoration: BoxDecoration(
-
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              bottomLeft: Radius.circular(15)
-                          ),
-                          color: Color(0xFF004c4c),
-                        ),
-                        child: Container(margin: EdgeInsets.only(left: 10,top: 5),
-                          child: Text(requestCount!=null&&requestCount['All Requests Count']!=null?requestCount['All Requests Count'].toString():"0",
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(left: 12),
+                          child: Text("All Requests",
                             style: TextStyle(
-                                color:Colors.white,
-                                //Color(0xFF004c4c),
-                                fontSize: 15,
                                 fontWeight: FontWeight.bold
                             ),
-
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                        Container(
+                          //margin: EdgeInsets.only(left: 10, top: 5,bottom: 5),
+                          height: 30,
+                          width: MediaQuery.of(context).size.width *0.35,
+                          //width: 145,
+                          decoration: BoxDecoration(
 
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                bottomLeft: Radius.circular(15)
+                            ),
+                            color: Color(0xFF004c4c),
+                          ),
+                          child: Container(margin: EdgeInsets.only(left: 10,top: 5),
+                            child: Text(requestCount!=null&&requestCount['All Requests Count']!=null?requestCount['All Requests Count'].toString():"0",
+                              style: TextStyle(
+                                  color:Colors.white,
+                                  //Color(0xFF004c4c),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold
+                              ),
+
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                  ),
                 ),
               ),
             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
-import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,23 +8,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'Suitability.dart';
 class designTopology extends StatefulWidget {
   var market,event,other,size,surfaceId,thickness,classification,color,myClients;
-  List<dynamic> sizesList=[],colorsList=[];
-
+  List<dynamic> sizesList=[],colorsList=[],colorsDropDown=[],colorNames=[];
   designTopology(this.market, this.event, this.sizesList,
-      this.surfaceId, this.thickness, this.classification, this.colorsList,this.myClients);
+      this.surfaceId, this.thickness, this.classification, this.colorsList,this.myClients,this.colorsDropDown);
 
   @override
-  _designTopologyState createState() => _designTopologyState(market,event,sizesList,surfaceId,thickness,classification,colorsList,myClients);
+  _designTopologyState createState() => _designTopologyState(market,event,sizesList,surfaceId,thickness,classification,colorsList,myClients,colorsDropDown);
 }
 
-class _designTopologyState extends ResumableState<designTopology> {
+class _designTopologyState extends State<designTopology> {
   List _myMaterials,myClients;
   bool designTopologyDropDownVisible=false;
   final formKey = new GlobalKey<FormState>();
   bool rangeDropdownVisible=false,technologyDropdownVisible=false,edgeDropdownVisible=false,structureDropdownVisible=false;
  List<Dropdown> designTopology=[], range=[], material=[],structure=[], edge=[],technology=[];
- List<String> designTopologyName=[], rangeName=[], materialName=[],structureName=[], edgeName=[],technologyName=[];
- List<dynamic> designTopologies=[],sizesList=[],colorsList=[];
+ List<String> designTopologyName=[], rangeName=[], materialName=[],structureName=[], edgeName=[],technologyName=[],colorNames=[];
+ List<dynamic> designTopologies=[],sizesList=[],colorsList=[],colorsDropDown=[];
  var market,event,other,size,surfaceId,name,thickness,classification,color;
 String selected_technology, selected_structure, selected_edge,selected_range, selected_material;
 GlobalKey<FormBuilderState> fbkey=GlobalKey();
@@ -38,15 +36,9 @@ int range_id, material_id,technology_id, structure_id, edge_id;
       this.thickness,
       this.classification,
       this.colorsList,
-      this.myClients
+      this.myClients,
+     this.colorsDropDown,
      );
- @override
-  void onResume() {
-   if(resume.data.toString()=='Close') {
-     Navigator.pop(context, 'Close');
-   }
-    super.onResume();
-  }
 
   @override
   void initState() {
@@ -324,7 +316,7 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                           });
                           print(technology_id.toString());
                           print( range_id.toString());
-                          push(context, MaterialPageRoute(builder: (context)=>Suitability(
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>Suitability(
                               market,
                               event,
                               sizesList,
@@ -337,7 +329,8 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                               edge_id,
                               range_id,
                               _myMaterials,
-                              myClients
+                              myClients,
+                             colorsDropDown,
                           )));
 
                         }

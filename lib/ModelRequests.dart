@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/ApproveForTrial.dart';
 import 'package:productdevelopment/DetailsPage.dart';
 import 'package:productdevelopment/Model/Request.dart';
@@ -28,7 +27,7 @@ class ModelRequests extends StatefulWidget {
   _ModelReState createState() => _ModelReState(statusId,currentUserRoles);
 }
 
-class _ModelReState extends ResumableState<ModelRequests>{
+class _ModelReState extends State<ModelRequests>{
   List<Request> products=[];
   var claims;
   GlobalKey<RefreshIndicatorState> refreshIndicatorKey=GlobalKey();
@@ -286,7 +285,7 @@ class _ModelReState extends ResumableState<ModelRequests>{
                               }else{
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                               }
-                            }else if(products[index].statusName=="Approved Trial"){
+                            }else if(products[index].statusName=="Model Approved"){
                               if(currentUserRoles["5"]!=null||currentUserRoles["6"]!=null){
                                 Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products[index].requestId,currentUserRoles)));
                               }else{
@@ -306,7 +305,15 @@ class _ModelReState extends ResumableState<ModelRequests>{
                               children: <Widget>[
                                 Padding(
                                   padding: const EdgeInsets.only(left: 6, top: 8),
-                                  child: Text(products[index].modelName!=null?products[index].modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                                  child: Text((){
+                                    if(products[index].newModelName!=null){
+                                      return products[index].newModelName;
+                                    }else if(products[index].modelName!=null){
+                                      return products[index].modelName;
+                                    }else{
+                                      return '';
+                                    }
+                                  }(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
                                 ),
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -628,10 +635,10 @@ class _ModelReState extends ResumableState<ModelRequests>{
       onPressed: () {
         if(selectedPreference=="Approve"){
           Navigator.pop(context);
-          push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,request)));
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,request)));
         }else if(selectedPreference=="Reject"){
           Navigator.pop(context);
-          push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,request)));
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>acmcApproval(selectedPreference,request)));
         }
       },
     );

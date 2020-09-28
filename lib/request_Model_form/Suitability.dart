@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
-import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
@@ -16,7 +15,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Suitability extends StatefulWidget{
 
   var market,event,size,surface,thickness,classification,color,technologyId,structureId, edge,range,material,myClient;
-  List<dynamic> designTopologies=[],sizesList=[],colorsList=[];
+  List<dynamic> designTopologies=[],sizesList=[],colorsList=[],colorDropDown=[];
+  List<String> colorNames=[];
   Suitability(
     this.market,
     this.event,
@@ -30,29 +30,43 @@ class Suitability extends StatefulWidget{
     this.edge,
     this.range,
     this.designTopologies,
-      this.myClient
+      this.myClient,
+      this.colorDropDown,
       );
   @override
   State<StatefulWidget> createState() {
-    return _Suitability_State(market,event,sizesList,surface,thickness,classification,colorsList,technologyId, structureId, edge,range,designTopologies,myClient);
+    return _Suitability_State(market,event,sizesList,surface,thickness,classification,colorsList,technologyId, structureId, edge,range,designTopologies,myClient,colorDropDown);
   }
 }
 
-class _Suitability_State extends ResumableState<Suitability> {
+class _Suitability_State extends State<Suitability> {
   List _myActivities,myClient;
-  var base64EncodedImage;
+  var base64EncodedImage,colorID;
   final formKey = new GlobalKey<FormState>();
   final fbKey = new GlobalKey<FormBuilderState>();
   List<Dropdown> suitibility=[];
-  List<String> suitibilityName=[];
-  List<dynamic> suitibilitys=[];
-  bool suitibilityDropDownVisible=false;
+  List<String> suitibilityName=[],colorName=[];
+  List<dynamic> suitibilitys=[],colorDropDown=[],colorIds=[];
+  bool suitibilityDropDownVisible=false,colorDropDownVisible=false;
+  List<Dropdown> colorsDropDown=[];
   TextEditingController technical_consideration;
   List<dynamic> designTopologies=[],sizesList=[],colorsList=[];
   var market,event,other,size,surface,thickness,classification,color,technologyId, structureId, edge,range,material;
  @override
   void initState() {
    technical_consideration=TextEditingController();
+   for(int i=0;i<colorDropDown.length;i++){
+     setState(() {
+       colorIds.add(colorDropDown[i]['value']);
+     });
+   }
+   colorName.clear();
+   for(int i=0;i<colorsList.length;i++){
+     setState(() {
+       colorName.add(colorDropDown[colorIds.indexOf(colorsList[i])]['display']);
+     });
+   }
+   print(colorName);
    SharedPreferences.getInstance().then((prefs){
      Network_Operations.getDropDowns(context, prefs.getString("token"), "GetSuitability").then((suitibilityDropDown){
        setState(() {
@@ -70,7 +84,6 @@ class _Suitability_State extends ResumableState<Suitability> {
            suitibilityDropDownVisible=true;
          }
        });
-
      });
    });
     super.initState();
@@ -89,7 +102,8 @@ class _Suitability_State extends ResumableState<Suitability> {
       this.edge,
       this.range,
       this.designTopologies,
-      this.myClient
+      this.myClient,
+      this.colorDropDown,
       );
 
   Uint8List picked_image;
@@ -199,6 +213,67 @@ class _Suitability_State extends ResumableState<Suitability> {
                       ],
                     ),
                   ),
+                  Padding(
+
+                    padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
+
+                    child: Card(
+
+                      elevation: 10,
+
+                      shape: RoundedRectangleBorder(
+
+                        borderRadius: BorderRadius.circular(15),
+
+                      ),
+
+                      child: FormBuilderDropdown(
+
+                        attribute: "Color",
+
+                        validators: [FormBuilderValidators.required()],
+
+                        hint: Text("Select Color for Image"),
+
+                        items:colorName!=null?colorName.map((horse)=>DropdownMenuItem(
+
+                          child: Text(horse),
+
+                          value: horse,
+
+                        )).toList():[""].map((name) => DropdownMenuItem(
+
+                            value: name, child: Text("$name")))
+
+                            .toList(),
+
+                        style: Theme.of(context).textTheme.bodyText1,
+
+                        decoration: InputDecoration(
+
+                          border: InputBorder.none,
+
+                          contentPadding: EdgeInsets.all(16),
+
+                        ),
+
+                        onChanged: (value){
+
+                          setState(() {
+                            for(int i=0;i<colorDropDown.length;i++){
+                               if(colorDropDown[i]['display']==value){
+                                 this.colorID =colorDropDown[i]['value'];
+                               }
+                            }
+                          });
+
+                        },
+
+                      ),
+
+                    ),
+
+                  ),
                   Builder(
                     builder: (BuildContext context){
                       return Padding(
@@ -214,9 +289,7 @@ class _Suitability_State extends ResumableState<Suitability> {
 //                                  _myActivitiesResult = _myActivities.toString();
 //                                });
                                 SharedPreferences.getInstance().then((prefs){
-
-                                    var claims=Utils.parseJwt(prefs.getString("token"));
-
+                                  var claims=Utils.parseJwt(prefs.getString("token"));
                                   Network_Operations.saveRequest(context,prefs.getString("token") ,Request(
                                     requestId: 0,
                                     marketId: market,
@@ -235,6 +308,7 @@ class _Suitability_State extends ResumableState<Suitability> {
                                     image: base64EncodedImage,
                                     multipleColors: colorsList,
                                     multipleSizes: sizesList,
+                                    ImageSelectedForColor:colorID,
                                     multipleDesignTopoligies: designTopologies,
                                     multipleSuitability: _myActivities,
                                   ));

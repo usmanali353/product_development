@@ -47,7 +47,7 @@ class _MyAppState extends State<MyApp> {
         var claims=Utils.parseJwt(prefs.getString("token"));
 
         if(DateTime.fromMillisecondsSinceEpoch(int.parse(claims['exp'].toString()+"000")).isAfter(DateTime.now())){
-
+          print(DateTime.fromMillisecondsSinceEpoch(int.parse(claims['exp'].toString()+"000")));
           setState(() {
 
             isLogin=true;

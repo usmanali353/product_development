@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
-import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/request_Model_form/designTopology.dart';
@@ -15,14 +14,14 @@ class Specifications extends StatefulWidget {
   _SpecificationsState createState() => _SpecificationsState(market,event,myClients);
 }
 
-class _SpecificationsState extends ResumableState<Specifications> {
+class _SpecificationsState extends State<Specifications> {
   var market,event,other,myClients;
   TextEditingController thickness;
   List<dynamic> sizes=[],colors=[];
   bool classificationDropDownVisible=false,surfaceDropDownVisible=false,sizeDropDownVisible=false,colorDropDownVisible=false;
   List<Dropdown> classifications=[],surface=[],size=[],color=[];
   bool sizeVisible=false,surfaceVisible=false,thicknessVisible=false,colorVisible=false;
-  List<String> colorName=[], surfaceName=[],sizeName=[], product_name =["Alma","Apollo","Aqua","Aragon","Arcadia","Area","Artic","Atrium","Avenue","Baikal","Barsha","Bistro","Bologna","Brada","Bronze","CalaCatta","Canica","Capri","carrara","Cement","Circle","Code","Coliseo","Cotto","Cotton","Daka","Darco","Dayana","Devon","Diverse","Dogana","Duomo","Finnis","Joly","Maria","Tiera","Venecia"],classificationName=[];
+  List<String> selectedColorNames=[], colorName=[], surfaceName=[],sizeName=[], product_name =["Alma","Apollo","Aqua","Aragon","Arcadia","Area","Artic","Atrium","Avenue","Baikal","Barsha","Bistro","Bologna","Brada","Bronze","CalaCatta","Canica","Capri","carrara","Cement","Circle","Code","Coliseo","Cotto","Cotton","Daka","Darco","Dayana","Devon","Diverse","Dogana","Duomo","Finnis","Joly","Maria","Tiera","Venecia"],classificationName=[];
 
   String selected_product_name, selected_surface, selected_size,selected_classification;
   int product_name_id, surface_id, size_id,classification_id;
@@ -32,14 +31,6 @@ class _SpecificationsState extends ResumableState<Specifications> {
   final formKey = new GlobalKey<FormState>();
   final formKey2 = new GlobalKey<FormState>();
   final fbKey = new GlobalKey<FormBuilderState>();
-  @override
-  void onResume() {
-    if(resume.data.toString()=='Close') {
-      Navigator.pop(context, 'Close');
-      Navigator.pop(context, 'Close');
-    }
-    super.onResume();
-  }
 @override
   void initState() {
    thickness=TextEditingController();
@@ -250,37 +241,34 @@ class _SpecificationsState extends ResumableState<Specifications> {
                   ),
                 ),
                 //Product Color multiSelect FormField
-                Form(
-                  key: formKey,
-                  child: Visibility(
-                    visible: colorDropDownVisible,
-                    child: Padding(
-                      padding: EdgeInsets.only(top:16,left:16,right:16),
-                      child: Card(
-                        elevation: 10,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: MultiSelectFormField(
-                          hintText: "Select Color for the Product",
-                          titleText: 'Select Colors',
-                          border: InputBorder.none,
-                          validator: (value) {
-                            return value == null || value.length == 0?'Please select one or more options':null;
-                          },
-                          dataSource: colors,
-                          textField: 'display',
-                          valueField: 'value',
-                          okButtonLabel: 'OK',
-                          cancelButtonLabel: 'CANCEL',
-                          //value: _myActivities,
-                          onSaved: (value) {
-                            if (value == null) return;
-                            setState(() {
-                              _myActivities = value;
-                            });
-                          },
-                        ),
+                Visibility(
+                  visible: colorDropDownVisible,
+                  child: Padding(
+                    padding: EdgeInsets.only(top:16,left:16,right:16),
+                    child: Card(
+                      elevation: 10,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: MultiSelectFormField(
+                        hintText: "Select Color for the Product",
+                        titleText: 'Select Colors',
+                        border: InputBorder.none,
+                        validator: (value) {
+                          return value == null || value.length == 0?'Please select one or more options':null;
+                        },
+                        dataSource: colors,
+                        textField: 'display',
+                        valueField: 'value',
+                        okButtonLabel: 'OK',
+                        cancelButtonLabel: 'CANCEL',
+                        //value: _myActivities,
+                        onSaved: (value) {
+                          if (value == null) return;
+                          setState(() {
+                            _myActivities = value;
+                          });
+                        },
                       ),
                     ),
                   ),
@@ -292,13 +280,13 @@ class _SpecificationsState extends ResumableState<Specifications> {
                       color: Color(0xFF004c4c),
                       child: Text("Proceed",style: TextStyle(color: Colors.white),),
                       onPressed: (){
-                        if(fbKey.currentState.validate()&&formKey.currentState.validate()&&formKey2.currentState.validate()){
-                          formKey.currentState.save();
+                        if(fbKey.currentState.validate()&&formKey2.currentState.validate()){
+                          //formKey.currentState.save();
                           formKey2.currentState.save();
                           setState(() {
                             _myActivitiesResult = _myActivities.toString();
                           });
-                          push(context, MaterialPageRoute(builder: (context)=>designTopology(market,event,selectedSizes,surface_id,thickness.text,classification_id,_myActivities,myClients)));
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>designTopology(market,event,selectedSizes,surface_id,thickness.text,classification_id,_myActivities,myClients,colors)));
                         }
                       },
                     ),

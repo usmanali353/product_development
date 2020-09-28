@@ -85,7 +85,7 @@ class _AllRequestListState extends State<AllRequestList> {
     });
     SharedPreferences.getInstance().then((prefs) {
       Network_Operations.getRequestForGM(
-          context, prefs.getString("token"), 10, 1).then((allRequests) {
+          context, prefs.getString("token"), 100, 1).then((allRequests) {
         setState(() {
           this.allRequests = allRequests;
           if (this.allRequests.length > 0) {
@@ -310,7 +310,7 @@ class _AllRequestListState extends State<AllRequestList> {
                               }else{
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
                               }
-                            }else if(allRequests[index].statusName=="Approved Trial"){
+                            }else if(allRequests[index].statusName=="Model Approved"){
                               if(widget.currentUserRoles["5"]!=null||widget.currentUserRoles["6"]!=null){
                                 Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(allRequests[index].requestId,widget.currentUserRoles)));
                               }else{
@@ -336,11 +336,15 @@ class _AllRequestListState extends State<AllRequestList> {
                               children: <Widget>[
                                 Padding(
                                   padding: const EdgeInsets.only(left: 6, top: 8),
-                                  child: Text(allRequests[index].modelName != null
-                                      ? allRequests[index].modelName
-                                      : '', style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15),),
+                                  child: Text((){
+                                    if(allRequests[index].newModelName!=null){
+                                      return allRequests[index].newModelName;
+                                    }else if(allRequests[index].modelName!=null){
+                                      return allRequests[index].modelName;
+                                    }else{
+                                      return '';
+                                    }
+                                  }(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
                                 ),
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -459,7 +463,7 @@ class _AllRequestListState extends State<AllRequestList> {
       onSubmitted:(query){
         if(query.isNotEmpty){
           SharedPreferences.getInstance().then((prefs){
-            Network_Operations.getRequestForGMSearchable(context,prefs.getString("token"),10,1,query).then((allRequests){
+            Network_Operations.getRequestForGMSearchable(context,prefs.getString("token"),100,1,query).then((allRequests){
               setState(() {
                 this.allRequests.clear();
                 this.allRequests = allRequests;
@@ -472,7 +476,7 @@ class _AllRequestListState extends State<AllRequestList> {
         }else{
           SharedPreferences.getInstance().then((prefs) {
             Network_Operations.getRequestForGM(
-                context, prefs.getString("token"), 10, 1).then((allRequests) {
+                context, prefs.getString("token"), 100, 1).then((allRequests) {
               setState(() {
                 this.allRequests.clear();
                 this.allRequests = allRequests;
@@ -532,7 +536,7 @@ class _AllRequestListState extends State<AllRequestList> {
       updateSearchQuery("Search query");
       SharedPreferences.getInstance().then((prefs) {
         Network_Operations.getRequestForGM(
-            context, prefs.getString("token"), 10, 1).then((allRequests) {
+            context, prefs.getString("token"), 100, 1).then((allRequests) {
           setState(() {
             this.allRequests.clear();
             this.allRequests = allRequests;

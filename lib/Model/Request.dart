@@ -7,7 +7,7 @@ class Request {
   String technicalConcentration, event,statusName,surfaceName,date,designerObservation,customerObservation,modelName,modelCode,trialDate,closeing_date,userId,classificationName,marketName,technologyName,structureName,edgeName,rangeName,client,targetStartDate,targetEndDate,actualStartDate,actualEndDate,status,qrcodeImage,clientName,rangeImage,newModelName,newModelCode;
   double thickness;
 
-  var image,hasNext,hasPrevious;
+  var image,hasNext,hasPrevious,ImageSelectedForColor;
   DateTime dateTime;
   List<Colors> multipleColorNames;
   List<RemarksHistory> remarksHistory,allRequestClientRemarks;
@@ -35,6 +35,7 @@ class Request {
     this.customerObservation,
     this.userId,
     this.multipleClients,
+    this.ImageSelectedForColor
   });
   Map<String, dynamic> toJson() {
     var map = new Map<String, dynamic>();

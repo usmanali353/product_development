@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
-
-import 'package:need_resume/need_resume.dart';
-
 import 'package:productdevelopment/Model/Dropdown.dart';
-
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'Specifications.dart';
 
 class Assumptions extends StatefulWidget {
@@ -23,7 +16,7 @@ class Assumptions extends StatefulWidget {
 
 
 
-class _AssumptionsState extends ResumableState<Assumptions> {
+class _AssumptionsState extends State<Assumptions> {
 
   TextEditingController event;
 
@@ -46,16 +39,6 @@ class _AssumptionsState extends ResumableState<Assumptions> {
   String selectedMarket,selectedClient="Client 1";
 
   String clientId;
-
-  @override
-
-  void onResume() {
-
-   Navigator.pop(context,'Refresh');
-
-    super.onResume();
-
-  }
 
   @override
 
@@ -341,7 +324,7 @@ class _AssumptionsState extends ResumableState<Assumptions> {
                           if(marketId==2) {
                             myClients.add(clientId);
                           }
-                          push(context, MaterialPageRoute(builder: (context)=>Specifications(marketId,event.text,myClients)));
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>Specifications(marketId,event.text,myClients)));
                         }
                       },
 

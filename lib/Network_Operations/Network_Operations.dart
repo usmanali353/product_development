@@ -28,14 +28,14 @@ import '../DetailsPage.dart';
        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
      }else if(response.body!=null){
        pd.hide();
-       Utils.showError(context, response.body);
+       Utils.showError(context, "Invalid Username or Password");
      }else{
        pd.hide();
        Utils.showError(context, response.statusCode.toString());
      }
     }catch(e) {
       pd.hide();
-      Utils.showError(context, e.toString());
+      Utils.showError(context,e.toString());
     }
   }
   static void register(BuildContext context,String email,String password,String name) async{
@@ -130,7 +130,8 @@ import '../DetailsPage.dart';
         "multipleDesigners": request.multipleDesigners,
         "designerObservation": request.designerObservation,
         "customerObservation": request.customerObservation,
-        "multipleClients":request.multipleClients
+        "multipleClients":request.multipleClients,
+        "ImageSelectedForColor":request.ImageSelectedForColor,
       }, toEncodable: Utils.myEncode);
        print(body);
        var response =await http.post(Utils.getBaseUrl()+"Request/RequestSave",body: body,headers:{"Content-Type": "application/json", "Authorization": "Bearer " + token});
@@ -140,6 +141,7 @@ import '../DetailsPage.dart';
          Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
        }else{
          pd.hide();
+         print(response.body.toString());
          Utils.showError(context, response.statusCode.toString());
        }
     }catch(e){
@@ -166,7 +168,7 @@ import '../DetailsPage.dart';
        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
       }else{
         pd.hide();
-        Utils.showError(context, response.body.toString());
+        Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
       pd.hide();
