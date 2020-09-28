@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Observations.dart';

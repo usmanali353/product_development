@@ -6,6 +6,7 @@ import 'package:productdevelopment/Model/Request.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Model/Dropdown.dart';
 import 'Network_Operations/Network_Operations.dart';
+import 'Utils/Utils.dart';
 class ApproveForTrial extends StatefulWidget {
   Request request;
   String status;
@@ -33,7 +34,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
     modelName=TextEditingController();
     modelCode=TextEditingController();
     SharedPreferences.getInstance().then((prefs){
-      Network_Operations.getDropDowns(context, prefs.getString("token"),"Clients").then((cli){
+      Network_Operations.getClientsForTrial(context, prefs.getString("token"),request.requestId).then((cli){
         setState(() {
           this.clientsDropdown=cli;
           for(var c in cli){
@@ -171,7 +172,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                    ),
                  ),
                  Visibility(
-                   visible: status=="Approve"&&request.marketId!=2,
+                   visible: status=="Approve"&&request.marketId!=2&&clientNames.length>0,
                    child: Padding(
                      padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
                      child: Card(
@@ -203,7 +204,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                    ),
                  ),
                  Visibility(
-                   visible: status=="Approve"&&request.marketId==2,
+                   visible: status=="Approve"&&request.marketId==2&&clientNames.length>0,
                    child: Padding(
 
                      padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
@@ -289,13 +290,19 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                          onPressed: (){
                            if(fbKey.currentState.validate()){
                              if(status=="Approve"){
-                               SharedPreferences.getInstance().then((prefs){
+                               if(actualStartDate.isBefore(actualEndDate)&&actualEndDate.isAfter(actualStartDate)){
+                                 SharedPreferences.getInstance().then((prefs){
                                    if(request.marketId==2){
                                      myClients.clear();
                                      myClients.add(clientId);
                                    }
-                                 Network_Operations.trialClient(context, prefs.getString("token"),myClients, request.requestId,remarks.text,clientVisitDate,actualStartDate,actualEndDate,modelName.text,modelCode.text);
-                               });
+
+                                   Network_Operations.trialClient(context, prefs.getString("token"),myClients, request.requestId,remarks.text,clientVisitDate,actualStartDate,actualEndDate,modelName.text,modelCode.text);
+                                 });
+                               }else{
+                                 Utils.showError(context,"Actual Start Date Should be before Actual End Date and ");
+                               }
+
                              }
                            }
                          },

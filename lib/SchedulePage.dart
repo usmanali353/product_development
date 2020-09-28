@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
+import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Network_Operations/Network_Operations.dart';
 class SchedulePage extends StatefulWidget {
@@ -116,9 +117,14 @@ class _SchedulePageState extends State<SchedulePage> {
                   onPressed: (){
                     if(fbKey.currentState.validate()){
                       fbKey.currentState.save();
-                      SharedPreferences.getInstance().then((prefs){
-                        Network_Operations.addRequestSchedule(context,prefs.getString("token"), request.requestId, targetStartDate, targetEndDate,request.statusId==4?true:null,remarks.text);
-                      });
+                      if(targetStartDate.isBefore(targetEndDate)&&targetEndDate.isAfter(targetStartDate)){
+                        SharedPreferences.getInstance().then((prefs){
+                          Network_Operations.addRequestSchedule(context,prefs.getString("token"), request.requestId, targetStartDate, targetEndDate,request.statusId==4?true:null,remarks.text);
+                        });
+                      }else{
+                        Utils.showError(context,"Target Start Date Should be before the End Date");
+                      }
+
                     }
                   },
                 ),

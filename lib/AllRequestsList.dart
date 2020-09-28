@@ -171,7 +171,6 @@ class _AllRequestListState extends State<AllRequestList> {
                                           allRequests[index].image != null
                                               ? allRequests[index].image
                                               : "https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"),
-                                      //MemoryImage(base64Decode(products[index]['image'])),
                                       fit: BoxFit.cover,
                                     )
                                 ),

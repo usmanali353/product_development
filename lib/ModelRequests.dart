@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -34,6 +36,10 @@ class _ModelReState extends State<ModelRequests>{
   var selectedPreference,selectedStatus;
   int statusId;
   var currentUserRoles;
+  TextEditingController _searchQuery;
+  bool _isSearching = false;
+  static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  String searchQuery = "Search query";
   _ModelReState(this.statusId,this.currentUserRoles);
  bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false,isListVisible=false;
  bool isColorsVisible=false;
@@ -41,6 +47,7 @@ class _ModelReState extends State<ModelRequests>{
   @override
   void initState() {
     print(currentUserRoles);
+    _searchQuery = TextEditingController();
     SharedPreferences.getInstance().then((prefs) {
       setState(() {
         claims = Utils.parseJwt(prefs.getString("token"));
@@ -76,8 +83,8 @@ class _ModelReState extends State<ModelRequests>{
             isClient = true;
           });
         }
-        if(isGm){
-          Network_Operations.getRequestByStatusGM(context, token, statusId).then((requestsList){
+        if(!isClient){
+          Network_Operations.getRequestByStatusGM(context, token, statusId,1,100).then((requestsList){
             setState(() {
               this.products=requestsList;
               if(products!=null&&products.length>0){
@@ -101,16 +108,11 @@ class _ModelReState extends State<ModelRequests>{
   }
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
         appBar: AppBar(
-          title: Text("Model Requests", style: TextStyle(
-              color: Colors.white
-          ),
-          ),
-          actions: <Widget>[
-
-          ],
+          leading: _isSearching ? const BackButton() : null,
+          title: _isSearching ? _buildSearchField() : _buildTitle(context),
+          actions: _buildActions(),
         ),
       body: Visibility(
         visible: isListVisible,
@@ -257,7 +259,6 @@ class _ModelReState extends State<ModelRequests>{
                              }else{
                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                              }
-
                             }else if(products[index].statusName=="Samples Scheduled"){
                               if(currentUserRoles["4"]!=null){
                                 await showMenu(
@@ -688,6 +689,157 @@ class _ModelReState extends State<ModelRequests>{
       builder: (BuildContext context) {
         return alert;
       },
+    );
+  }
+
+  void _startSearch() {
+    ModalRoute
+        .of(context)
+        .addLocalHistoryEntry(new LocalHistoryEntry(onRemove: _stopSearching));
+
+    setState(() {
+      _isSearching = true;
+    });
+  }
+
+  Widget _buildSearchField() {
+    return  TextField(
+      controller: _searchQuery,
+      autofocus: true,
+      textInputAction: TextInputAction.search,
+      decoration: const InputDecoration(
+        hintText: 'Search...',
+        border: InputBorder.none,
+        hintStyle: const TextStyle(color: Colors.white30),
+      ),
+      style: const TextStyle(color: Colors.white, fontSize: 16.0),
+      onSubmitted:(query){
+        if(query.isNotEmpty){
+          if(!isClient){
+            Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,1,100,query).then((requestsList){
+              setState(() {
+                this.products=requestsList;
+                if(products!=null&&products.length>0){
+                  isListVisible=true;
+                }
+              });
+            });
+          }else {
+            Network_Operations.getRequestByStatusIndividualUserSearchable(context, token, statusId,query).then((requestsList){
+              setState(() {
+                this.products=requestsList;
+                if(products!=null&&products.length>0){
+                  isListVisible=true;
+                }
+              });
+            });
+          }
+        }else{
+          if(!isClient){
+            Network_Operations.getRequestByStatusGM(context, token, statusId,1,100).then((requestsList){
+              setState(() {
+                this.products=requestsList;
+                if(products!=null&&products.length>0){
+                  isListVisible=true;
+                }
+              });
+            });
+          }else {
+            Network_Operations.getRequestByStatusIndividualUser(context, token, statusId).then((requestsList){
+              setState(() {
+                this.products=requestsList;
+                if(products!=null&&products.length>0){
+                  isListVisible=true;
+                }
+              });
+            });
+          }
+        }
+      },
+    );
+  }
+
+  void updateSearchQuery(String newQuery) {
+    setState(() {
+      searchQuery = newQuery;
+    });
+    print("search query " + newQuery);
+  }
+
+  List<Widget> _buildActions() {
+    if (_isSearching) {
+      return <Widget>[
+        new IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () {
+            if (_searchQuery == null || _searchQuery.text.isEmpty) {
+              Navigator.pop(context);
+              return;
+            }
+            _clearSearchQuery();
+          },
+        ),
+      ];
+    }
+    return <Widget>[
+      new IconButton(
+        icon: const Icon(Icons.search),
+        onPressed: _startSearch,
+      ),
+    ];
+  }
+
+  void _stopSearching() {
+    _clearSearchQuery();
+
+    setState(() {
+      _isSearching = false;
+    });
+  }
+
+  void _clearSearchQuery() {
+    print("close search box");
+    setState(() {
+      _searchQuery.clear();
+      updateSearchQuery("Search query");
+      if(!isClient){
+        Network_Operations.getRequestByStatusGM(context, token, statusId,1,100).then((requestsList){
+          setState(() {
+            this.products=requestsList;
+            if(products!=null&&products.length>0){
+              isListVisible=true;
+            }
+          });
+        });
+      }else {
+        Network_Operations.getRequestByStatusIndividualUser(context, token, statusId).then((requestsList){
+          setState(() {
+            this.products=requestsList;
+            if(products!=null&&products.length>0){
+              isListVisible=true;
+            }
+          });
+        });
+      }
+    });
+  }
+
+  Widget _buildTitle(BuildContext context) {
+    var horizontalTitleAlignment =
+    Platform.isIOS ? CrossAxisAlignment.center : CrossAxisAlignment.start;
+
+    return new InkWell(
+      onTap: () => scaffoldKey.currentState.openDrawer(),
+      child: new Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: horizontalTitleAlignment,
+          children: <Widget>[
+            const Text('Model Requests'),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -25,7 +25,7 @@ class _DashboardState extends ResumableState<Dashboard> {
    SharedPreferences.getInstance().then((prefs){
      setState(() {
        claims=Utils.parseJwt(prefs.getString("token"));
-       if(claims['role'].contains("General Manager")) {
+       if(!claims['role'].contains("Client")) {
          Network_Operations.getRequestCount(context, prefs.getString("token")).then((requestCountMap){
            setState(() {
              this.requestCount=requestCountMap['statuses'];
@@ -50,7 +50,7 @@ class _DashboardState extends ResumableState<Dashboard> {
     SharedPreferences.getInstance().then((prefs){
       setState(() {
         claims=Utils.parseJwt(prefs.getString("token"));
-        if(claims['role'].contains("General Manager")) {
+        if(!claims['role'].contains("Client")) {
           Network_Operations.getRequestCount(context, prefs.getString("token")).then((requestCountMap){
             setState(() {
               this.requestCount=requestCountMap['statuses'];

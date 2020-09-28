@@ -39,12 +39,12 @@ class _DetailPageState extends State<DetailPage>{
      });
    }
    setState(() {
+     imageUrl.add(request.image);
      for(int i=0;i<request.multipleImages.length;i++){
        if(request.multipleImages[i]!=null){
          imageUrl.add(request.multipleImages[i]);
        }
      }
-     imageUrl.add(request.image);
    });
     super.initState();
   }
@@ -292,7 +292,8 @@ class _DetailPageState extends State<DetailPage>{
                               ),),
                               subtitle: Wrap(
                                 children: [
-                                  for ( var images in request.multipleImages) images!=null?Image.network(images,width: 100,height: 100):Container(),
+
+                                  for ( var images in imageUrl) images!=null?Image.network(images,width: 100,height: 100):Container(),
                                 ],
                               )
                             ),
@@ -332,7 +333,7 @@ class _DetailPageState extends State<DetailPage>{
                               subtitle: Text(request.multipleSuitabilityNames.toString().replaceAll("[", "").replaceAll("]", "")),
                             ),
                             Divider(),
-                            request.statusName=='Approved By Customer'||request.statusName=='Approved Trial'||request.statusName=='Rejected By Customer'||request.statusName=="Rejected Trial"&&request.qrcodeImage!=null?Column(
+                            request.statusName=='Approved By Customer'||request.statusName=='Model Approved'||request.statusName=='Rejected By Customer'||request.statusName=="Model Rejected"&&request.qrcodeImage!=null?Column(
                               children: [
                                 ListTile(
                                   title: Text("Qr Code", style: TextStyle(

@@ -262,9 +262,25 @@ import '../DetailsPage.dart';
     }
     return null;
   }
-  static Future<List<Request>> getRequestByStatusGM(BuildContext context,String token,int statusId) async{
+  static Future<List<Request>> getRequestByStatusGM(BuildContext context,String token,int statusId,int pageNumber,int pageSize) async{
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        List<Request> requests=[];
+        for(int i=0;i<jsonDecode(response.body)['response']['allRequests'].length;i++){
+          requests.add(Request.fromMap(jsonDecode(response.body)['response']['allRequests'][i]));
+        }
+        return requests;
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static Future<List<Request>> getRequestByStatusGMSearchable(BuildContext context,String token,int statusId,int pageNumber,int pageSize,String query) async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         List<Request> requests=[];
         for(int i=0;i<jsonDecode(response.body)['response']['allRequests'].length;i++){
@@ -424,6 +440,24 @@ import '../DetailsPage.dart';
     }
     return null;
   }
+  static Future<List<Request>> getRequestByStatusIndividualUserSearchable(BuildContext context,String token,int statusId,String query) async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId&SearchString=$query",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        List<Request> requests=[];
+        for(int i=0;i<jsonDecode(response.body).length;i++){
+          requests.add(Request.fromMap(jsonDecode(response.body)[i]));
+        }
+        return requests;
+      }else {
+        Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
   static Future<void> changeStatusWithRemarks(BuildContext context,String token,int requestId,int status,String remarks)async{
     try{
       final body=jsonEncode({
@@ -520,6 +554,25 @@ import '../DetailsPage.dart';
       }else{
         pd.hide();
         Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static Future<List<Dropdown>> getClientsForTrial(BuildContext context,String token,int requestId)async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestClientsDropdown/$requestId",headers:{"Authorization":"Bearer "+token});
+      var data= jsonDecode(response.body);
+      if(response.statusCode==200){
+        List<Dropdown> list=List();
+        list.clear();
+        for(int i=0;i<data.length;i++){
+          list.add(Dropdown(data[i]["id"],data[i]["name"],data[i]["stringId"]));
+        }
+        print(data.toString());
+        return list;
       }
     }catch(e){
       print(e);
