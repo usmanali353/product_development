@@ -463,20 +463,26 @@ import '../DetailsPage.dart';
       Utils.showError(context, e.toString());
     }
   }
-  static Future<List<TrialRequests>> getClientRequestsByStatus(BuildContext context,String token,int statusId)async{
-    ProgressDialog pd=ProgressDialog(context);
-    pd.show();
+  static Future<String> getClientRequestsByStatus(BuildContext context,String token,int statusId,int pageNumber,int pageSize)async{
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
-        List<TrialRequests> requests=[];
-        for(int i=0;i<jsonDecode(response.body)['response'].length;i++){
-          requests.add(TrialRequests.fromJson(jsonDecode(response.body)['response'][i]));
-        }
-        return requests;
+        return response.body;
       }else{
-        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static Future<String> getClientRequestsByStatusSearchable(BuildContext context,String token,int statusId,int pageNumber,int pageSize,String searchQuery)async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        return response.body;
+      }else{
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){

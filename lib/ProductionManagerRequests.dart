@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
@@ -17,17 +20,24 @@ class ProductionManagerRequests extends StatefulWidget {
 }
 
 class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
-  List<TrialRequests> requests;
+  List<TrialRequests> requests=[];
   bool isVisible=false;
   var selectedPreference;
   int statusId;
   String type;
-  var currentUserRole;
+  var currentUserRole,req;
+  int pageNum=1,searchPageNum=1;
+  String searchQuery = "Search query";
+  static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  TextEditingController _searchQuery;
+  bool _isSearching = false;
+  var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   _ProductionManagerRequestsState(this.statusId,this.type,this.currentUserRole);
 
   @override
   void initState() {
+    _searchQuery=TextEditingController();
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
     super.initState();
@@ -35,24 +45,114 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: type!=null?AppBar(title: Text("Model Requests"),):null,
+      appBar: AppBar(
+        leading: _isSearching ? const BackButton() : null,
+        title: _isSearching ? _buildSearchField() : _buildTitle(context),
+        actions: _buildActions(),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton:
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Visibility(
+              visible: previousButtonVisible,
+              child: FloatingActionButton(
+                  backgroundColor: Colors.white12, //Color(0xFF004c4c),
+                  splashColor: Colors.red,
+                  mini: true,
+                  child: Icon(Icons.arrow_back, color: Colors.teal, size: 30,),heroTag: "btn2", onPressed: (){
+                if(!_isSearching){
+                  setState(() {
+                    pageNum=pageNum-1;
+                  });
+                  print(pageNum);
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                }else{
+                  setState(() {
+                    searchPageNum=searchPageNum-1;
+                  });
+                  print(searchPageNum);
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                }
+
+              }
+              ),
+            ),
+            Visibility(
+              visible: nextButtonVisible,
+              child: FloatingActionButton(
+                  backgroundColor: Colors.white12,//Color(0xFF004c4c),
+                  splashColor: Colors.red,
+                  mini: true,
+                  child: Icon(Icons.arrow_forward, color: Colors.teal, size: 30,),heroTag: "btn1", onPressed: (){
+                if(!_isSearching){
+                  setState(() {
+                    pageNum=pageNum+1;
+                  });
+                  print(pageNum);
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                }else{
+                  setState(() {
+                    searchPageNum=searchPageNum+1;
+                  });
+                  print(searchPageNum);
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                }
+
+              }
+              ),
+            ),
+          ],
+        ),
+      ),
       body: RefreshIndicator(
         key: _refreshIndicatorKey,
         onRefresh: (){
           return Utils.check_connectivity().then((isConnected){
             if(isConnected){
-              SharedPreferences.getInstance().then((prefs){
-                Network_Operations.getClientRequestsByStatus(context, prefs.getString("token"), statusId).then((trialRequestsList){
-                  setState(() {
-                    this.requests=trialRequestsList;
-                    if(requests.length>0){
-                      isVisible=true;
-                    }else{
-                      Utils.showSuccess(context, "No Requests Found");
-                    }
+              if(!_isSearching){
+                SharedPreferences.getInstance().then((prefs){
+                  Network_Operations.getClientRequestsByStatus(context, prefs.getString("token"), statusId,pageNum,10).then((response){
+                    setState(() {
+                      req=jsonDecode(response);
+                      this.requests.clear();
+                      for(int i=0;i<jsonDecode(response)['response'].length;i++){
+                        this.requests.add(TrialRequests.fromJson(jsonDecode(response)['response'][i]));
+                      }
+                      if(requests.length>0){
+                        isVisible=true;
+                      }else{
+                        Utils.showSuccess(context, "No Requests Found");
+                      }
+                    });
                   });
                 });
-              });
+              }
+              else{
+                SharedPreferences.getInstance().then((prefs){
+                  Network_Operations.getClientRequestsByStatusSearchable(context, prefs.getString("token"), statusId,searchPageNum,10,searchQuery).then((response){
+                    setState(() {
+                      req=jsonDecode(response);
+                      this.requests.clear();
+                      for(int i=0;i<jsonDecode(response)['response'].length;i++){
+                        this.requests.add(TrialRequests.fromJson(jsonDecode(response)['response'][i]));
+                      }
+                      if(requests.length>0){
+                        isVisible=true;
+                      }else{
+                        Utils.showSuccess(context, "No Requests Found");
+                      }
+                    });
+                  });
+                });
+              }
             }else{
               Utils.showError(context, "Network Not Available");
             }
@@ -433,117 +533,44 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
       style: const TextStyle(color: Colors.white, fontSize: 16.0),
       onSubmitted:(query){
         if(query.isNotEmpty){
-          if(!isClient){
-            Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,searchPageNum,10,query).then((response){
+          setState(() {
+            this.searchQuery=query;
+          });
+
+          SharedPreferences.getInstance().then((prefs){
+            Network_Operations.getClientRequestsByStatusSearchable(context, prefs.getString("token"), statusId,searchPageNum,10,searchQuery).then((response){
               setState(() {
-                requests.clear();
                 req=jsonDecode(response);
-                for(int i=0;i<req["response"]['allRequests'].length;i++){
-                  requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                requests.clear();
+                for(int i=0;i<jsonDecode(response)['response'].length;i++){
+                  this.requests.add(TrialRequests.fromJson(jsonDecode(response)['response'][i]));
                 }
-                this.products = requests;
-                if (this.products.length > 0) {
-                  isListVisible = true;
-                }
-                if(req['hasNext']&&req['hasPrevious']){
-                  nextButtonVisible=true;
-                  previousButtonVisible=true;
-                }else if(req['hasPrevious']&&!req['hasNext']){
-                  previousButtonVisible=true;
-                  nextButtonVisible=false;
-                }else if(!req['hasPrevious']&&req['hasNext']){
-                  previousButtonVisible=false;
-                  nextButtonVisible=true;
+                if(requests.length>0){
+                  isVisible=true;
                 }else{
-                  previousButtonVisible=false;
-                  nextButtonVisible=false;
+                  Utils.showSuccess(context, "No Requests Found");
                 }
               });
             });
-          }else {
-            Network_Operations.getRequestByStatusIndividualUserSearchable(context, token, statusId,query,searchPageNum,10).then((response){
+          });
+        }
+        else{
+          SharedPreferences.getInstance().then((prefs){
+            Network_Operations.getClientRequestsByStatus(context, prefs.getString("token"), statusId,pageNum,10).then((response){
               setState(() {
-                requests.clear();
-                for(int i=0;i<jsonDecode(response).length;i++){
-                  requests.add(Request.fromMap(jsonDecode(response)[i]));
-                }
-                this.products=requests;
-                if(products!=null&&products.length>0){
-                  isListVisible=true;
-                }
-                print(requests.length);
-                if(req['hasNext']&&req['hasPrevious']){
-                  nextButtonVisible=true;
-                  previousButtonVisible=true;
-                }else if(req['hasPrevious']&&!req['hasNext']){
-                  previousButtonVisible=true;
-                  nextButtonVisible=false;
-                }else if(!req['hasPrevious']&&req['hasNext']){
-                  previousButtonVisible=false;
-                  nextButtonVisible=true;
-                }else{
-                  previousButtonVisible=false;
-                  nextButtonVisible=false;
-                }
-              });
-            });
-          }
-        }else{
-          if(!isClient){
-            Network_Operations.getRequestByStatusGM(context, token, statusId,pageNum,10).then((response){
-              setState(() {
-                requests.clear();
                 req=jsonDecode(response);
-                for(int i=0;i<req["response"]['allRequests'].length;i++){
-                  requests.add(Request.fromMap(req["response"]['allRequests'][i]));
-                }
-                this.products = requests;
-                if (this.products.length > 0) {
-                  isListVisible = true;
-                }
-                if(req['hasNext']&&req['hasPrevious']){
-                  nextButtonVisible=true;
-                  previousButtonVisible=true;
-                }else if(req['hasPrevious']&&!req['hasNext']){
-                  previousButtonVisible=true;
-                  nextButtonVisible=false;
-                }else if(!req['hasPrevious']&&req['hasNext']){
-                  previousButtonVisible=false;
-                  nextButtonVisible=true;
-                }else{
-                  previousButtonVisible=false;
-                  nextButtonVisible=false;
-                }
-              });
-            });
-          }else {
-            Network_Operations.getRequestByStatusIndividualUser(context, token, statusId,pageNum,10).then((response){
-              setState(() {
                 requests.clear();
-                for(int i=0;i<jsonDecode(response).length;i++){
-                  requests.add(Request.fromMap(jsonDecode(response)[i]));
+                for(int i=0;i<jsonDecode(response)['response'].length;i++){
+                  this.requests.add(TrialRequests.fromJson(jsonDecode(response)['response'][i]));
                 }
-                this.products=requests;
-                if(products!=null&&products.length>0){
-                  isListVisible=true;
-                }
-                print(requests.length);
-                if(req['hasNext']&&req['hasPrevious']){
-                  nextButtonVisible=true;
-                  previousButtonVisible=true;
-                }else if(req['hasPrevious']&&!req['hasNext']){
-                  previousButtonVisible=true;
-                  nextButtonVisible=false;
-                }else if(!req['hasPrevious']&&req['hasNext']){
-                  previousButtonVisible=false;
-                  nextButtonVisible=true;
+                if(requests.length>0){
+                  isVisible=true;
                 }else{
-                  previousButtonVisible=false;
-                  nextButtonVisible=false;
+                  Utils.showSuccess(context, "No Requests Found");
                 }
               });
             });
-          }
+          });
         }
       },
     );
