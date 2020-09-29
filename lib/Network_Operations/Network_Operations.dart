@@ -226,36 +226,26 @@ import '../DetailsPage.dart';
     }
 
   }
-  static Future<List<Request>> getRequestForGM(BuildContext context,String token,int PageSize,int PageNumber)async{
+  static Future<String> getRequestForGM(BuildContext context,String token,int PageSize,int PageNumber)async{
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        var req=jsonDecode(response.body);
-        List<Request> requests=[];
-        for(int i=0;i<req["response"]['allRequests'].length;i++){
-          requests.add(Request.fromMap(req["response"]['allRequests'][i]));
-        }
-         print(requests.length);
-        return requests;
-      }
+         return response.body;
+      }else
+        return null;
     }catch(e){
       print(e);
       Utils.showError(context, e.toString());
     }
     return null;
   }
-  static Future<List<Request>> getRequestForGMSearchable(BuildContext context,String token,int PageSize,int PageNumber,String searchQuery)async{
+  static Future<String> getRequestForGMSearchable(BuildContext context,String token,int PageSize,int PageNumber,String searchQuery)async{
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        var req=jsonDecode(response.body);
-        List<Request> requests=[];
-        for(int i=0;i<req["response"]['allRequests'].length;i++){
-          requests.add(Request.fromMap(req["response"]['allRequests'][i]));
-        }
-        print(requests.length);
-        return requests;
-      }
+        return response.body;
+      }else
+        return null;
     }catch(e){
       print(e);
       Utils.showError(context, e.toString());
@@ -363,20 +353,16 @@ import '../DetailsPage.dart';
     return null;
   }
   static Future<Map<String,dynamic>> getRequestCount(BuildContext context,String token)async{
-    ProgressDialog pd=ProgressDialog(context);
-    pd.show();
+
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestsCountForDashboard",headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
         print(response.body.toString());
         return jsonDecode(response.body);
       }else{
-        pd.hide();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
       Utils.showError(context, e.toString());
     }
    return null;
@@ -404,20 +390,14 @@ import '../DetailsPage.dart';
     }
   }
   static Future<Map<String,dynamic>> getRequestCountIndividualUser(BuildContext context,String token)async{
-    ProgressDialog pd=ProgressDialog(context);
-    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestsCountForIndividual",headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
-        print(response.body.toString());
         return jsonDecode(response.body);
       }else{
-        pd.hide();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
       Utils.showError(context, e.toString());
     }
     return null;

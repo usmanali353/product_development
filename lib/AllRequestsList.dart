@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -37,10 +38,15 @@ class _AllRequestListState extends State<AllRequestList> {
   var claims;
   var selectedPreference,selectedStatus;
   String token;
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   String searchQuery = "Search query";
   bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false;
   bool isColorsVisible=false;
-  ScrollController _scrollController =  ScrollController();
+  int pageNum=1,searchPageNum=1;
+  List<Request> requests=[];
+  var req;
+
+  var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
 
   bool isLoading = false;
   @override
@@ -82,22 +88,8 @@ class _AllRequestListState extends State<AllRequestList> {
           });
         }
       });
-    });
-    SharedPreferences.getInstance().then((prefs) {
-      Network_Operations.getRequestForGM(
-          context, prefs.getString("token"), 100, 1).then((allRequests) {
-        setState(() {
-          this.allRequests = allRequests;
-          if (this.allRequests.length > 0) {
-            isListVisible = true;
-          }
-        });
-      });
-    });
-    _scrollController.addListener(() {
-      if(_scrollController.position.pixels==_scrollController.position.maxScrollExtent){
-
-      }
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
     });
     super.initState();
   }
@@ -111,329 +103,463 @@ class _AllRequestListState extends State<AllRequestList> {
         title: _isSearching ? _buildSearchField() : _buildTitle(context),
         actions: _buildActions(),
       ),
-      body: Visibility(
-        visible: isListVisible,
-        child: ListView.builder(
-            itemCount: allRequests != null ? allRequests.length : 0,
-            controller: _scrollController,
-            itemBuilder: (context, int index) {
-              return Card(
-                elevation: 6,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    //color: Colors.teal,
-                  ),
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width,
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height * 0.21,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton:
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Visibility(
+              visible: previousButtonVisible,
+              child: FloatingActionButton(
+                  backgroundColor: Colors.white12, //Color(0xFF004c4c),
+                  splashColor: Colors.red,
+                  mini: true,
+                  child: Icon(Icons.arrow_back, color: Colors.teal, size: 30,),heroTag: "btn2", onPressed: (){
+                    if(!_isSearching){
+                      setState(() {
+                        pageNum=pageNum-1;
+                      });
+                      print(pageNum);
+                      WidgetsBinding.instance
+                          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                    }else{
+                      setState(() {
+                        searchPageNum=searchPageNum-1;
+                      });
+                      print(searchPageNum);
+                      WidgetsBinding.instance
+                          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                    }
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(13.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            InkWell(
-                              onTap: () {
-                                setState(() {
-                                  List<String> imageUrl = [];
-                                  for (int i = 0; i <
-                                      allRequests[index].multipleImages
-                                          .length; i++) {
-                                    if (allRequests[index].multipleImages[i] !=
-                                        null) {
-                                      imageUrl.add(
-                                          allRequests[index].multipleImages[i]);
+              }
+              ),
+            ),
+            Visibility(
+              visible: nextButtonVisible,
+              child: FloatingActionButton(
+                  backgroundColor: Colors.white12,//Color(0xFF004c4c),
+                  splashColor: Colors.red,
+                  mini: true,
+                  child: Icon(Icons.arrow_forward, color: Colors.teal, size: 30,),heroTag: "btn1", onPressed: (){
+                    if(!_isSearching){
+                      setState(() {
+                        pageNum=pageNum+1;
+                      });
+                      print(pageNum);
+                      WidgetsBinding.instance
+                          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                    }else{
+                      setState(() {
+                        searchPageNum=searchPageNum+1;
+                      });
+                      print(searchPageNum);
+                      WidgetsBinding.instance
+                          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                    }
+
+              }
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: (){
+          return Utils.check_connectivity().then((isConnected){
+            if(isConnected){
+              SharedPreferences.getInstance().then((prefs) {
+                if(!_isSearching){
+                  Network_Operations.getRequestForGM(
+                      context, prefs.getString("token"), 10, pageNum).then((response) {
+                    setState(() {
+                      requests.clear();
+                      req=jsonDecode(response);
+                      for(int i=0;i<req["response"]['allRequests'].length;i++){
+                        requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                      }
+                      this.allRequests = requests;
+
+                      if (this.allRequests.length > 0) {
+                        isListVisible = true;
+                      }
+                      print(requests.length);
+                      if(req['hasNext']&&req['hasPrevious']){
+                        nextButtonVisible=true;
+                        previousButtonVisible=true;
+                      }else if(req['hasPrevious']&&!req['hasNext']){
+                        previousButtonVisible=true;
+                        nextButtonVisible=false;
+                      }else if(!req['hasPrevious']&&req['hasNext']){
+                        previousButtonVisible=false;
+                        nextButtonVisible=true;
+                      }else{
+                        previousButtonVisible=false;
+                        nextButtonVisible=false;
+                      }
+                    });
+                  });
+                }else{
+                  Network_Operations.getRequestForGMSearchable(context, prefs.getString("token"), 10, searchPageNum,searchQuery).then((response) {
+                    setState(() {
+                      requests.clear();
+                      req=jsonDecode(response);
+                      for(int i=0;i<req["response"]['allRequests'].length;i++){
+                        requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                      }
+                      this.allRequests = requests;
+
+                      if (this.allRequests.length > 0) {
+                        isListVisible = true;
+                      }
+                      print(requests.length);
+                      if(req['hasNext']&&req['hasPrevious']){
+                        nextButtonVisible=true;
+                        previousButtonVisible=true;
+                      }else if(req['hasPrevious']&&!req['hasNext']){
+                        previousButtonVisible=true;
+                        nextButtonVisible=false;
+                      }else if(!req['hasPrevious']&&req['hasNext']){
+                        previousButtonVisible=false;
+                        nextButtonVisible=true;
+                      }else{
+                        previousButtonVisible=false;
+                        nextButtonVisible=false;
+                      }
+                    });
+                  });
+                }
+              });
+            }else{
+              Utils.showError(context,"Network Not Available");
+            }
+          });
+        },
+        child: Visibility(
+          visible: isListVisible,
+          child: ListView.builder(
+              itemCount: allRequests != null ? allRequests.length : 0,
+              itemBuilder: (context, int index) {
+                return Card(
+                  elevation: 6,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      //color: Colors.teal,
+                    ),
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width,
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.21,
+
+                    child: Padding(
+                      padding: const EdgeInsets.all(13.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    List<String> imageUrl = [];
+                                    for (int i = 0; i <
+                                        allRequests[index].multipleImages
+                                            .length; i++) {
+                                      if (allRequests[index].multipleImages[i] !=
+                                          null) {
+                                        imageUrl.add(
+                                            allRequests[index].multipleImages[i]);
+                                      }
                                     }
-                                  }
-                                  imageUrl.add(allRequests[index].image);
-                                  Navigator.push(context, MaterialPageRoute(
-                                      builder: (context) => RequestImageGallery(
-                                          allRequests[index])));
-                                });
-                              },
-                              child: Container(
-                                //color: Color(0xFF004c4c),
-                                height: 90,
-                                width: 90,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: DecorationImage(
-                                      image: NetworkImage(
-                                          allRequests[index].image != null
-                                              ? allRequests[index].image
-                                              : "https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"),
-                                      fit: BoxFit.cover,
-                                    )
+                                    imageUrl.add(allRequests[index].image);
+                                    Navigator.push(context, MaterialPageRoute(
+                                        builder: (context) => RequestImageGallery(
+                                            allRequests[index])));
+                                  });
+                                },
+                                child: Container(
+                                  //color: Color(0xFF004c4c),
+                                  height: 90,
+                                  width: 90,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      image: DecorationImage(
+                                        image: NetworkImage(
+                                            allRequests[index].image != null
+                                                ? allRequests[index].image
+                                                : "https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"),
+                                        fit: BoxFit.cover,
+                                      )
+                                  ),
                                 ),
                               ),
-                            ),
-                            //Padding(padding: EdgeInsets.only(top:2),),
-                            allRequests[index].multipleColorNames != null &&
-                                allRequests[index].multipleColorNames.length > 0
-                                ? Row(
-                              children: <Widget>[
-                                for(int i = 0; i <
-                                    allRequests[index].multipleColorNames
-                                        .length; i++)
-                                  Padding(
-                                    padding: const EdgeInsets.all(2),
-                                    child: Wrap(
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                                2),
-                                            color: Color(Utils.getColorFromHex(
-                                                allRequests[index]
-                                                    .multipleColorNames[i]
-                                                    .colorCode)),
-                                            //color: Colors.teal,
-                                          ),
-                                          height: 10,
-                                          width: 15,
-                                        ),
-
-                                      ],
-                                    ),
-                                  ),
-
-
-                              ],
-                            )
-                                : Container(),
-                          ],
-                        ),
-                        VerticalDivider(color: Colors.grey,),
-                        GestureDetector(
-                          onTapDown: (details)async{
-                            if(allRequests[index].statusName=="New Request"){
-                              if(widget.currentUserRoles["1"]!=null) {
-                                await showMenu(
-                                  context: context,
-                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                  items: [
-                                    PopupMenuItem<String>(
-                                        child: const Text('Change Status'), value: 'changeStatus'),
-                                    PopupMenuItem<String>(
-                                        child: const Text('Add Images'), value: 'addImage'),
-                                    PopupMenuItem<String>(
-                                        child: const Text('See Details'), value: 'Details'),
-                                  ],
-                                  elevation: 8.0,
-                                ).then((selectedItem){
-                                  if(selectedItem=="changeStatus"){
-                                    showAlertDialog(context,allRequests[index]);
-                                  }else if(selectedItem=="Details"){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
-                                  }else if(selectedItem=="addImage"){
-                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(allRequests[index])));
-                                  }
-                                });
-                              }else if(isClient){
-                                await showMenu(
-                                  context: context,
-                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                  items: [
-                                    PopupMenuItem<String>(
-                                        child: const Text('Add Images'), value: 'addImage'),
-                                    PopupMenuItem<String>(
-                                        child: const Text('See Details'), value: 'Details'),
-                                  ],
-                                  elevation: 8.0,
-                                ).then((selectedItem){
-                                  if(selectedItem=="Details"){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
-                                  }else if(selectedItem=="addImage"){
-                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(allRequests[index])));
-                                  }
-                                });
-                              }else{
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
-                              }
-                            }else if(allRequests[index].statusName=="Approved By GM"){
-                              if(widget.currentUserRoles["2"]!=null||widget.currentUserRoles["3"]!=null){
-                                await showMenu(
-                                  context: context,
-                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                  items: [
-                                    PopupMenuItem<String>(
-                                        child: const Text('Change Status'), value: 'changeStatus'),
-                                    PopupMenuItem<String>(
-                                        child: const Text('See Details'), value: 'Details'),
-                                  ],
-                                  elevation: 8.0,
-                                ).then((selectedItem){
-                                  if(selectedItem=="changeStatus"){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(allRequests[index])));
-                                  }else if(selectedItem=="Details"){
-                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests[index])));
-                                  }
-                                });
-                              }else{
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
-                              }
-
-                            }else if(allRequests[index].statusName=="Samples Scheduled"){
-                              if(widget.currentUserRoles["4"]!=null){
-                                await showMenu(
-                                  context: context,
-                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                  items: [
-                                    PopupMenuItem<String>(
-                                        child: const Text('Change Status'), value: 'changeStatus'),
-                                    PopupMenuItem<String>(
-                                        child: const Text('Update Schedule'), value: 'updateschedule'),
-                                    PopupMenuItem<String>(
-                                        child: const Text('See Details'), value: 'Details'),
-                                  ],
-                                  elevation: 8.0,
-                                ).then((selectedItem){
-                                  if(selectedItem=="changeStatus"){
-                                    showAlertChangeStatus(context,allRequests[index]);
-                                  }else if(selectedItem=="Details"){
-                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests[index])));
-                                  }else if(selectedItem=="updateschedule"){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(allRequests[index])));
-                                  }
-                                });
-
-                              }else{
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
-                              }
-                            }else if(allRequests[index].statusName=="Model Approved"){
-                              if(widget.currentUserRoles["5"]!=null||widget.currentUserRoles["6"]!=null){
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(allRequests[index].requestId,widget.currentUserRoles)));
-                              }else{
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
-                              }
-                            }else {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
-                            }
-                          },
-                          child: Container(
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width * 0.62,
-                            height: MediaQuery
-                                .of(context)
-                                .size
-                                .height * 0.62,
-                            color: Colors.white,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 6, top: 8),
-                                  child: Text((){
-                                    if(allRequests[index].newModelName!=null){
-                                      return allRequests[index].newModelName;
-                                    }else if(allRequests[index].modelName!=null){
-                                      return allRequests[index].modelName;
-                                    }else{
-                                      return '';
-                                    }
-                                  }(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-                                ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  //mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: <Widget>[
-                                    Row(
-                                      //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      children: <Widget>[
-                                        Icon(
-                                          Icons.date_range,
-                                          color: Colors.teal,
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              left: 2, right: 2),
-                                        ),
-                                        Text(DateFormat("yyyy-MM-dd").format(
-                                            DateTime.parse(
-                                                allRequests[index].date)))
-                                      ],
-                                    ),
+                              //Padding(padding: EdgeInsets.only(top:2),),
+                              allRequests[index].multipleColorNames != null &&
+                                  allRequests[index].multipleColorNames.length > 0
+                                  ? Row(
+                                children: <Widget>[
+                                  for(int i = 0; i <
+                                      allRequests[index].multipleColorNames
+                                          .length; i++)
                                     Padding(
-                                      padding: EdgeInsets.only(left: 30),
-                                      child: Row(
+                                      padding: const EdgeInsets.all(2),
+                                      child: Wrap(
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(
+                                                  2),
+                                              color: Color(Utils.getColorFromHex(
+                                                  allRequests[index]
+                                                      .multipleColorNames[i]
+                                                      .colorCode)),
+                                              //color: Colors.teal,
+                                            ),
+                                            height: 10,
+                                            width: 15,
+                                          ),
+
+                                        ],
+                                      ),
+                                    ),
+
+
+                                ],
+                              )
+                                  : Container(),
+                            ],
+                          ),
+                          VerticalDivider(color: Colors.grey,),
+                          GestureDetector(
+                            onTapDown: (details)async{
+                              if(allRequests[index].statusName=="New Request"){
+                                if(widget.currentUserRoles["1"]!=null) {
+                                  await showMenu(
+                                    context: context,
+                                    position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                    items: [
+                                      PopupMenuItem<String>(
+                                          child: const Text('Change Status'), value: 'changeStatus'),
+                                      PopupMenuItem<String>(
+                                          child: const Text('Add Images'), value: 'addImage'),
+                                      PopupMenuItem<String>(
+                                          child: const Text('See Details'), value: 'Details'),
+                                    ],
+                                    elevation: 8.0,
+                                  ).then((selectedItem){
+                                    if(selectedItem=="changeStatus"){
+                                      showAlertDialog(context,allRequests[index]);
+                                    }else if(selectedItem=="Details"){
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                    }else if(selectedItem=="addImage"){
+                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(allRequests[index])));
+                                    }
+                                  });
+                                }else if(isClient){
+                                  await showMenu(
+                                    context: context,
+                                    position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                    items: [
+                                      PopupMenuItem<String>(
+                                          child: const Text('Add Images'), value: 'addImage'),
+                                      PopupMenuItem<String>(
+                                          child: const Text('See Details'), value: 'Details'),
+                                    ],
+                                    elevation: 8.0,
+                                  ).then((selectedItem){
+                                    if(selectedItem=="Details"){
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                    }else if(selectedItem=="addImage"){
+                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(allRequests[index])));
+                                    }
+                                  });
+                                }else{
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                }
+                              }else if(allRequests[index].statusName=="Approved By GM"){
+                                if(widget.currentUserRoles["2"]!=null||widget.currentUserRoles["3"]!=null){
+                                  await showMenu(
+                                    context: context,
+                                    position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                    items: [
+                                      PopupMenuItem<String>(
+                                          child: const Text('Change Status'), value: 'changeStatus'),
+                                      PopupMenuItem<String>(
+                                          child: const Text('See Details'), value: 'Details'),
+                                    ],
+                                    elevation: 8.0,
+                                  ).then((selectedItem){
+                                    if(selectedItem=="changeStatus"){
+                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(allRequests[index])));
+                                    }else if(selectedItem=="Details"){
+                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests[index])));
+                                    }
+                                  });
+                                }else{
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                }
+
+                              }else if(allRequests[index].statusName=="Samples Scheduled"){
+                                if(widget.currentUserRoles["4"]!=null){
+                                  await showMenu(
+                                    context: context,
+                                    position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                    items: [
+                                      PopupMenuItem<String>(
+                                          child: const Text('Change Status'), value: 'changeStatus'),
+                                      PopupMenuItem<String>(
+                                          child: const Text('Update Schedule'), value: 'updateschedule'),
+                                      PopupMenuItem<String>(
+                                          child: const Text('See Details'), value: 'Details'),
+                                    ],
+                                    elevation: 8.0,
+                                  ).then((selectedItem){
+                                    if(selectedItem=="changeStatus"){
+                                      showAlertChangeStatus(context,allRequests[index]);
+                                    }else if(selectedItem=="Details"){
+                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests[index])));
+                                    }else if(selectedItem=="updateschedule"){
+                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(allRequests[index])));
+                                    }
+                                  });
+
+                                }else{
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                }
+                              }else if(allRequests[index].statusName=="Model Approved"){
+                                if(widget.currentUserRoles["5"]!=null||widget.currentUserRoles["6"]!=null){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(allRequests[index].requestId,widget.currentUserRoles)));
+                                }else{
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                }
+                              }else {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                              }
+                            },
+                            child: Container(
+                              width: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .width * 0.62,
+                              height: MediaQuery
+                                  .of(context)
+                                  .size
+                                  .height * 0.62,
+                              color: Colors.white,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 6, top: 8),
+                                    child: Text((){
+                                      if(allRequests[index].newModelName!=null){
+                                        return allRequests[index].newModelName;
+                                      }else if(allRequests[index].modelName!=null){
+                                        return allRequests[index].modelName;
+                                      }else{
+                                        return '';
+                                      }
+                                    }(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                                  ),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    //mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      Row(
+                                        //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: <Widget>[
                                           Icon(
-                                            Icons.layers,
+                                            Icons.date_range,
                                             color: Colors.teal,
                                           ),
                                           Padding(
                                             padding: EdgeInsets.only(
                                                 left: 2, right: 2),
                                           ),
-                                          Text(allRequests[index].surfaceName !=
-                                              null ? allRequests[index]
-                                              .surfaceName : '')
+                                          Text(DateFormat("yyyy-MM-dd").format(
+                                              DateTime.parse(
+                                                  allRequests[index].date)))
                                         ],
-
                                       ),
-                                    ),
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 30),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.layers,
+                                              color: Colors.teal,
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                  left: 2, right: 2),
+                                            ),
+                                            Text(allRequests[index].surfaceName !=
+                                                null ? allRequests[index]
+                                                .surfaceName : '')
+                                          ],
 
-                                  ],
-                                ),
-                                Row(
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.zoom_out_map,
-                                      color: Colors.teal,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 2, right: 2),
-                                    ),
-                                    Text(allRequests[index].multipleSizeNames
-                                        .toString()
-                                        .replaceAll("[", "")
-                                        .replaceAll("]", "")
-                                        .replaceAll(".00", "")),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 1),
-                                  child: Row(
-                                    //crossAxisAlignment: CrossAxisAlignment.start,
+                                        ),
+                                      ),
+
+                                    ],
+                                  ),
+                                  Row(
                                     children: <Widget>[
                                       Icon(
-                                        Icons.done_all,
-                                        //size: 14,
+                                        Icons.zoom_out_map,
                                         color: Colors.teal,
                                       ),
                                       Padding(
-                                        padding: EdgeInsets.only(
-                                            left: 3, right: 3),
+                                        padding: EdgeInsets.only(left: 2, right: 2),
                                       ),
-                                      Text(allRequests[index].statusName != null
-                                          ? allRequests[index].statusName
-                                          : '')
+                                      Text(allRequests[index].multipleSizeNames
+                                          .toString()
+                                          .replaceAll("[", "")
+                                          .replaceAll("]", "")
+                                          .replaceAll(".00", "")),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 1),
+                                    child: Row(
+                                      //crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.done_all,
+                                          //size: 14,
+                                          color: Colors.teal,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              left: 3, right: 3),
+                                        ),
+                                        Text(allRequests[index].statusName != null
+                                            ? allRequests[index].statusName
+                                            : '')
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
 
-                ),
-              );
-            }),
+                  ),
+                );
+              }),
+        ),
       ),
     );
   }
@@ -461,13 +587,33 @@ class _AllRequestListState extends State<AllRequestList> {
       style: const TextStyle(color: Colors.white, fontSize: 16.0),
       onSubmitted:(query){
         if(query.isNotEmpty){
+          this.searchQuery=query;
           SharedPreferences.getInstance().then((prefs){
-            Network_Operations.getRequestForGMSearchable(context,prefs.getString("token"),100,1,query).then((allRequests){
+            Network_Operations.getRequestForGMSearchable(context,prefs.getString("token"),10,searchPageNum,query).then((response){
               setState(() {
-                this.allRequests.clear();
-                this.allRequests = allRequests;
+                requests.clear();
+                req=jsonDecode(response);
+                for(int i=0;i<req["response"]['allRequests'].length;i++){
+                  requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                }
+                this.allRequests = requests;
+
                 if (this.allRequests.length > 0) {
                   isListVisible = true;
+                }
+                print(requests.length);
+                if(req['hasNext']&&req['hasPrevious']){
+                  nextButtonVisible=true;
+                  previousButtonVisible=true;
+                }else if(req['hasPrevious']&&!req['hasNext']){
+                  previousButtonVisible=true;
+                  nextButtonVisible=false;
+                }else if(!req['hasPrevious']&&req['hasNext']){
+                  previousButtonVisible=false;
+                  nextButtonVisible=true;
+                }else{
+                  previousButtonVisible=false;
+                  nextButtonVisible=false;
                 }
               });
             });
@@ -475,10 +621,10 @@ class _AllRequestListState extends State<AllRequestList> {
         }else{
           SharedPreferences.getInstance().then((prefs) {
             Network_Operations.getRequestForGM(
-                context, prefs.getString("token"), 100, 1).then((allRequests) {
+                context, prefs.getString("token"), 10, pageNum).then((allRequests) {
               setState(() {
                 this.allRequests.clear();
-                this.allRequests = allRequests;
+               // this.allRequests = allRequests;
                 if (this.allRequests.length > 0) {
                   isListVisible = true;
                 }
@@ -525,6 +671,7 @@ class _AllRequestListState extends State<AllRequestList> {
 
     setState(() {
       _isSearching = false;
+
     });
   }
 
@@ -533,18 +680,6 @@ class _AllRequestListState extends State<AllRequestList> {
     setState(() {
       _searchQuery.clear();
       updateSearchQuery("Search query");
-      SharedPreferences.getInstance().then((prefs) {
-        Network_Operations.getRequestForGM(
-            context, prefs.getString("token"), 100, 1).then((allRequests) {
-          setState(() {
-            this.allRequests.clear();
-            this.allRequests = allRequests;
-            if (this.allRequests.length > 0) {
-              isListVisible = true;
-            }
-          });
-        });
-      });
     });
   }
 
@@ -567,17 +702,6 @@ class _AllRequestListState extends State<AllRequestList> {
     );
   }
 
-  Widget _buildProgressIndicator() {
-    return new Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: new Center(
-        child: new Opacity(
-          opacity: isLoading ? 1.0 : 00,
-          child: new CircularProgressIndicator(),
-        ),
-      ),
-    );
-  }
 
   showAlertChangeStatus(BuildContext context,Request request){
     // set up the buttons

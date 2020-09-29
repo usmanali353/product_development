@@ -39,6 +39,7 @@ class _ModelReState extends State<ModelRequests>{
   TextEditingController _searchQuery;
   bool _isSearching = false;
   static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   String searchQuery = "Search query";
   _ModelReState(this.statusId,this.currentUserRoles);
  bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false,isListVisible=false;
@@ -83,25 +84,8 @@ class _ModelReState extends State<ModelRequests>{
             isClient = true;
           });
         }
-        if(!isClient){
-          Network_Operations.getRequestByStatusGM(context, token, statusId,1,100).then((requestsList){
-            setState(() {
-              this.products=requestsList;
-              if(products!=null&&products.length>0){
-                isListVisible=true;
-              }
-            });
-          });
-        }else {
-          Network_Operations.getRequestByStatusIndividualUser(context, token, statusId).then((requestsList){
-            setState(() {
-              this.products=requestsList;
-              if(products!=null&&products.length>0){
-                isListVisible=true;
-              }
-            });
-          });
-        }
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
       });
     });
     super.initState();
@@ -114,284 +98,314 @@ class _ModelReState extends State<ModelRequests>{
           title: _isSearching ? _buildSearchField() : _buildTitle(context),
           actions: _buildActions(),
         ),
-      body: Visibility(
-        visible: isListVisible,
-        child: ListView.builder(
-                itemCount:products!=null?products.length:0, itemBuilder: (context,int index)
-            {
-              return Card(
-                elevation: 6,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    //color: Colors.teal,
-                  ),
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height * 0.21,
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: (){
+          return Utils.check_connectivity().then((isConnected){
+            if(isConnected){
+              if(!isClient){
+                Network_Operations.getRequestByStatusGM(context, token, statusId,1,100).then((requestsList){
+                  setState(() {
+                    this.products=requestsList;
+                    if(products!=null&&products.length>0){
+                      isListVisible=true;
+                    }
+                  });
+                });
+              }else {
+                Network_Operations.getRequestByStatusIndividualUser(context, token, statusId).then((requestsList){
+                  setState(() {
+                    this.products=requestsList;
+                    if(products!=null&&products.length>0){
+                      isListVisible=true;
+                    }
+                  });
+                });
+              }
+            }else{
+              Utils.showError(context,"Network Not Available");
+            }
+          });
+        },
+        child: Visibility(
+          visible: isListVisible,
+          child: ListView.builder(
+                  itemCount:products!=null?products.length:0, itemBuilder: (context,int index)
+              {
+                return Card(
+                  elevation: 6,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      //color: Colors.teal,
+                    ),
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * 0.21,
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(13.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            InkWell(
-                              onTap: (){
-                                setState(() {
-                                  List<String> imageUrl=[];
-                                  for(int i=0;i<products[index].multipleImages.length;i++){
-                                    if(products[index].multipleImages[i]!=null){
-                                      imageUrl.add(products[index].multipleImages[i]);
+                    child: Padding(
+                      padding: const EdgeInsets.all(13.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              InkWell(
+                                onTap: (){
+                                  setState(() {
+                                    List<String> imageUrl=[];
+                                    for(int i=0;i<products[index].multipleImages.length;i++){
+                                      if(products[index].multipleImages[i]!=null){
+                                        imageUrl.add(products[index].multipleImages[i]);
+                                      }
                                     }
-                                  }
-                                  imageUrl.add(products[index].image);
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
-                                });
-                              },
-                              child: Container(
-                                //color: Color(0xFF004c4c),
-                                height: 90,
-                                width: 90,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: DecorationImage(
-                                      image: NetworkImage(products[index].image!=null?products[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"), //MemoryImage(base64Decode(products[index]['image'])),
-                                      fit: BoxFit.cover,
-                                    )
+                                    imageUrl.add(products[index].image);
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
+                                  });
+                                },
+                                child: Container(
+                                  //color: Color(0xFF004c4c),
+                                  height: 90,
+                                  width: 90,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      image: DecorationImage(
+                                        image: NetworkImage(products[index].image!=null?products[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"), //MemoryImage(base64Decode(products[index]['image'])),
+                                        fit: BoxFit.cover,
+                                      )
+                                  ),
                                 ),
                               ),
-                            ),
-                            //Padding(padding: EdgeInsets.only(top:2),),
-                            products[index].multipleColorNames!=null&&products[index].multipleColorNames.length>0?Row(
-                              children: <Widget>[
-                                for(int i=0;i<products[index].multipleColorNames.length;i++)
-                                  Padding(
-                                    padding: const EdgeInsets.all(2),
-                                    child: Wrap(
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(2),
-                                            color: Color(Utils.getColorFromHex(products[index].multipleColorNames[i].colorCode)),
-                                            //color: Colors.teal,
-                                          ),
-                                          height: 10,
-                                          width: 15,
-                                        ),
-
-                                      ],
-                                    ),
-                                  ),
-
-
-                              ],
-                            ):Container(),
-                          ],
-                        ),
-                        VerticalDivider(color: Colors.grey,),
-                        GestureDetector(
-                          onTapDown: (details)async{
-                            if(products[index].statusName=="New Request"){
-                              if(currentUserRoles["1"]!=null) {
-                                await showMenu(
-                                  context: context,
-                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                  items: [
-                                    PopupMenuItem<String>(
-                                        child: const Text('Change Status'), value: 'changeStatus'),
-                                    PopupMenuItem<String>(
-                                        child: const Text('Add Images'), value: 'addImage'),
-                                    PopupMenuItem<String>(
-                                        child: const Text('See Details'), value: 'Details'),
-                                  ],
-                                  elevation: 8.0,
-                                ).then((selectedItem){
-                                  if(selectedItem=="changeStatus"){
-                                    showAlertDialog(context,products[index]);
-                                  }else if(selectedItem=="Details"){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
-                                  }else if(selectedItem=="addImage"){
-                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
-                                  }
-                                });
-                              }else if(isClient){
-                                await showMenu(
-                                  context: context,
-                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                  items: [
-                                    PopupMenuItem<String>(
-                                        child: const Text('Add Images'), value: 'addImage'),
-                                    PopupMenuItem<String>(
-                                        child: const Text('See Details'), value: 'Details'),
-                                  ],
-                                  elevation: 8.0,
-                                ).then((selectedItem){
-                                   if(selectedItem=="Details"){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
-                                  }else if(selectedItem=="addImage"){
-                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
-                                  }
-                                });
-                              }else{
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
-                              }
-                            }else if(products[index].statusName=="Approved By GM"){
-                             if(currentUserRoles["2"]!=null||currentUserRoles["3"]!=null){
-                               await showMenu(
-                                 context: context,
-                                 position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                 items: [
-                                   PopupMenuItem<String>(
-                                       child: const Text('Change Status'), value: 'changeStatus'),
-                                   PopupMenuItem<String>(
-                                       child: const Text('See Details'), value: 'Details'),
-                                 ],
-                                 elevation: 8.0,
-                               ).then((selectedItem){
-                                 if(selectedItem=="changeStatus"){
-                                   Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products[index])));
-                                 }else if(selectedItem=="Details"){
-                                   Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
-                                 }
-                               });
-                             }else{
-                               Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
-                             }
-                            }else if(products[index].statusName=="Samples Scheduled"){
-                              if(currentUserRoles["4"]!=null){
-                                await showMenu(
-                                  context: context,
-                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                  items: [
-                                    PopupMenuItem<String>(
-                                        child: const Text('Change Status'), value: 'changeStatus'),
-                                    PopupMenuItem<String>(
-                                        child: const Text('Update Schedule'), value: 'updateschedule'),
-                                    PopupMenuItem<String>(
-                                        child: const Text('See Details'), value: 'Details'),
-                                  ],
-                                  elevation: 8.0,
-                                ).then((selectedItem){
-                                  if(selectedItem=="changeStatus"){
-                                    showAlertChangeStatus(context,products[index]);
-                                  }else if(selectedItem=="Details"){
-                                    Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
-                                  }else if(selectedItem=="updateschedule"){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products[index])));
-                                  }
-                                });
-
-                              }else{
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
-                              }
-                            }else if(products[index].statusName=="Model Approved"){
-                              if(currentUserRoles["5"]!=null||currentUserRoles["6"]!=null){
-                                Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products[index].requestId,currentUserRoles)));
-                              }else{
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
-                              }
-                            }else {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
-                            }
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width * 0.62,
-                            height: MediaQuery.of(context).size.height * 0.62,
-                            color: Colors.white,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 6, top: 8),
-                                  child: Text((){
-                                    if(products[index].newModelName!=null){
-                                      return products[index].newModelName;
-                                    }else if(products[index].modelName!=null){
-                                      return products[index].modelName;
-                                    }else{
-                                      return '';
-                                    }
-                                  }(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-                                ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  //mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: <Widget>[
-                                    Row(
-                                      //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      children: <Widget>[
-                                        Icon(
-                                          Icons.date_range,
-                                          color: Colors.teal,
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 2, right: 2),
-                                        ),
-                                        Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(products[index].date)))
-                                      ],
-                                    ),
+                              //Padding(padding: EdgeInsets.only(top:2),),
+                              products[index].multipleColorNames!=null&&products[index].multipleColorNames.length>0?Row(
+                                children: <Widget>[
+                                  for(int i=0;i<products[index].multipleColorNames.length;i++)
                                     Padding(
-                                      padding: EdgeInsets.only(left: 30),
-                                      child: Row(
+                                      padding: const EdgeInsets.all(2),
+                                      child: Wrap(
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(2),
+                                              color: Color(Utils.getColorFromHex(products[index].multipleColorNames[i].colorCode)),
+                                              //color: Colors.teal,
+                                            ),
+                                            height: 10,
+                                            width: 15,
+                                          ),
+
+                                        ],
+                                      ),
+                                    ),
+
+
+                                ],
+                              ):Container(),
+                            ],
+                          ),
+                          VerticalDivider(color: Colors.grey,),
+                          GestureDetector(
+                            onTapDown: (details)async{
+                              if(products[index].statusName=="New Request"){
+                                if(currentUserRoles["1"]!=null) {
+                                  await showMenu(
+                                    context: context,
+                                    position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                    items: [
+                                      PopupMenuItem<String>(
+                                          child: const Text('Change Status'), value: 'changeStatus'),
+                                      PopupMenuItem<String>(
+                                          child: const Text('Add Images'), value: 'addImage'),
+                                      PopupMenuItem<String>(
+                                          child: const Text('See Details'), value: 'Details'),
+                                    ],
+                                    elevation: 8.0,
+                                  ).then((selectedItem){
+                                    if(selectedItem=="changeStatus"){
+                                      showAlertDialog(context,products[index]);
+                                    }else if(selectedItem=="Details"){
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                    }else if(selectedItem=="addImage"){
+                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
+                                    }
+                                  });
+                                }else if(isClient){
+                                  await showMenu(
+                                    context: context,
+                                    position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                    items: [
+                                      PopupMenuItem<String>(
+                                          child: const Text('Add Images'), value: 'addImage'),
+                                      PopupMenuItem<String>(
+                                          child: const Text('See Details'), value: 'Details'),
+                                    ],
+                                    elevation: 8.0,
+                                  ).then((selectedItem){
+                                     if(selectedItem=="Details"){
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                    }else if(selectedItem=="addImage"){
+                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
+                                    }
+                                  });
+                                }else{
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                }
+                              }else if(products[index].statusName=="Approved By GM"){
+                               if(currentUserRoles["2"]!=null||currentUserRoles["3"]!=null){
+                                 await showMenu(
+                                   context: context,
+                                   position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                   items: [
+                                     PopupMenuItem<String>(
+                                         child: const Text('Change Status'), value: 'changeStatus'),
+                                     PopupMenuItem<String>(
+                                         child: const Text('See Details'), value: 'Details'),
+                                   ],
+                                   elevation: 8.0,
+                                 ).then((selectedItem){
+                                   if(selectedItem=="changeStatus"){
+                                     Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products[index])));
+                                   }else if(selectedItem=="Details"){
+                                     Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
+                                   }
+                                 });
+                               }else{
+                                 Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                               }
+                              }else if(products[index].statusName=="Samples Scheduled"){
+                                if(currentUserRoles["4"]!=null){
+                                  await showMenu(
+                                    context: context,
+                                    position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                    items: [
+                                      PopupMenuItem<String>(
+                                          child: const Text('Change Status'), value: 'changeStatus'),
+                                      PopupMenuItem<String>(
+                                          child: const Text('Update Schedule'), value: 'updateschedule'),
+                                      PopupMenuItem<String>(
+                                          child: const Text('See Details'), value: 'Details'),
+                                    ],
+                                    elevation: 8.0,
+                                  ).then((selectedItem){
+                                    if(selectedItem=="changeStatus"){
+                                      showAlertChangeStatus(context,products[index]);
+                                    }else if(selectedItem=="Details"){
+                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
+                                    }else if(selectedItem=="updateschedule"){
+                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products[index])));
+                                    }
+                                  });
+
+                                }else{
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                }
+                              }else if(products[index].statusName=="Model Approved"){
+                                if(currentUserRoles["5"]!=null||currentUserRoles["6"]!=null){
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products[index].requestId,currentUserRoles)));
+                                }else{
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                }
+                              }else {
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                              }
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.62,
+                              height: MediaQuery.of(context).size.height * 0.62,
+                              color: Colors.white,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 6, top: 8),
+                                    child: Text((){
+                                      if(products[index].newModelName!=null){
+                                        return products[index].newModelName;
+                                      }else if(products[index].modelName!=null){
+                                        return products[index].modelName;
+                                      }else{
+                                        return '';
+                                      }
+                                    }(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                                  ),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    //mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      Row(
+                                        //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                         children: <Widget>[
                                           Icon(
-                                            Icons.layers,
+                                            Icons.date_range,
                                             color: Colors.teal,
                                           ),
                                           Padding(
                                             padding: EdgeInsets.only(left: 2, right: 2),
                                           ),
-                                          Text(products[index].surfaceName!=null?products[index].surfaceName:'')
+                                          Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(products[index].date)))
                                         ],
-
                                       ),
-                                    ),
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 30),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.layers,
+                                              color: Colors.teal,
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: 2, right: 2),
+                                            ),
+                                            Text(products[index].surfaceName!=null?products[index].surfaceName:'')
+                                          ],
 
-                                  ],
-                                ),
-                                Row(
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.zoom_out_map,
-                                      color: Colors.teal,
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 2, right: 2),
-                                    ),
-                                    Text(products[index].multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", "")),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 1),
-                                  child: Row(
-                                    //crossAxisAlignment: CrossAxisAlignment.start,
+                                        ),
+                                      ),
+
+                                    ],
+                                  ),
+                                  Row(
                                     children: <Widget>[
                                       Icon(
-                                        Icons.done_all,
-                                        //size: 14,
+                                        Icons.zoom_out_map,
                                         color: Colors.teal,
                                       ),
                                       Padding(
-                                        padding: EdgeInsets.only(left: 3, right: 3),
+                                        padding: EdgeInsets.only(left: 2, right: 2),
                                       ),
-                                      Text(products[index].statusName!=null?products[index].statusName:'')
+                                      Text(products[index].multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", "")),
                                     ],
                                   ),
-                                ),
-                              ],
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 1),
+                                    child: Row(
+                                      //crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.done_all,
+                                          //size: 14,
+                                          color: Colors.teal,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 3, right: 3),
+                                        ),
+                                        Text(products[index].statusName!=null?products[index].statusName:'')
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
 
-                ),
-              );
-            }),
+                  ),
+                );
+              }),
+        ),
       )
     );
 
