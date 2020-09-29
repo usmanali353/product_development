@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -36,6 +37,8 @@ class _ModelReState extends State<ModelRequests>{
   var selectedPreference,selectedStatus;
   int statusId;
   var currentUserRoles;
+  var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
+  int searchPageNum=1,pageNum=1;
   TextEditingController _searchQuery;
   bool _isSearching = false;
   static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
@@ -44,10 +47,11 @@ class _ModelReState extends State<ModelRequests>{
   _ModelReState(this.statusId,this.currentUserRoles);
  bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false,isListVisible=false;
  bool isColorsVisible=false;
+ List<Request> requests=[];
+ var req;
   String token;
   @override
   void initState() {
-    print(currentUserRoles);
     _searchQuery = TextEditingController();
     SharedPreferences.getInstance().then((prefs) {
       setState(() {
@@ -98,30 +102,191 @@ class _ModelReState extends State<ModelRequests>{
           title: _isSearching ? _buildSearchField() : _buildTitle(context),
           actions: _buildActions(),
         ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton:
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Visibility(
+              visible: previousButtonVisible,
+              child: FloatingActionButton(
+                  backgroundColor: Colors.white12, //Color(0xFF004c4c),
+                  splashColor: Colors.red,
+                  mini: true,
+                  child: Icon(Icons.arrow_back, color: Colors.teal, size: 30,),heroTag: "btn2", onPressed: (){
+                if(!_isSearching){
+                  setState(() {
+                    pageNum=pageNum-1;
+                  });
+                  print(pageNum);
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                }else{
+                  setState(() {
+                    searchPageNum=searchPageNum-1;
+                  });
+                  print(searchPageNum);
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                }
+
+              }
+              ),
+            ),
+            Visibility(
+              visible: nextButtonVisible,
+              child: FloatingActionButton(
+                  backgroundColor: Colors.white12,//Color(0xFF004c4c),
+                  splashColor: Colors.red,
+                  mini: true,
+                  child: Icon(Icons.arrow_forward, color: Colors.teal, size: 30,),heroTag: "btn1", onPressed: (){
+                if(!_isSearching){
+                  setState(() {
+                    pageNum=pageNum+1;
+                  });
+                  print(pageNum);
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                }else{
+                  setState(() {
+                    searchPageNum=searchPageNum+1;
+                  });
+                  print(searchPageNum);
+                  WidgetsBinding.instance
+                      .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                }
+
+              }
+              ),
+            ),
+          ],
+        ),
+      ),
       body: RefreshIndicator(
         key: _refreshIndicatorKey,
         onRefresh: (){
           return Utils.check_connectivity().then((isConnected){
             if(isConnected){
-              if(!isClient){
-                Network_Operations.getRequestByStatusGM(context, token, statusId,1,100).then((requestsList){
-                  setState(() {
-                    this.products=requestsList;
-                    if(products!=null&&products.length>0){
-                      isListVisible=true;
-                    }
+              if(!_isSearching){
+                if(!isClient){
+                  Network_Operations.getRequestByStatusGM(context, token, statusId,pageNum,10).then((response){
+                    setState(() {
+                      requests.clear();
+                      req=jsonDecode(response);
+                      for(int i=0;i<req["response"]['allRequests'].length;i++){
+                        requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                      }
+                      this.products = requests;
+                      if (this.products.length > 0) {
+                        isListVisible = true;
+                      }
+                      print(requests.length);
+                      if(req['hasNext']&&req['hasPrevious']){
+                        nextButtonVisible=true;
+                        previousButtonVisible=true;
+                      }else if(req['hasPrevious']&&!req['hasNext']){
+                        previousButtonVisible=true;
+                        nextButtonVisible=false;
+                      }else if(!req['hasPrevious']&&req['hasNext']){
+                        previousButtonVisible=false;
+                        nextButtonVisible=true;
+                      }else{
+                        previousButtonVisible=false;
+                        nextButtonVisible=false;
+                      }
+                    });
                   });
-                });
-              }else {
-                Network_Operations.getRequestByStatusIndividualUser(context, token, statusId).then((requestsList){
-                  setState(() {
-                    this.products=requestsList;
-                    if(products!=null&&products.length>0){
-                      isListVisible=true;
-                    }
+                }
+                else {
+                  Network_Operations.getRequestByStatusIndividualUser(context, token, statusId,pageNum,10).then((response){
+                    setState(() {
+                      requests.clear();
+                      for(int i=0;i<jsonDecode(response).length;i++){
+                        requests.add(Request.fromMap(jsonDecode(response)[i]));
+                      }
+                      this.products=requests;
+                      if(products!=null&&products.length>0){
+                        isListVisible=true;
+                      }
+                      print(requests.length);
+                      if(req['hasNext']&&req['hasPrevious']){
+                        nextButtonVisible=true;
+                        previousButtonVisible=true;
+                      }else if(req['hasPrevious']&&!req['hasNext']){
+                        previousButtonVisible=true;
+                        nextButtonVisible=false;
+                      }else if(!req['hasPrevious']&&req['hasNext']){
+                        previousButtonVisible=false;
+                        nextButtonVisible=true;
+                      }else{
+                        previousButtonVisible=false;
+                        nextButtonVisible=false;
+                      }
+                    });
                   });
-                });
+                }
+              }else{
+                if(!isClient){
+                  Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,pageNum,10,searchQuery).then((response){
+                    setState(() {
+                      requests.clear();
+                      req=jsonDecode(response);
+                      for(int i=0;i<req["response"]['allRequests'].length;i++){
+                        requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                      }
+                      this.products = requests;
+                      if (this.products.length > 0) {
+                        isListVisible = true;
+                      }
+                      print(requests.length);
+                      if(req['hasNext']&&req['hasPrevious']){
+                        nextButtonVisible=true;
+                        previousButtonVisible=true;
+                      }else if(req['hasPrevious']&&!req['hasNext']){
+                        previousButtonVisible=true;
+                        nextButtonVisible=false;
+                      }else if(!req['hasPrevious']&&req['hasNext']){
+                        previousButtonVisible=false;
+                        nextButtonVisible=true;
+                      }else{
+                        previousButtonVisible=false;
+                        nextButtonVisible=false;
+                      }
+                    });
+                  });
+                }
+                else {
+                  Network_Operations.getRequestByStatusIndividualUserSearchable(context,token,statusId,searchQuery,searchPageNum,10).then((response){
+                    setState(() {
+                      requests.clear();
+                      for(int i=0;i<jsonDecode(response).length;i++){
+                        requests.add(Request.fromMap(jsonDecode(response)[i]));
+                      }
+                      this.products=requests;
+                      if(products!=null&&products.length>0){
+                        isListVisible=true;
+                      }
+                      print(requests.length);
+                      if(req['hasNext']&&req['hasPrevious']){
+                        nextButtonVisible=true;
+                        previousButtonVisible=true;
+                      }else if(req['hasPrevious']&&!req['hasNext']){
+                        previousButtonVisible=true;
+                        nextButtonVisible=false;
+                      }else if(!req['hasPrevious']&&req['hasNext']){
+                        previousButtonVisible=false;
+                        nextButtonVisible=true;
+                      }else{
+                        previousButtonVisible=false;
+                        nextButtonVisible=false;
+                      }
+                    });
+                  });
+                }
               }
+
             }else{
               Utils.showError(context,"Network Not Available");
             }
@@ -705,7 +870,6 @@ class _ModelReState extends State<ModelRequests>{
       },
     );
   }
-
   void _startSearch() {
     ModalRoute
         .of(context)
@@ -715,7 +879,6 @@ class _ModelReState extends State<ModelRequests>{
       _isSearching = true;
     });
   }
-
   Widget _buildSearchField() {
     return  TextField(
       controller: _searchQuery,
@@ -730,40 +893,112 @@ class _ModelReState extends State<ModelRequests>{
       onSubmitted:(query){
         if(query.isNotEmpty){
           if(!isClient){
-            Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,1,100,query).then((requestsList){
+            Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,searchPageNum,10,query).then((response){
               setState(() {
-                this.products=requestsList;
-                if(products!=null&&products.length>0){
-                  isListVisible=true;
+                requests.clear();
+                req=jsonDecode(response);
+                for(int i=0;i<req["response"]['allRequests'].length;i++){
+                  requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                }
+                this.products = requests;
+                if (this.products.length > 0) {
+                  isListVisible = true;
+                }
+                if(req['hasNext']&&req['hasPrevious']){
+                  nextButtonVisible=true;
+                  previousButtonVisible=true;
+                }else if(req['hasPrevious']&&!req['hasNext']){
+                  previousButtonVisible=true;
+                  nextButtonVisible=false;
+                }else if(!req['hasPrevious']&&req['hasNext']){
+                  previousButtonVisible=false;
+                  nextButtonVisible=true;
+                }else{
+                  previousButtonVisible=false;
+                  nextButtonVisible=false;
                 }
               });
             });
           }else {
-            Network_Operations.getRequestByStatusIndividualUserSearchable(context, token, statusId,query).then((requestsList){
+            Network_Operations.getRequestByStatusIndividualUserSearchable(context, token, statusId,query,searchPageNum,10).then((response){
               setState(() {
-                this.products=requestsList;
+                requests.clear();
+                for(int i=0;i<jsonDecode(response).length;i++){
+                  requests.add(Request.fromMap(jsonDecode(response)[i]));
+                }
+                this.products=requests;
                 if(products!=null&&products.length>0){
                   isListVisible=true;
+                }
+                print(requests.length);
+                if(req['hasNext']&&req['hasPrevious']){
+                  nextButtonVisible=true;
+                  previousButtonVisible=true;
+                }else if(req['hasPrevious']&&!req['hasNext']){
+                  previousButtonVisible=true;
+                  nextButtonVisible=false;
+                }else if(!req['hasPrevious']&&req['hasNext']){
+                  previousButtonVisible=false;
+                  nextButtonVisible=true;
+                }else{
+                  previousButtonVisible=false;
+                  nextButtonVisible=false;
                 }
               });
             });
           }
         }else{
           if(!isClient){
-            Network_Operations.getRequestByStatusGM(context, token, statusId,1,100).then((requestsList){
+            Network_Operations.getRequestByStatusGM(context, token, statusId,pageNum,10).then((response){
               setState(() {
-                this.products=requestsList;
-                if(products!=null&&products.length>0){
-                  isListVisible=true;
+                requests.clear();
+                req=jsonDecode(response);
+                for(int i=0;i<req["response"]['allRequests'].length;i++){
+                  requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                }
+                this.products = requests;
+                if (this.products.length > 0) {
+                  isListVisible = true;
+                }
+                if(req['hasNext']&&req['hasPrevious']){
+                  nextButtonVisible=true;
+                  previousButtonVisible=true;
+                }else if(req['hasPrevious']&&!req['hasNext']){
+                  previousButtonVisible=true;
+                  nextButtonVisible=false;
+                }else if(!req['hasPrevious']&&req['hasNext']){
+                  previousButtonVisible=false;
+                  nextButtonVisible=true;
+                }else{
+                  previousButtonVisible=false;
+                  nextButtonVisible=false;
                 }
               });
             });
           }else {
-            Network_Operations.getRequestByStatusIndividualUser(context, token, statusId).then((requestsList){
+            Network_Operations.getRequestByStatusIndividualUser(context, token, statusId,pageNum,10).then((response){
               setState(() {
-                this.products=requestsList;
+                requests.clear();
+                for(int i=0;i<jsonDecode(response).length;i++){
+                  requests.add(Request.fromMap(jsonDecode(response)[i]));
+                }
+                this.products=requests;
                 if(products!=null&&products.length>0){
                   isListVisible=true;
+                }
+                print(requests.length);
+                if(req['hasNext']&&req['hasPrevious']){
+                  nextButtonVisible=true;
+                  previousButtonVisible=true;
+                }else if(req['hasPrevious']&&!req['hasNext']){
+                  previousButtonVisible=true;
+                  nextButtonVisible=false;
+                }else if(!req['hasPrevious']&&req['hasNext']){
+                  previousButtonVisible=false;
+                  nextButtonVisible=true;
+                }else{
+                  previousButtonVisible=false;
+                  nextButtonVisible=false;
                 }
               });
             });
@@ -772,14 +1007,12 @@ class _ModelReState extends State<ModelRequests>{
       },
     );
   }
-
   void updateSearchQuery(String newQuery) {
     setState(() {
       searchQuery = newQuery;
     });
     print("search query " + newQuery);
   }
-
   List<Widget> _buildActions() {
     if (_isSearching) {
       return <Widget>[
@@ -802,42 +1035,22 @@ class _ModelReState extends State<ModelRequests>{
       ),
     ];
   }
-
   void _stopSearching() {
     _clearSearchQuery();
-
     setState(() {
       _isSearching = false;
+      searchPageNum=1;
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
     });
   }
-
   void _clearSearchQuery() {
     print("close search box");
     setState(() {
       _searchQuery.clear();
       updateSearchQuery("Search query");
-      if(!isClient){
-        Network_Operations.getRequestByStatusGM(context, token, statusId,1,100).then((requestsList){
-          setState(() {
-            this.products=requestsList;
-            if(products!=null&&products.length>0){
-              isListVisible=true;
-            }
-          });
-        });
-      }else {
-        Network_Operations.getRequestByStatusIndividualUser(context, token, statusId).then((requestsList){
-          setState(() {
-            this.products=requestsList;
-            if(products!=null&&products.length>0){
-              isListVisible=true;
-            }
-          });
-        });
-      }
     });
   }
-
   Widget _buildTitle(BuildContext context) {
     var horizontalTitleAlignment =
     Platform.isIOS ? CrossAxisAlignment.center : CrossAxisAlignment.start;

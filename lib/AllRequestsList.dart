@@ -45,10 +45,7 @@ class _AllRequestListState extends State<AllRequestList> {
   int pageNum=1,searchPageNum=1;
   List<Request> requests=[];
   var req;
-
   var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
-
-  bool isLoading = false;
   @override
   void initState() {
     _searchQuery = TextEditingController();
@@ -185,7 +182,6 @@ class _AllRequestListState extends State<AllRequestList> {
                       if (this.allRequests.length > 0) {
                         isListVisible = true;
                       }
-                      print(requests.length);
                       if(req['hasNext']&&req['hasPrevious']){
                         nextButtonVisible=true;
                         previousButtonVisible=true;
@@ -573,7 +569,6 @@ class _AllRequestListState extends State<AllRequestList> {
       _isSearching = true;
     });
   }
-
   Widget _buildSearchField() {
     return  TextField(
       controller: _searchQuery,
@@ -619,30 +614,18 @@ class _AllRequestListState extends State<AllRequestList> {
             });
           });
         }else{
-          SharedPreferences.getInstance().then((prefs) {
-            Network_Operations.getRequestForGM(
-                context, prefs.getString("token"), 10, pageNum).then((allRequests) {
-              setState(() {
-                this.allRequests.clear();
-               // this.allRequests = allRequests;
-                if (this.allRequests.length > 0) {
-                  isListVisible = true;
-                }
-              });
-            });
-          });
+          WidgetsBinding.instance
+              .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
         }
       },
     );
   }
-
   void updateSearchQuery(String newQuery) {
     setState(() {
       searchQuery = newQuery;
     });
     print("search query " + newQuery);
   }
-
   List<Widget> _buildActions() {
     if (_isSearching) {
       return <Widget>[
@@ -665,16 +648,15 @@ class _AllRequestListState extends State<AllRequestList> {
       ),
     ];
   }
-
   void _stopSearching() {
     _clearSearchQuery();
-
     setState(() {
       _isSearching = false;
-
+      searchPageNum=1;
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
     });
   }
-
   void _clearSearchQuery() {
     print("close search box");
     setState(() {
@@ -682,7 +664,6 @@ class _AllRequestListState extends State<AllRequestList> {
       updateSearchQuery("Search query");
     });
   }
-
   Widget _buildTitle(BuildContext context) {
     var horizontalTitleAlignment =
     Platform.isIOS ? CrossAxisAlignment.center : CrossAxisAlignment.start;
@@ -701,8 +682,6 @@ class _AllRequestListState extends State<AllRequestList> {
       ),
     );
   }
-
-
   showAlertChangeStatus(BuildContext context,Request request){
     // set up the buttons
     Widget cancelButton = FlatButton(

@@ -411,4 +411,203 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
       },
     );
   }
+  void _startSearch() {
+    ModalRoute
+        .of(context)
+        .addLocalHistoryEntry(new LocalHistoryEntry(onRemove: _stopSearching));
+
+    setState(() {
+      _isSearching = true;
+    });
+  }
+  Widget _buildSearchField() {
+    return  TextField(
+      controller: _searchQuery,
+      autofocus: true,
+      textInputAction: TextInputAction.search,
+      decoration: const InputDecoration(
+        hintText: 'Search...',
+        border: InputBorder.none,
+        hintStyle: const TextStyle(color: Colors.white30),
+      ),
+      style: const TextStyle(color: Colors.white, fontSize: 16.0),
+      onSubmitted:(query){
+        if(query.isNotEmpty){
+          if(!isClient){
+            Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,searchPageNum,10,query).then((response){
+              setState(() {
+                requests.clear();
+                req=jsonDecode(response);
+                for(int i=0;i<req["response"]['allRequests'].length;i++){
+                  requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                }
+                this.products = requests;
+                if (this.products.length > 0) {
+                  isListVisible = true;
+                }
+                if(req['hasNext']&&req['hasPrevious']){
+                  nextButtonVisible=true;
+                  previousButtonVisible=true;
+                }else if(req['hasPrevious']&&!req['hasNext']){
+                  previousButtonVisible=true;
+                  nextButtonVisible=false;
+                }else if(!req['hasPrevious']&&req['hasNext']){
+                  previousButtonVisible=false;
+                  nextButtonVisible=true;
+                }else{
+                  previousButtonVisible=false;
+                  nextButtonVisible=false;
+                }
+              });
+            });
+          }else {
+            Network_Operations.getRequestByStatusIndividualUserSearchable(context, token, statusId,query,searchPageNum,10).then((response){
+              setState(() {
+                requests.clear();
+                for(int i=0;i<jsonDecode(response).length;i++){
+                  requests.add(Request.fromMap(jsonDecode(response)[i]));
+                }
+                this.products=requests;
+                if(products!=null&&products.length>0){
+                  isListVisible=true;
+                }
+                print(requests.length);
+                if(req['hasNext']&&req['hasPrevious']){
+                  nextButtonVisible=true;
+                  previousButtonVisible=true;
+                }else if(req['hasPrevious']&&!req['hasNext']){
+                  previousButtonVisible=true;
+                  nextButtonVisible=false;
+                }else if(!req['hasPrevious']&&req['hasNext']){
+                  previousButtonVisible=false;
+                  nextButtonVisible=true;
+                }else{
+                  previousButtonVisible=false;
+                  nextButtonVisible=false;
+                }
+              });
+            });
+          }
+        }else{
+          if(!isClient){
+            Network_Operations.getRequestByStatusGM(context, token, statusId,pageNum,10).then((response){
+              setState(() {
+                requests.clear();
+                req=jsonDecode(response);
+                for(int i=0;i<req["response"]['allRequests'].length;i++){
+                  requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                }
+                this.products = requests;
+                if (this.products.length > 0) {
+                  isListVisible = true;
+                }
+                if(req['hasNext']&&req['hasPrevious']){
+                  nextButtonVisible=true;
+                  previousButtonVisible=true;
+                }else if(req['hasPrevious']&&!req['hasNext']){
+                  previousButtonVisible=true;
+                  nextButtonVisible=false;
+                }else if(!req['hasPrevious']&&req['hasNext']){
+                  previousButtonVisible=false;
+                  nextButtonVisible=true;
+                }else{
+                  previousButtonVisible=false;
+                  nextButtonVisible=false;
+                }
+              });
+            });
+          }else {
+            Network_Operations.getRequestByStatusIndividualUser(context, token, statusId,pageNum,10).then((response){
+              setState(() {
+                requests.clear();
+                for(int i=0;i<jsonDecode(response).length;i++){
+                  requests.add(Request.fromMap(jsonDecode(response)[i]));
+                }
+                this.products=requests;
+                if(products!=null&&products.length>0){
+                  isListVisible=true;
+                }
+                print(requests.length);
+                if(req['hasNext']&&req['hasPrevious']){
+                  nextButtonVisible=true;
+                  previousButtonVisible=true;
+                }else if(req['hasPrevious']&&!req['hasNext']){
+                  previousButtonVisible=true;
+                  nextButtonVisible=false;
+                }else if(!req['hasPrevious']&&req['hasNext']){
+                  previousButtonVisible=false;
+                  nextButtonVisible=true;
+                }else{
+                  previousButtonVisible=false;
+                  nextButtonVisible=false;
+                }
+              });
+            });
+          }
+        }
+      },
+    );
+  }
+  void updateSearchQuery(String newQuery) {
+    setState(() {
+      searchQuery = newQuery;
+    });
+    print("search query " + newQuery);
+  }
+  List<Widget> _buildActions() {
+    if (_isSearching) {
+      return <Widget>[
+        new IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () {
+            if (_searchQuery == null || _searchQuery.text.isEmpty) {
+              Navigator.pop(context);
+              return;
+            }
+            _clearSearchQuery();
+          },
+        ),
+      ];
+    }
+    return <Widget>[
+      new IconButton(
+        icon: const Icon(Icons.search),
+        onPressed: _startSearch,
+      ),
+    ];
+  }
+  void _stopSearching() {
+    _clearSearchQuery();
+    setState(() {
+      _isSearching = false;
+      searchPageNum=1;
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+    });
+  }
+  void _clearSearchQuery() {
+    print("close search box");
+    setState(() {
+      _searchQuery.clear();
+      updateSearchQuery("Search query");
+    });
+  }
+  Widget _buildTitle(BuildContext context) {
+    var horizontalTitleAlignment =
+    Platform.isIOS ? CrossAxisAlignment.center : CrossAxisAlignment.start;
+
+    return new InkWell(
+      onTap: () => scaffoldKey.currentState.openDrawer(),
+      child: new Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: horizontalTitleAlignment,
+          children: <Widget>[
+            const Text('Model Requests'),
+          ],
+        ),
+      ),
+    );
+  }
 }
