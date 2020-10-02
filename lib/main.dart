@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:productdevelopment/HistoryPage.dart';
 
@@ -33,11 +34,27 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
 
   bool isLogin=false;
+  FirebaseMessaging messaging;
 
   @override
 
   void initState(){
+    messaging=FirebaseMessaging();
 
+    messaging.configure(
+      onMessage:(Map<String, dynamic> message)async{
+
+      },
+      onBackgroundMessage: (Map<String, dynamic> message)async{
+
+     },
+     onResume: (Map<String, dynamic> message) async{
+
+    },
+    onLaunch: (Map<String, dynamic> message)async{
+
+    }
+    );
     myColor = MaterialColor(0xFF004c4c, color);
 
     SharedPreferences.getInstance().then((prefs){
@@ -51,7 +68,6 @@ class _MyAppState extends State<MyApp> {
           setState(() {
 
             isLogin=true;
-
           });
 
         }
