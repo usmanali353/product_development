@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:productdevelopment/Login.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
@@ -19,13 +21,19 @@ import '../DetailsPage.dart';
     try{
     var response=await http.post(Utils.getBaseUrl()+"Account/Login",body:body,headers: {"Content-type":"application/json"});
      if(response.statusCode==200){
-       pd.hide();
        SharedPreferences.getInstance().then((prefs){
          prefs.setString("token", jsonDecode(response.body)['result']);
          prefs.setString("email", email);
        });
-       Utils.showSuccess(context, "Login Successful");
-       Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+       var claims=Utils.parseJwt(jsonDecode(response.body)['result']);
+       //Utils.showSuccess(context, "Login Successful");
+       FirebaseMessaging().getToken().then((token){
+         pd.hide();
+         addFCMToken(context, claims['nameid'], token, jsonDecode(response.body)['result']).then((value){
+
+         });
+       });
+
      }else if(response.body!=null){
        pd.hide();
        Utils.showError(context, "Invalid Username or Password");
@@ -161,6 +169,7 @@ import '../DetailsPage.dart';
         "modelCode":modelCode,
         "Remarks":remarks
       },toEncodable: Utils.myEncode);
+      print(body);
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestDesignerSave",body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
        pd.hide();
@@ -550,5 +559,57 @@ import '../DetailsPage.dart';
       Utils.showError(context, e.toString());
     }
     return null;
+  }
+  static Future<void> addFCMToken(BuildContext context,String userId,String fcmToken,String token) async{
+      try{
+        final body=jsonEncode({
+          "Token":fcmToken,
+          "UserId":userId
+        },toEncodable: Utils.myEncode);
+        var response=await http.post(Utils.getBaseUrl()+"Account/UserTokenForFCMSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+        if(response.statusCode==200){
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+        }else{
+          Utils.showError(context,response.statusCode.toString());
+        }
+    }catch(e){
+      Utils.showError(context, e.toString());
+    }
+  }
+ static Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) {
+    dynamic data;
+    if (message.containsKey('data')) {
+      // Handle data message
+       data = message['data'];
+    }
+
+    if (message.containsKey('notification')) {
+      // Handle notification message
+       data = message['notification'];
+    }
+      print(data.toString());
+    return data;
+    // Or do other work.
+  }
+  static Future<void> deleteFCMToken(BuildContext context,String userId,String fcmToken,String token) async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      final body=jsonEncode({
+        "Token":fcmToken,
+        "UserId":userId
+      },toEncodable: Utils.myEncode);
+      var response=await http.post(Utils.getBaseUrl()+"Account/DeleteUserTokenForFCM",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        pd.hide();
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Login()), (route) => false);
+      }else{
+        pd.hide();
+        Utils.showError(context,response.statusCode.toString());
+      }
+    }catch(e){
+      pd.hide();
+      Utils.showError(context, e.toString());
+    }
   }
 }

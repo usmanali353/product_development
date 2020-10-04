@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:need_resume/need_resume.dart';
@@ -20,6 +23,7 @@ class _DashboardState extends ResumableState<Dashboard> {
  var claims;
  var requestCount;
  var currentUserRoles;
+ FirebaseMessaging messaging;
  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
  @override
   void onResume() {
@@ -29,6 +33,27 @@ class _DashboardState extends ResumableState<Dashboard> {
   }
  @override
   void initState() {
+   messaging=FirebaseMessaging();
+   messaging.getToken().then((value) =>debugPrint(value));
+   messaging.configure(
+       onMessage:(Map<String, dynamic> message)async{
+         print("Foreground Mesage "+message.toString());
+         await showDialog(
+             context: context,
+             child: AlertDialog(
+               title: Text(message['title']),
+               content: Text(message['body']),
+             )
+         );
+       },
+        //onBackgroundMessage: Platform.isIOS ? null : Network_Operations.myBackgroundMessageHandler,
+       onResume: (Map<String, dynamic> message) async{
+         print(message.toString());
+       },
+       onLaunch: (Map<String, dynamic> message)async{
+         print(message.toString());
+       }
+   );
    WidgetsBinding.instance
        .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
     super.initState();
@@ -83,8 +108,12 @@ class _DashboardState extends ResumableState<Dashboard> {
                     leading: Icon(FontAwesomeIcons.signOutAlt),
                     onTap: (){
                      SharedPreferences.getInstance().then((prefs){
-                       prefs.remove("token");
-                       Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Login()),(Route<dynamic> route) => false);
+
+                       messaging.getToken().then((fcmToken){
+                         Network_Operations.deleteFCMToken(context, claims["nameid"],fcmToken, prefs.getString("token")).then((value){
+                           prefs.remove("token");
+                         });
+                       });
                      });
                     },
                   ),
