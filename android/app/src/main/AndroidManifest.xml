@@ -2,7 +2,7 @@
 
     package="iib.productdevelopment">
 
-    <!-- io.flutter.app.FlutterApplication is an android.app.Application that
+    <!-- io.flutter.app.FlutterApplication is an android.app.iib.productdevelopment.Application that
 
          calls FlutterMain.startInitialization(this); in its onCreate method.
 
@@ -17,7 +17,7 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <application
 
-        android:name="io.flutter.app.FlutterApplication"
+        android:name=".Application"
 
         android:label="ACMC Products"
 

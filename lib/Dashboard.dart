@@ -38,15 +38,23 @@ class _DashboardState extends ResumableState<Dashboard> {
    messaging.configure(
        onMessage:(Map<String, dynamic> message)async{
          print("Foreground Mesage "+message.toString());
-         await showDialog(
-             context: context,
-             child: AlertDialog(
-               title: Text(message['title']),
-               content: Text(message['body']),
-             )
+         showDialog(
+           context: context,
+           builder: (context) => AlertDialog(
+             content: ListTile(
+               title: Text(message['notification']['title']),
+               subtitle: Text(message['notification']['body']),
+             ),
+             actions: <Widget>[
+               FlatButton(
+                 child: Text('Ok'),
+                 onPressed: () => Navigator.of(context).pop(),
+               ),
+             ],
+           ),
          );
        },
-        //onBackgroundMessage: Platform.isIOS ? null : Network_Operations.myBackgroundMessageHandler,
+        onBackgroundMessage: Platform.isIOS ? null : Network_Operations.myBackgroundMessageHandler,
        onResume: (Map<String, dynamic> message) async{
          print(message.toString());
        },
