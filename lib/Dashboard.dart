@@ -1,10 +1,10 @@
 import 'dart:io';
-
+import 'package:productdevelopment/Notifications/NotificationListPage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:need_resume/need_resume.dart';
-import 'package:productdevelopment/Login.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:productdevelopment/ProductionManagerPage.dart';
 import 'package:productdevelopment/scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -38,21 +38,39 @@ class _DashboardState extends ResumableState<Dashboard> {
    messaging.configure(
        onMessage:(Map<String, dynamic> message)async{
          print("Foreground Mesage "+message.toString());
-         showDialog(
-           context: context,
-           builder: (context) => AlertDialog(
-             content: ListTile(
-               title: Text(message['notification']['title']),
-               subtitle: Text(message['notification']['body']),
-             ),
-             actions: <Widget>[
-               FlatButton(
-                 child: Text('Ok'),
-                 onPressed: () => Navigator.of(context).pop(),
+         // showDialog(
+         //   context: context,
+         //   builder: (context) => AlertDialog(
+         //     content: ListTile(
+         //       title: Text(message['notification']['title'],style: TextStyle(fontWeight: FontWeight.bold),),
+         //       subtitle: Text(message['notification']['body']),
+         //     ),
+         //     actions: <Widget>[
+         //       FlatButton(
+         //         child: Text('Ok'),
+         //         onPressed: () => Navigator.of(context).pop(),
+         //       ),
+         //     ],
+         //   ),
+         // );
+         showOverlayNotification((context) {
+           return Card(
+             margin: const EdgeInsets.symmetric(horizontal: 4),
+             child: SafeArea(
+               child: ListTile(
+                 leading:Image.asset("Assets/img/arabianceramics.png"),
+                 title: Text(message['notification']['title']),
+                 subtitle: Text(message['notification']['body']),
+
+                 trailing: IconButton(
+                     icon: Icon(Icons.close),
+                     onPressed: () {
+                       OverlaySupportEntry.of(context).dismiss();
+                     }),
                ),
-             ],
-           ),
-         );
+             ),
+           );
+         }, duration: Duration(milliseconds: 10000));
        },
         onBackgroundMessage: Platform.isIOS ? null : Network_Operations.myBackgroundMessageHandler,
        onResume: (Map<String, dynamic> message) async{
@@ -96,6 +114,14 @@ class _DashboardState extends ResumableState<Dashboard> {
                     leading: Icon(FontAwesomeIcons.barcode),
                     onTap: (){
                       Navigator.push(context, MaterialPageRoute(builder: (context)=>QRScanner()));
+                    },
+                  ),
+                  Divider(),
+                  ListTile(
+                    title: Text("Notifications"),
+                    leading: Icon(Icons.notifications),
+                    onTap: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
                     },
                   ),
                   Divider(),

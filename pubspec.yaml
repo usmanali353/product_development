@@ -94,6 +94,8 @@ dependencies:
 
   firebase_messaging:
 
+  overlay_support: ^1.0.0
+
 
 dev_dependencies:
 

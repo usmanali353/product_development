@@ -1,16 +1,8 @@
-import 'dart:io';
-
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:productdevelopment/Login.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
-
-
 import 'Dashboard.dart';
-
-import 'DetailsPage.dart';
 import 'Utils/Utils.dart';
 
 void main() {
@@ -48,7 +40,6 @@ class _MyAppState extends State<MyApp> {
         if(DateTime.fromMillisecondsSinceEpoch(int.parse(claims['exp'].toString()+"000")).isAfter(DateTime.now())){
           print(DateTime.fromMillisecondsSinceEpoch(int.parse(claims['exp'].toString()+"000")));
           setState(() {
-
             isLogin=true;
           });
 
@@ -94,22 +85,25 @@ class _MyAppState extends State<MyApp> {
 
   Widget build(BuildContext context) {
 
-    return MaterialApp(
+    return OverlaySupport(
 
-      debugShowCheckedModeBanner: false,
+      child: MaterialApp(
 
-      title: 'ACMC Products',
+        debugShowCheckedModeBanner: false,
 
-      theme: ThemeData(
+        title: 'ACMC Products',
 
-        primarySwatch: myColor,
+        theme: ThemeData(
 
-        brightness: Brightness.light,
+          primarySwatch: myColor,
+
+          brightness: Brightness.light,
+
+        ),
+
+        home: isLogin?Dashboard():Login(),
 
       ),
-
-      home: isLogin?Dashboard():Login(),
-
     );
 
   }
