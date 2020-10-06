@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Dashboard.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
-
+import 'package:productdevelopment/Model/Notifications.dart';
 import '../DetailsPage.dart';
 
  class Network_Operations{
@@ -576,7 +577,7 @@ import '../DetailsPage.dart';
       Utils.showError(context, e.toString());
     }
   }
- static Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) {
+  static Future<dynamic> myBackgroundMessageHandler(Map<String, dynamic> message) {
     dynamic data;
     if (message.containsKey('data')) {
       // Handle data message
@@ -611,5 +612,57 @@ import '../DetailsPage.dart';
       pd.hide();
       Utils.showError(context, e.toString());
     }
+  }
+  static Future<List<Notifications>> getUserNotifications(BuildContext context,String token)async{
+    try{
+      var response =await http.get(Utils.getBaseUrl()+"Account/GetAllNotificationsOfUser",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        List<Notifications> notifications=[];
+        for(int i=0;i<jsonDecode(response.body).length;i++){
+          notifications.add(Notifications.fromJson(jsonDecode(response.body)[i]));
+        }
+        return notifications;
+      }else{
+        Utils.showError(context,"No Notifications Found");
+      }
+    }catch(e){
+      print(e.toString());
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static Future<void> readNotification(BuildContext context,String token,int notificationId,int requestId) async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Account/ReadNotification/$notificationId",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        //getRequestById(context, token, requestId);
+      }else{
+        Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+  }
+  static Future<Request> getRequestByIdNotifications(BuildContext context,String token,int requestId) async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestById/$requestId",headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+        Request request;
+        request=Request.fromMap(jsonDecode(response.body));
+       // Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
+        return request;
+      }else{
+        pd.hide();
+        Utils.showError(context, "No Request Found against this Id");
+      }
+    }catch(e){
+      pd.hide();
+      print(e.toString());
+    }
+
   }
 }
