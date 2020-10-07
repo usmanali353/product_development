@@ -57,6 +57,7 @@ class _NotificationListPageState extends ResumableState<NotificationListPage> {
             itemCount: notifications!=null&&notifications.length>0?notifications.length:0,
             itemBuilder: (context,int index){
                return Padding(
+
                  padding: EdgeInsets.only(top: 8,right: 8,left: 8),
                  child: Card(
                    elevation: 10.0,

@@ -13,7 +13,7 @@ import '../Dashboard.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
 import 'package:productdevelopment/Model/Notifications.dart';
 import '../DetailsPage.dart';
-
+import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
  class Network_Operations{
   static void signIn(BuildContext context,String email,String password) async {
     ProgressDialog pd=ProgressDialog(context);
@@ -664,5 +664,24 @@ import '../DetailsPage.dart';
       print(e.toString());
     }
 
+  }
+  static Future<List<ClientVisitSchedule>> getClientVisitSchedule(BuildContext context,String token,String date)async{
+    try{
+      var response =await http.get(Utils.getBaseUrl()+"Request/GetRequestClientsSchedule?Date=$date",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        print(response.body);
+        List<ClientVisitSchedule> clientVisitSchedule=[];
+        for(int i=0;i<jsonDecode(response.body)['result'].length;i++){
+          clientVisitSchedule.add(ClientVisitSchedule.fromJson(jsonDecode(response.body)['result'][i]));
+        }
+        return clientVisitSchedule;
+      }else{
+        Utils.showError(context,"No Schedules Found");
+      }
+    }catch(e){
+      print(e.toString());
+      Utils.showError(context, e.toString());
+    }
+    return null;
   }
 }

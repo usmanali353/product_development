@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:productdevelopment/DailyClientSchedule.dart';
 import 'package:productdevelopment/Notifications/NotificationListPage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -137,6 +138,18 @@ class _DashboardState extends ResumableState<Dashboard> {
                      Divider(),
                    ],
                  ):Container(),
+                  currentUserRoles!=null&&currentUserRoles["11"]!=null?Column(
+                    children: [
+                      ListTile(
+                        title: Text("Client Visit Schedule"),
+                        leading: Icon(Icons.schedule),
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>DailyClientSchedule()));
+                        },
+                      ),
+                      Divider(),
+                    ],
+                  ):Container(),
                   ListTile(
                     title: Text("Sign Out"),
                     leading: Icon(FontAwesomeIcons.signOutAlt),
