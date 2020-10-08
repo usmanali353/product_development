@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:need_resume/need_resume.dart';
-import 'package:productdevelopment/DetailPage.dart';
+import 'package:productdevelopment/DetailsPage.dart';
 import 'package:productdevelopment/Model/Notifications.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
@@ -44,6 +44,8 @@ class _NotificationListPageState extends ResumableState<NotificationListPage> {
                     this.notifications=notificationList;
                     if(notifications.length>0){
                       isVisible=true;
+                    }else{
+                      Utils.showError(context,"No Notifications Yet");
                     }
                   });
                 });
@@ -69,20 +71,20 @@ class _NotificationListPageState extends ResumableState<NotificationListPage> {
                      child: ListTile(
                        title: Text(notifications[index].notificationDetails.title),
                        subtitle: Text(notifications[index].notificationDetails.body+"\n"+DateFormat("MMM-dd-yyyy").format(notifications[index].notificationDetails.dateTime)),
-                       leading: Icon(Icons.notifications,color: Color(0xFF004c4c),),
+                       leading: Icon(Icons.notifications,color: Color(0xFF004c4c),size: 40,),
                        trailing: notifications[index].read?Text(""):Icon(Icons.new_releases,color: Color(0xFF004c4c)),
                        onTap: (){
                          if(notifications[index].read){
                            SharedPreferences.getInstance().then((prefs){
                              Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"), notifications[index].notificationDetails.requestId).then((request){
-                               push(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
+                               push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
                              });
                            });
                          }else{
                            SharedPreferences.getInstance().then((prefs){
                              Network_Operations.readNotification(context, prefs.getString("token"),notifications[index].notificationDetails.id,notifications[index].notificationDetails.requestId).then((v){
                              Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"), notifications[index].notificationDetails.requestId).then((request){
-                               push(context, MaterialPageRoute(builder: (context)=>DetailPage(request)));
+                               push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
                              });
                              });
                            });

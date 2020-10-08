@@ -51,7 +51,7 @@ class _SchedulePageState extends State<SchedulePage> {
                       inputType: InputType.date,
                       validators: [FormBuilderValidators.required()],
                       format: DateFormat("MM-dd-yyyy"),
-                      decoration: InputDecoration(hintText: "Target Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                      decoration: InputDecoration(hintText: "Sample Production Target Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                       onChanged: (value){
                         setState(() {
                           this.targetStartDate=value;
@@ -79,7 +79,7 @@ class _SchedulePageState extends State<SchedulePage> {
                       inputType: InputType.date,
                       validators: [FormBuilderValidators.required()],
                       format: DateFormat("MM-dd-yyyy"),
-                      decoration: InputDecoration(hintText: "Target End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                      decoration: InputDecoration(hintText: "Sample Production Target End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                       onChanged: (value){
                         setState(() {
                           this.targetEndDate=value;
@@ -122,7 +122,7 @@ class _SchedulePageState extends State<SchedulePage> {
                           Network_Operations.addRequestSchedule(context,prefs.getString("token"), request.requestId, targetStartDate, targetEndDate,request.statusId==4?true:null,remarks.text);
                         });
                       }else{
-                        Utils.showError(context,"Target Start Date Should be before the End Date");
+                        Utils.showError(context,"Sample Production Target Start Date Should be before the End Date");
                       }
 
                     }

@@ -96,6 +96,8 @@ dependencies:
 
   overlay_support: ^1.0.0
 
+  date_range_picker: ^1.0.5
+
 
 dev_dependencies:
 

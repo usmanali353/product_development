@@ -74,7 +74,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                        inputType: InputType.date,
                        validators: [FormBuilderValidators.required()],
                        format: DateFormat("MM-dd-yyyy"),
-                       decoration: InputDecoration(hintText: "Actual Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                       decoration: InputDecoration(hintText: "Sample Production Actual Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                        onChanged: (value){
                          setState(() {
                            this.actualStartDate=value;
@@ -91,12 +91,12 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                        borderRadius: BorderRadius.circular(15),
                      ),
                      child: FormBuilderDateTimePicker(
-                       attribute: "Actual End Date",
+                       attribute: "Sample Production Actual End Date",
                        style: Theme.of(context).textTheme.bodyText1,
                        inputType: InputType.date,
                        validators: [FormBuilderValidators.required()],
                        format: DateFormat("MM-dd-yyyy"),
-                       decoration: InputDecoration(hintText: "Actual End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                       decoration: InputDecoration(hintText: "Sample Production Actual End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                        onChanged: (value){
                          setState(() {
                            this.actualEndDate=value;
@@ -105,32 +105,10 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                      ),
                    ),
                  ),
-                 Padding(
-                   padding: EdgeInsets.all(16),
-                   child:Card(
-                     elevation: 10,
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(15),
-                     ),
-                     child: FormBuilderDateTimePicker(
-                       attribute: "Client Visit Date",
-                       style: Theme.of(context).textTheme.bodyText1,
-                       inputType: InputType.date,
-                       validators: [FormBuilderValidators.required()],
-                       format: DateFormat("MM-dd-yyyy"),
-                       decoration: InputDecoration(hintText: "Client Visit Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
-                       onChanged: (value){
-                         setState(() {
-                           this.clientVisitDate=value;
-                         });
-                       },
-                     ),
-                   ),
-                 ),
                  Visibility(
                    visible: status=="Approve",
                    child: Padding(
-                     padding: const EdgeInsets.only(left: 16,right: 16),
+                     padding: const EdgeInsets.only(left: 16,right: 16,top: 16),
                      child: Card(
                        elevation: 10,
                        shape: RoundedRectangleBorder(
@@ -171,8 +149,9 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                      ),
                    ),
                  ),
+
                  Visibility(
-                   visible: status=="Approve"&&request.marketId!=2&&clientNames.length>0,
+                   visible: status=="Approve"&&clientNames.length>0,
                    child: Padding(
                      padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
                      child: Card(
@@ -203,64 +182,26 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                      ),
                    ),
                  ),
-                 Visibility(
-                   visible: status=="Approve"&&request.marketId==2&&clientNames.length>0,
-                   child: Padding(
-
-                     padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
-
-                     child: Card(
-
-                       elevation: 10,
-
-                       shape: RoundedRectangleBorder(
-
-                         borderRadius: BorderRadius.circular(15),
-
-                       ),
-
-                       child: FormBuilderDropdown(
-
-                         attribute: "Client",
-
-                         validators: [FormBuilderValidators.required()],
-
-                         hint: Text("Select Client"),
-
-                         items:clientNames!=null?clientNames.map((horse)=>DropdownMenuItem(
-
-                           child: Text(horse),
-
-                           value: horse,
-
-                         )).toList():[""].map((name) => DropdownMenuItem(
-
-                             value: name, child: Text("$name")))
-
-                             .toList(),
-
-                         style: Theme.of(context).textTheme.bodyText1,
-
-                         decoration: InputDecoration(
-
-                           border: InputBorder.none,
-
-                           contentPadding: EdgeInsets.all(16),
-
-                         ),
-
-                         onChanged: (value){
-
-                           setState(() {
-                             this.clientId =clientsDropdown[clientNames.indexOf(value)].stringId;
-                           });
-
-                         },
-
-                       ),
-
+                 Padding(
+                   padding: EdgeInsets.only(bottom: 16,left: 16,right: 16),
+                   child:Card(
+                     elevation: 10,
+                     shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(15),
                      ),
-
+                     child: FormBuilderDateTimePicker(
+                       attribute: "Client Visit Date",
+                       style: Theme.of(context).textTheme.bodyText1,
+                       inputType: InputType.date,
+                       validators: [FormBuilderValidators.required()],
+                       format: DateFormat("MM-dd-yyyy"),
+                       decoration: InputDecoration(hintText: "Client Visit Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                       onChanged: (value){
+                         setState(() {
+                           this.clientVisitDate=value;
+                         });
+                       },
+                     ),
                    ),
                  ),
                  Padding(

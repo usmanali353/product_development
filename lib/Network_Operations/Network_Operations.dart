@@ -665,9 +665,9 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
 
   }
-  static Future<List<ClientVisitSchedule>> getClientVisitSchedule(BuildContext context,String token,String date)async{
+  static Future<List<ClientVisitSchedule>> getClientVisitSchedule(BuildContext context,String token,String date,String endDate)async{
     try{
-      var response =await http.get(Utils.getBaseUrl()+"Request/GetRequestClientsSchedule?Date=$date",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response =await http.get(Utils.getBaseUrl()+"Request/GetRequestClientsSchedule?Date=$date&&endDate=$endDate",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         print(response.body);
         List<ClientVisitSchedule> clientVisitSchedule=[];
@@ -676,7 +676,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         }
         return clientVisitSchedule;
       }else{
-        Utils.showError(context,"No Schedules Found");
+        Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
       print(e.toString());

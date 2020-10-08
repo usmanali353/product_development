@@ -62,7 +62,9 @@ class _DashboardState extends ResumableState<Dashboard> {
                  leading:Image.asset("Assets/img/arabianceramics.png"),
                  title: Text(message['notification']['title']),
                  subtitle: Text(message['notification']['body']),
-
+                 onTap: (){
+                   Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
+                 },
                  trailing: IconButton(
                      icon: Icon(Icons.close),
                      onPressed: () {

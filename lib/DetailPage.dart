@@ -139,7 +139,7 @@ class _DetailPageState extends State<DetailPage>{
                             request.targetStartDate!=null?Column(
                               children: <Widget>[
                                 ListTile(
-                                  title: Text("Target Start Date",style: TextStyle(fontWeight: FontWeight.bold),),
+                                  title: Text("Sample Production Target Start Date",style: TextStyle(fontWeight: FontWeight.bold),),
                                   subtitle: Text(DateFormat("dd MMMM yyyy").format(DateTime.parse(request.targetStartDate))),
                                 ),
                                 Divider(),
@@ -148,7 +148,7 @@ class _DetailPageState extends State<DetailPage>{
                             request.targetEndDate!=null?Column(
                               children: <Widget>[
                                 ListTile(
-                                  title: Text("Target End Date",style: TextStyle(fontWeight: FontWeight.bold),),
+                                  title: Text("Sample Production Target End Date",style: TextStyle(fontWeight: FontWeight.bold),),
                                   subtitle: Text(DateFormat("dd MMMM yyyy").format(DateTime.parse(request.targetEndDate))),
                                 ),
                                 Divider(),
@@ -157,7 +157,7 @@ class _DetailPageState extends State<DetailPage>{
                             request.actualStartDate!=null?Column(
                               children: <Widget>[
                                 ListTile(
-                                  title: Text("Actual Start Date",style: TextStyle(fontWeight: FontWeight.bold),),
+                                  title: Text("Sample Production Actual Start Date",style: TextStyle(fontWeight: FontWeight.bold),),
                                   subtitle: Text(DateFormat("dd MMMM yyyy").format(DateTime.parse(request.actualStartDate))),
                                 ),
                                 Divider(),
@@ -166,7 +166,7 @@ class _DetailPageState extends State<DetailPage>{
                             request.actualEndDate!=null?Column(
                               children: <Widget>[
                                 ListTile(
-                                  title: Text("Actual End Date",style: TextStyle(fontWeight: FontWeight.bold),),
+                                  title: Text("Sample Production Actual End Date",style: TextStyle(fontWeight: FontWeight.bold),),
                                   subtitle: Text(DateFormat("dd MMMM yyyy").format(DateTime.parse(request.actualEndDate))),
                                 ),
                                 Divider(),

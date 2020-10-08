@@ -114,7 +114,7 @@ packages:
     source: hosted
     version: "0.3.4"
   date_range_picker:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: date_range_picker
       url: "https://pub.dartlang.org"
