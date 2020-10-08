@@ -120,14 +120,6 @@ class _DashboardState extends ResumableState<Dashboard> {
                     },
                   ),
                   Divider(),
-                  ListTile(
-                    title: Text("Notifications"),
-                    leading: Icon(Icons.notifications),
-                    onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
-                    },
-                  ),
-                  Divider(),
                  claims!=null&&claims["role"].contains("Product Manager")?Column(
                    children: [
                      ListTile(
@@ -173,7 +165,17 @@ class _DashboardState extends ResumableState<Dashboard> {
           ],
         ),
       ),
-      appBar: AppBar(title: Text("Dashboard"),),
+      appBar: AppBar(
+        title: Text("Dashboard"),
+        actions: [
+          IconButton(
+            icon:Icon(Icons.notifications),
+            onPressed: (){
+              push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
+            },
+          )
+        ],
+      ),
       body: RefreshIndicator(
         key: _refreshIndicatorKey,
         onRefresh: (){
