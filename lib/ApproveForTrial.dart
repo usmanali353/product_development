@@ -161,8 +161,8 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                        ),
                        child: MultiSelectFormField(
                          autovalidate: false,
-                         hintText: "Select Clients",
-                         titleText: 'Select Clients',
+                         title: Text("Select Clients"),
+                         hintWidget: Text("Select Clients for the Trial"),
                          textField: 'display',
                          valueField: 'value',
                          okButtonLabel: 'OK',

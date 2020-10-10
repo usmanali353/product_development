@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:badges/badges.dart';
 import 'package:productdevelopment/DailyClientSchedule.dart';
 import 'package:productdevelopment/Notifications/NotificationListPage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -22,7 +23,7 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends ResumableState<Dashboard> {
  var claims;
- var requestCount;
+ var requestCount,notificationCount;
  var currentUserRoles;
  FirebaseMessaging messaging;
  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
@@ -169,7 +170,12 @@ class _DashboardState extends ResumableState<Dashboard> {
         title: Text("Dashboard"),
         actions: [
           IconButton(
-            icon:Icon(Icons.notifications),
+            icon:Badge(
+              toAnimate: true,
+              showBadge:notificationCount!=null&&notificationCount['Unread Notifications Count']!=null,
+                badgeContent: Text(notificationCount!=null&&notificationCount['Unread Notifications Count']!=null?notificationCount['Unread Notifications Count'].toString():'',style: TextStyle(color: Colors.white),),
+                child: Icon(Icons.notifications)
+            ),
             onPressed: (){
               push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
             },
@@ -189,6 +195,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                       setState(() {
                         this.requestCount=requestCountMap['statuses'];
                         this.currentUserRoles=requestCountMap['currentLoggedInUserStatuses'];
+                        this.notificationCount=requestCountMap['notificationsCount'];
                       });
                     });
                   }else{

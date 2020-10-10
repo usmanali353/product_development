@@ -75,8 +75,8 @@ class _acmcApprovalState extends State<acmcApproval> {
                         ),
                         child: MultiSelectFormField(
                           autovalidate: false,
-                          hintText: "Select Designers",
-                          titleText: 'Select Designers',
+                          title: Text("Select Designers"),
+                          hintWidget: Text("Select Designers Involved"),
                           textField: 'display',
                           valueField: 'value',
                           okButtonLabel: 'OK',
@@ -201,7 +201,6 @@ class _acmcApprovalState extends State<acmcApproval> {
                   },
 
                 ),
-
               ],
 
             ),

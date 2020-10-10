@@ -79,7 +79,6 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                   WidgetsBinding.instance
                       .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
                 }
-
               }
               ),
             ),
@@ -268,7 +267,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
                               Padding(
-                                padding: const EdgeInsets.only(left: 6, top: 8),
+                                padding: const EdgeInsets.only(left: 6, top: 8,bottom: 6),
                                 child: Text(requests[index].modelName!=null?requests[index].modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
                               ),
                               Row(
@@ -321,6 +320,29 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                         padding: EdgeInsets.only(left: 2, right: 2),
                                       ),
                                       Text(requests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""))
+                                    ],
+
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 27),
+                                  ),
+
+                                ],
+                              ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: <Widget>[
+                                  Row(
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.person,
+                                        color: Colors.teal,
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 2, right: 2),
+                                      ),
+                                      Text(requests[index].clientName)
                                     ],
 
                                   ),

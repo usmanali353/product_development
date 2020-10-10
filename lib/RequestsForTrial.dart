@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Observations.dart';
@@ -152,7 +151,7 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                              crossAxisAlignment: CrossAxisAlignment.start,
                              children: <Widget>[
                                Padding(
-                                 padding: const EdgeInsets.only(left: 6, top: 8),
+                                 padding: const EdgeInsets.only(left: 6, top: 8,bottom: 6),
                                  child: Text(requests[index].modelName!=null?requests[index].modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
                                ),
                                Row(
@@ -205,6 +204,29 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                                          padding: EdgeInsets.only(left: 2, right: 2),
                                        ),
                                        Text(requests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""))
+                                     ],
+
+                                   ),
+                                   Padding(
+                                     padding: EdgeInsets.only(left: 27),
+                                   ),
+
+                                 ],
+                               ),
+                               Row(
+                                 crossAxisAlignment: CrossAxisAlignment.center,
+                                 // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                 children: <Widget>[
+                                   Row(
+                                     children: <Widget>[
+                                       Icon(
+                                         Icons.person,
+                                         color: Colors.teal,
+                                       ),
+                                       Padding(
+                                         padding: EdgeInsets.only(left: 2, right: 2),
+                                       ),
+                                       Text(requests[index].clientName)
                                      ],
 
                                    ),

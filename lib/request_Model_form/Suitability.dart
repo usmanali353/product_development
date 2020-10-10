@@ -135,8 +135,8 @@ class _Suitability_State extends State<Suitability> {
                               borderRadius: BorderRadius.circular(15)
                           ),
                           child: MultiSelectFormField(
-                            hintText: "Suitable for",
-                            titleText: 'Select Suitability',
+                            title: Text("Select Suitibility"),
+                            hintWidget: Text("Select Suitibility for the Product"),
                             border: InputBorder.none,
                             validator: (value) {
                               return value == null || value.length == 0?'Please select one or more options':null;

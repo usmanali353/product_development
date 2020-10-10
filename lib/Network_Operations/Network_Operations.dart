@@ -684,4 +684,47 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
     return null;
   }
+  static Future<List<Dropdown>> getModelsDropDowns(BuildContext context,String token,String endpoint)async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/"+endpoint+"Dropdown/5",headers:{"Authorization":"Bearer "+token});
+      var data= jsonDecode(response.body);
+      if(response.statusCode==200){
+        List<Dropdown> list=List();
+        list.clear();
+        for(int i=0;i<data.length;i++){
+          list.add(Dropdown(data[i]["id"],data[i]["name"],data[i]["stringId"]));
+        }
+        print(data.toString());
+        return list;
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static void addClientsToTrial(BuildContext context,String token,List<dynamic> multipleModels,List<dynamic> multipleClients,DateTime expectedClientVisitDate) async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      final body=jsonEncode({
+        "MultipleModels":multipleModels,
+        "MultipleClients":multipleClients,
+        "ExpectedClientVisitDate":expectedClientVisitDate
+      },toEncodable: Utils.myEncode);
+      print(body);
+      var response=await http.post(Utils.getBaseUrl()+"Request/ClientsSaveAfterModelApproval",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        pd.hide();
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+      }else{
+        pd.hide();
+        Utils.showError(context,response.statusCode.toString());
+      }
+    }catch(e){
+      pd.hide();
+      Utils.showError(context, e.toString());
+      print(e);
+    }
+  }
 }

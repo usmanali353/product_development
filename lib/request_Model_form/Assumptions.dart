@@ -287,8 +287,8 @@ class _AssumptionsState extends State<Assumptions> {
                       ),
                       child: MultiSelectFormField(
                         autovalidate: false,
-                        hintText: "Select Clients",
-                        titleText: 'Select Clients',
+                        title: Text("Select Clients"),
+                        hintWidget: Text("Select Clients"),
                         textField: 'display',
                         valueField: 'value',
                         okButtonLabel: 'OK',

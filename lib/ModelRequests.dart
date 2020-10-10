@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productdevelopment/AddClientsForTrial.dart';
 import 'package:productdevelopment/ApproveForTrial.dart';
 import 'package:productdevelopment/DetailsPage.dart';
 import 'package:productdevelopment/Model/Request.dart';
@@ -1029,10 +1030,16 @@ class _ModelReState extends State<ModelRequests>{
       ];
     }
     return <Widget>[
-      new IconButton(
+       IconButton(
         icon: const Icon(Icons.search),
         onPressed: _startSearch,
       ),
+     statusId==5?IconButton(
+        icon: const Icon(Icons.person_add),
+        onPressed:(){
+          Navigator.push(context, MaterialPageRoute(builder:(context)=>AddClientsToTrial()));
+        },
+      ):Container(),
     ];
   }
   void _stopSearching() {

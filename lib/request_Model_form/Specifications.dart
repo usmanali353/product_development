@@ -197,8 +197,8 @@ class _SpecificationsState extends State<Specifications> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: MultiSelectFormField(
-                          hintText: "Select Sizes for the Product",
-                          titleText: 'Select Sizes',
+                          hintWidget: Text("Select Sizes for the Product"),
+                          title: Text("Select Size"),
                           border: InputBorder.none,
                           validator: (value) {
                             return value == null || value.length == 0?'Please select one or more options':null;
@@ -251,8 +251,8 @@ class _SpecificationsState extends State<Specifications> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: MultiSelectFormField(
-                        hintText: "Select Color for the Product",
-                        titleText: 'Select Colors',
+                        title: Text("Select Colors"),
+                        hintWidget: Text("Select Colors for the Product"),
                         border: InputBorder.none,
                         validator: (value) {
                           return value == null || value.length == 0?'Please select one or more options':null;

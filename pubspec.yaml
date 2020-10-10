@@ -98,6 +98,8 @@ dependencies:
 
   date_range_picker: ^1.0.5
 
+  badges: ^1.1.3
+
 
 dev_dependencies:
 

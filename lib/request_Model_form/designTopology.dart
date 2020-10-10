@@ -135,8 +135,8 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                             borderRadius: BorderRadius.circular(15)
                         ),
                         child: MultiSelectFormField(
-                          hintText: "Select Design Topology",
-                          titleText: 'Select Design Topology',
+                          title: Text("Select Design Topology"),
+                          hintWidget: Text("Select Design Topology"),
                           border: InputBorder.none,
                           validator: (value) {
                             return value == null || value.length == 0?'Please select one or more options':null;
