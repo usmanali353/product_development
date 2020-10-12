@@ -18,6 +18,7 @@ class TrialRequests{
   List<dynamic> multipleClients,allRequestClients;
   List<Colors> multipleColors;
   List<String> multipleSizeNames;
+  List<Colors> multipleColorNames;
   List<dynamic> multipleImages;
   TrialRequests({
     this.id,
@@ -40,7 +41,8 @@ class TrialRequests{
     this.actualClientVisitDate,
     this.allRequestClients,
     this.newModelName,
-    this.newModelCode
+    this.newModelCode,
+    this.multipleColorNames
   });
   factory TrialRequests.fromJson(Map<String, dynamic> json) => TrialRequests(
     id: json["id"],
@@ -59,6 +61,7 @@ class TrialRequests{
     multipleColors: List<Colors>.from(json["multipleColors"].map((x) => Colors.fromJson(x))),
     multipleSizeNames: List<String>.from(json["multipleSizeNames"].map((x) => x)),
     multipleImages: List<dynamic>.from(json["multipleImages"].map((x) => x)),
+    multipleColorNames: List<Colors>.from(json["multipleColors"].map((x) => Colors.fromJson(x))),
     clientVisitDate:json["clientVisitDate"],
     actualClientVisitDate: json["actualClientVisitDate"],
     allRequestClients:json["allRequestClients"],

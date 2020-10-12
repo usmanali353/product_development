@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
@@ -215,22 +216,27 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                       imageUrl.add(requests[index].multipleImages[i]);
                                     }
                                   }
-                                  imageUrl.add(requests[index].image);
                                   Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(requests[index])));
                                 });
 
                               },
-                              child: Container(
-                                //color: Color(0xFF004c4c),
-                                height: 90,
-                                width: 90,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    image: DecorationImage(
-                                      image: NetworkImage(requests[index].image!=null?requests[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"), //MemoryImage(base64Decode(products[index]['image'])),
-                                      fit: BoxFit.cover,
-                                    )
-                                ),
+                              child: CachedNetworkImage(
+                                imageUrl: requests[index].image!=null?requests[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
+                                placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
+                                errorWidget: (context, url, error) => Icon(Icons.upload_file),
+                                imageBuilder: (context, imageProvider){
+                                  return Container(
+                                    height: 90,
+                                    width: 90,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover,
+                                        )
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                             //Padding(padding: EdgeInsets.only(top:2),),

@@ -371,7 +371,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
    return null;
   }
-  static void addRequestImages(BuildContext context,String token,int colorId,String colorImage)async{
+  static Future<void> addRequestImages(BuildContext context,String token,int colorId,String colorImage)async{
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
@@ -383,7 +383,6 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       if(response.statusCode==200){
         pd.hide();
         Utils.showSuccess(context, "Image Added Successfully");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
       }else{
         pd.hide();
         Utils.showError(context,response.statusCode.toString());

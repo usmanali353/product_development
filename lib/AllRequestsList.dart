@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:productdevelopment/RequestColorsList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'ApproveForTrial.dart';
@@ -15,7 +17,6 @@ import 'RequestsForTrial.dart';
 import 'SchedulePage.dart';
 import 'Utils/Utils.dart';
 import 'acmcapproval.dart';
-import 'addImagetoColor.dart';
 
 class AllRequestList extends StatefulWidget{
   var currentUserRoles;
@@ -281,20 +282,23 @@ class _AllRequestListState extends State<AllRequestList> {
                                             allRequests[index])));
                                   });
                                 },
-                                child: Container(
-                                  //color: Color(0xFF004c4c),
-                                  height: 90,
-                                  width: 90,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                            allRequests[index].image != null
-                                                ? allRequests[index].image
-                                                : "https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"),
-                                        fit: BoxFit.cover,
-                                      )
-                                  ),
+                                child: CachedNetworkImage(
+                                  imageUrl: allRequests[index].image!=null?allRequests[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
+                                  placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
+                                  errorWidget: (context, url, error) => Icon(Icons.upload_file),
+                                  imageBuilder: (context, imageProvider){
+                                    return Container(
+                                      height: 90,
+                                      width: 90,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(8),
+                                          image: DecorationImage(
+                                            image: imageProvider,
+                                            fit: BoxFit.cover,
+                                          )
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                               //Padding(padding: EdgeInsets.only(top:2),),
@@ -356,7 +360,7 @@ class _AllRequestListState extends State<AllRequestList> {
                                     }else if(selectedItem=="Details"){
                                       Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
                                     }else if(selectedItem=="addImage"){
-                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(allRequests[index])));
+                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(allRequests[index])));
                                     }
                                   });
                                 }else if(isClient){
@@ -374,7 +378,7 @@ class _AllRequestListState extends State<AllRequestList> {
                                     if(selectedItem=="Details"){
                                       Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
                                     }else if(selectedItem=="addImage"){
-                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(allRequests[index])));
+                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(allRequests[index])));
                                     }
                                   });
                                 }else{

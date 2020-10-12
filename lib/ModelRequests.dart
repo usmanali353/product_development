@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +11,7 @@ import 'package:productdevelopment/DetailsPage.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Observations.dart';
+import 'package:productdevelopment/RequestColorsList.dart';
 import 'package:productdevelopment/RequestImagesGallery.dart';
 import 'package:productdevelopment/SchedulePage.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
@@ -17,7 +19,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailsPage.dart';
 import 'RequestsForTrial.dart';
 import 'acmcapproval.dart';
-import 'addImagetoColor.dart';
 
 
 class ModelRequests extends StatefulWidget {
@@ -329,17 +330,24 @@ class _ModelReState extends State<ModelRequests>{
                                     Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
                                   });
                                 },
-                                child: Container(
-                                  //color: Color(0xFF004c4c),
-                                  height: 90,
-                                  width: 90,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      image: DecorationImage(
-                                        image: NetworkImage(products[index].image!=null?products[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"), //MemoryImage(base64Decode(products[index]['image'])),
-                                        fit: BoxFit.cover,
-                                      )
-                                  ),
+
+                                child:CachedNetworkImage(
+                                  imageUrl: products[index].image!=null?products[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
+                                  placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
+                                  errorWidget: (context, url, error) => Icon(Icons.upload_file),
+                                  imageBuilder: (context, imageProvider){
+                                     return Container(
+                                       height: 90,
+                                       width: 90,
+                                       decoration: BoxDecoration(
+                                           borderRadius: BorderRadius.circular(8),
+                                           image: DecorationImage(
+                                             image: imageProvider,
+                                             fit: BoxFit.cover,
+                                           )
+                                       ),
+                                     );
+                                  },
                                 ),
                               ),
                               //Padding(padding: EdgeInsets.only(top:2),),
@@ -392,7 +400,7 @@ class _ModelReState extends State<ModelRequests>{
                                     }else if(selectedItem=="Details"){
                                       Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                                     }else if(selectedItem=="addImage"){
-                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
+                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(products[index])));
                                     }
                                   });
                                 }else if(isClient){
@@ -410,7 +418,7 @@ class _ModelReState extends State<ModelRequests>{
                                      if(selectedItem=="Details"){
                                       Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                                     }else if(selectedItem=="addImage"){
-                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>addImageToColors(products[index])));
+                                      Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(products[index])));
                                     }
                                   });
                                 }else{

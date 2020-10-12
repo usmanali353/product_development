@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:photo_view/photo_view.dart';
@@ -292,8 +293,7 @@ class _DetailPageState extends State<DetailPage>{
                               ),),
                               subtitle: Wrap(
                                 children: [
-
-                                  for ( var images in imageUrl) images!=null?Image.network(images,width: 100,height: 100):Container(),
+                                  for ( var images in imageUrl) images!=null?CachedNetworkImage(imageUrl:images,width: 100,height: 100,placeholder:(context,url)=>Container(width: 80,height: 80,child: Center(child: CircularProgressIndicator(),),),):Container(),
                                 ],
                               )
                             ),
@@ -346,7 +346,7 @@ class _DetailPageState extends State<DetailPage>{
                                         padding: const EdgeInsets.all(8.0),
                                         child: RepaintBoundary(
                                           key: globalKey,
-                                            child: Image.network(request.qrcodeImage!=null?request.qrcodeImage:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",width: 100,height: 100,)
+                                            child: CachedNetworkImage(imageUrl:request.qrcodeImage!=null?request.qrcodeImage:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",width: 100,height: 100,placeholder: (context,url)=>Container(width: 80,height:80,child: Center(child: CircularProgressIndicator()),),)
                                         ),
                                       ),
                                       Column(
@@ -354,7 +354,7 @@ class _DetailPageState extends State<DetailPage>{
                                           MaterialButton(
                                             onPressed: (){
                                               Utils.urlToFile(context,request.qrcodeImage).then((file){
-                                                Share.shareFiles([file.path], text: 'Qr Code for Model '+request.modelName);
+                                                Share.shareFiles([file.path], text:request.newModelName!=null?'Qr Code for Model '+request.newModelName:'Qr Code for Model '+request.modelName);
                                               });
                                             },
                                             child: Text("Share",style: TextStyle(color: Colors.white),),
@@ -381,7 +381,6 @@ class _DetailPageState extends State<DetailPage>{
                                           ),
                                         ],
                                       )
-
                                     ]
                                   )
                                 ),

@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:productdevelopment/ProductionManagerPage.dart';
 import 'package:productdevelopment/scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'AllRequestsList.dart';
@@ -40,21 +39,6 @@ class _DashboardState extends ResumableState<Dashboard> {
    messaging.configure(
        onMessage:(Map<String, dynamic> message)async{
          print("Foreground Mesage "+message.toString());
-         // showDialog(
-         //   context: context,
-         //   builder: (context) => AlertDialog(
-         //     content: ListTile(
-         //       title: Text(message['notification']['title'],style: TextStyle(fontWeight: FontWeight.bold),),
-         //       subtitle: Text(message['notification']['body']),
-         //     ),
-         //     actions: <Widget>[
-         //       FlatButton(
-         //         child: Text('Ok'),
-         //         onPressed: () => Navigator.of(context).pop(),
-         //       ),
-         //     ],
-         //   ),
-         // );
          showOverlayNotification((context) {
            return Card(
              margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -64,6 +48,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                  title: Text(message['notification']['title']),
                  subtitle: Text(message['notification']['body']),
                  onTap: (){
+
                    Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
                  },
                  trailing: IconButton(
@@ -121,18 +106,6 @@ class _DashboardState extends ResumableState<Dashboard> {
                     },
                   ),
                   Divider(),
-                 claims!=null&&claims["role"].contains("Product Manager")?Column(
-                   children: [
-                     ListTile(
-                       title: Text("Production Requests"),
-                       leading: Icon(FontAwesomeIcons.industry),
-                       onTap: (){
-                         Navigator.push(context, MaterialPageRoute(builder: (context)=>ProductionManagerPage(currentUserRoles)));
-                       },
-                     ),
-                     Divider(),
-                   ],
-                 ):Container(),
                   currentUserRoles!=null&&currentUserRoles["11"]!=null?Column(
                     children: [
                       ListTile(
