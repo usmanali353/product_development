@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:photo_view/photo_view.dart';
 import 'package:printing/printing.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -367,11 +366,24 @@ class _DetailPageState extends State<DetailPage>{
                                               ByteData byteData = await image.toByteData(format: ImageByteFormat.png);
                                               Uint8List pngBytes = byteData.buffer.asUint8List();
                                               final PdfImage img = await pdfImageFromImageProvider(pdf: doc.document, image: MemoryImage(pngBytes));
+                                              final PdfImage imgLogo = await pdfImageFromImageProvider(pdf: doc.document, image: AssetImage("Assets/img/AC.png"));
                                               doc.addPage(pw.Page(
                                                   build: (pw.Context context) {
-                                                    return pw.Center(
-                                                      child: pw.Image(img),
-                                                    ); // Center
+                                                    return pw.Column(
+                                                      children: [
+                                                        pw.Center(
+                                                            child: pw.Image(imgLogo,width: 250,height:250)
+                                                        ),
+                                                        pw.Padding(padding: pw.EdgeInsets.all(8.0)),
+                                                        pw.Center(
+                                                            child: pw.Image(img,width: 200,height:200)
+                                                        ),
+                                                        pw.Padding(padding: pw.EdgeInsets.all(8.0)),
+                                                        pw.Center(
+                                                            child: pw.Text("Please Scan this QR Code to get Details of this Model",style: pw.TextStyle(fontSize: 18))
+                                                        ),
+                                                      ]
+                                                    );
                                                   })); // Pa
                                               await Printing.layoutPdf(
                                                   onLayout: (PdfPageFormat format) async => doc.save());

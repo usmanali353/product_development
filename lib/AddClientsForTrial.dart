@@ -152,6 +152,7 @@ class _AddClientsToTrialState extends State<AddClientsToTrial> {
                         textField: 'display',
                         valueField: 'value',
                         okButtonLabel: 'OK',
+                        required: true,
                         cancelButtonLabel: 'CANCEL',
                         dataSource: clients,
                         border: InputBorder.none,
