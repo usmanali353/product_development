@@ -165,7 +165,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
             return InkWell(
               onTap: (){
                 if(requests[index].status=="Approved By Customer"){
-                  if(currentUserRole["9"]!=null) {
+                  if(currentUserRole["9"]!=null||currentUserRole["10"]!=null) {
                     showProductionApprovalDialog(context, requests[index]);
                   }else{
                     SharedPreferences.getInstance().then((prefs){
@@ -173,7 +173,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                     });
                   }
                 }else if(requests[index].status=="Not Approved Nor Rejected"){
-                  if(currentUserRole["7"]!=null){
+                  if(currentUserRole["7"]!=null||currentUserRole["8"]!=null){
                     showTrialApprovalDialog(context, requests[index]);
                   }else{
                     SharedPreferences.getInstance().then((prefs){
@@ -221,13 +221,13 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
 
                               },
                               child: CachedNetworkImage(
-                                imageUrl: requests[index].image!=null?requests[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
+                                imageUrl:requests[index].image,
                                 placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
-                                errorWidget: (context, url, error) => Icon(Icons.upload_file),
+                                errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
                                 imageBuilder: (context, imageProvider){
                                   return Container(
-                                    height: 90,
-                                    width: 90,
+                                    height: 85,
+                                    width: 85,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(8),
                                         image: DecorationImage(
@@ -307,8 +307,6 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                       ),
                                       Text(requests[index].surfaceName!=null?requests[index].surfaceName:''),
                                     ],
-
-
                                   ),
                                 ],
                               ),

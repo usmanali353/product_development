@@ -330,15 +330,14 @@ class _ModelReState extends State<ModelRequests>{
                                     Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
                                   });
                                 },
-
                                 child:CachedNetworkImage(
                                   imageUrl: products[index].image!=null?products[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
                                   placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
                                   errorWidget: (context, url, error) => Icon(Icons.upload_file),
                                   imageBuilder: (context, imageProvider){
                                      return Container(
-                                       height: 90,
-                                       width: 90,
+                                       height: 85,
+                                       width: 85,
                                        decoration: BoxDecoration(
                                            borderRadius: BorderRadius.circular(8),
                                            image: DecorationImage(
@@ -367,12 +366,9 @@ class _ModelReState extends State<ModelRequests>{
                                             height: 10,
                                             width: 15,
                                           ),
-
                                         ],
                                       ),
                                     ),
-
-
                                 ],
                               ):Container(),
                             ],
@@ -381,7 +377,7 @@ class _ModelReState extends State<ModelRequests>{
                           GestureDetector(
                             onTapDown: (details)async{
                               if(products[index].statusName=="New Request"){
-                                if(currentUserRoles["1"]!=null) {
+                                if(currentUserRoles["2"]!=null||currentUserRoles["3"]) {
                                   await showMenu(
                                     context: context,
                                     position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
@@ -425,7 +421,7 @@ class _ModelReState extends State<ModelRequests>{
                                   Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                                 }
                               }else if(products[index].statusName=="Approved By GM"){
-                               if(currentUserRoles["2"]!=null||currentUserRoles["3"]!=null){
+                               if(currentUserRoles["4"]!=null){
                                  await showMenu(
                                    context: context,
                                    position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
@@ -447,7 +443,7 @@ class _ModelReState extends State<ModelRequests>{
                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                                }
                               }else if(products[index].statusName=="Samples Scheduled"){
-                                if(currentUserRoles["4"]!=null){
+                                if(currentUserRoles["5"]!=null||currentUserRoles["6"]!=null){
                                   await showMenu(
                                     context: context,
                                     position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
@@ -474,7 +470,7 @@ class _ModelReState extends State<ModelRequests>{
                                   Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
                                 }
                               }else if(products[index].statusName=="Model Approved"){
-                                if(currentUserRoles["5"]!=null||currentUserRoles["6"]!=null){
+                                if(currentUserRoles["7"]!=null||currentUserRoles["8"]!=null){
                                   Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products[index].requestId,currentUserRoles)));
                                 }else{
                                   Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));

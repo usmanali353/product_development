@@ -26,7 +26,6 @@ class _DetailPageState extends State<DetailPage>{
    Request request;
   _DetailPageState(this.request);
    GlobalKey globalKey = new GlobalKey();
-   final doc = pw.Document();
    List<String> colorsNames=[];
    List<String> imageUrl=[];
    List<RemarksHistory> clientRemarks=[];
@@ -361,6 +360,7 @@ class _DetailPageState extends State<DetailPage>{
                                           ),
                                           MaterialButton(
                                             onPressed: ()async{
+                                              final doc = pw.Document();
                                               RenderRepaintBoundary boundary = globalKey.currentContext.findRenderObject();
                                               var image = await boundary.toImage();
                                               ByteData byteData = await image.toByteData(format: ImageByteFormat.png);
@@ -372,15 +372,15 @@ class _DetailPageState extends State<DetailPage>{
                                                     return pw.Column(
                                                       children: [
                                                         pw.Center(
-                                                            child: pw.Image(imgLogo,width: 250,height:250)
+                                                            child: pw.Image(imgLogo,width: 150,height:150)
                                                         ),
                                                         pw.Padding(padding: pw.EdgeInsets.all(8.0)),
                                                         pw.Center(
-                                                            child: pw.Image(img,width: 200,height:200)
+                                                            child: pw.Image(img,width: 100,height:100)
                                                         ),
                                                         pw.Padding(padding: pw.EdgeInsets.all(8.0)),
                                                         pw.Center(
-                                                            child: pw.Text("Please Scan this QR Code to get Details of this Model",style: pw.TextStyle(fontSize: 18))
+                                                            child: pw.Text("Please Scan this QR Code to get Details of this Model",style: pw.TextStyle(fontSize: 15))
                                                         ),
                                                       ]
                                                     );

@@ -49,7 +49,7 @@ RequestsForTrial(this.requestId,this.currentUserRole);
              return InkWell(
                onTap: (){
                  if(requests[index].status=="Approved By Customer"){
-                   if(currentUserRole["9"]!=null){
+                   if(currentUserRole["9"]!=null||currentUserRole["10"]!=null){
                      showProductionApprovalDialog(context, requests[index]);
                    }else{
                      SharedPreferences.getInstance().then((prefs){
@@ -57,7 +57,7 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                      });
                    }
                  }else if(requests[index].status=="Not Approved Nor Rejected"){
-                   if(currentUserRole["7"]!=null) {
+                   if(currentUserRole["7"]!=null||currentUserRole["8"]!=null) {
                      showTrialApprovalDialog(context, requests[index]);
                    }else{
                      SharedPreferences.getInstance().then((prefs){
@@ -110,8 +110,8 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                                  errorWidget: (context, url, error) => Icon(Icons.upload_file),
                                  imageBuilder: (context, imageProvider){
                                    return Container(
-                                     height: 90,
-                                     width: 90,
+                                     height: 85,
+                                     width: 85,
                                      decoration: BoxDecoration(
                                          borderRadius: BorderRadius.circular(8),
                                          image: DecorationImage(

@@ -222,8 +222,8 @@ class _AddClientsToTrialState extends State<AddClientsToTrial> {
   showSelectModelDialog()async{
     await FilterListDialog.display(
         context,
-        allTextList: modelNames,
         height: 480,
+        allTextList: modelNames,
         borderRadius: 20,
         selectedTextBackgroundColor: Colors.teal,
         allResetButonColor: Color(0xFF004c4c),

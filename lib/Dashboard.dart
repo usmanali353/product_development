@@ -1,5 +1,8 @@
 import 'dart:io';
 import 'package:badges/badges.dart';
+import 'package:barcode_scan/barcode_scan.dart';
+import 'package:flushbar/flushbar.dart';
+import 'package:flutter/services.dart';
 import 'package:productdevelopment/DailyClientSchedule.dart';
 import 'package:productdevelopment/Notifications/NotificationListPage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -7,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:overlay_support/overlay_support.dart';
-import 'package:productdevelopment/scanner.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'AllRequestsList.dart';
 import 'ModelRequests.dart';
@@ -38,17 +40,17 @@ class _DashboardState extends ResumableState<Dashboard> {
    messaging.getToken().then((value) =>debugPrint(value));
    messaging.configure(
        onMessage:(Map<String, dynamic> message)async{
-         print("Foreground Mesage "+message.toString());
+         WidgetsBinding.instance
+             .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
          showOverlayNotification((context) {
            return Card(
              margin: const EdgeInsets.symmetric(horizontal: 4),
              child: SafeArea(
                child: ListTile(
-                 leading:Image.asset("Assets/img/arabianceramics.png"),
+                 leading:Icon(Icons.notifications,color: Theme.of(context).primaryColor,size: 40,),
                  title: Text(message['notification']['title']),
                  subtitle: Text(message['notification']['body']),
                  onTap: (){
-
                    Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
                  },
                  trailing: IconButton(
@@ -59,7 +61,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                ),
              ),
            );
-         }, duration: Duration(milliseconds: 10000));
+         }, duration: Duration(milliseconds: 5000));
        },
         onBackgroundMessage: Platform.isIOS ? null : Network_Operations.myBackgroundMessageHandler,
        onResume: (Map<String, dynamic> message) async{
@@ -90,19 +92,24 @@ class _DashboardState extends ResumableState<Dashboard> {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: <Widget>[
-                   ListTile(
-                     title: Text("Add Model Request"),
-                     leading: Icon(Icons.add),
-                     onTap: (){
-                       Navigator.push(context,MaterialPageRoute(builder: (context)=>Assumptions()));
-                     },
-                   ),
-                  Divider(),
+                  currentUserRoles!=null&&currentUserRoles["1"]!=null?Column(
+                    children: [
+                      ListTile(
+                        title: Text("Add Model Request"),
+                        leading: Icon(Icons.add),
+                        onTap: (){
+                          Navigator.push(context,MaterialPageRoute(builder: (context)=>Assumptions()));
+                        },
+                      ),
+                      Divider(),
+                    ],
+                  ):Container(),
                   ListTile(
                     title: Text("Scan Barcode"),
                     leading: Icon(FontAwesomeIcons.barcode),
                     onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>QRScanner()));
+                      scan();
+                      //Navigator.push(context, MaterialPageRoute(builder: (context)=>QRScanner()));
                     },
                   ),
                   Divider(),
@@ -145,7 +152,7 @@ class _DashboardState extends ResumableState<Dashboard> {
           IconButton(
             icon:Badge(
               toAnimate: true,
-              showBadge:notificationCount!=null&&notificationCount['Unread Notifications Count']!=null,
+              showBadge:notificationCount!=null&&notificationCount['Unread Notifications Count']!=null&&notificationCount['Unread Notifications Count']!=0,
                 badgeContent: Text(notificationCount!=null&&notificationCount['Unread Notifications Count']!=null?notificationCount['Unread Notifications Count'].toString():'',style: TextStyle(color: Colors.white),),
                 child: Icon(Icons.notifications)
             ),
@@ -863,4 +870,49 @@ class _DashboardState extends ResumableState<Dashboard> {
   void dispose() {
     super.dispose();
   }
+ Future scan() async {
+   ScanResult  barcode;
+   try {
+     barcode = (await BarcodeScanner.scan());
+     print('Barcode '+barcode.rawContent);
+     setState(() {
+       barcode = barcode;
+       if(barcode.rawContent!=null){
+         SharedPreferences.getInstance().then((prefs){
+           print(barcode.rawContent.split("?")[1].replaceAll("RequestId=", ""));
+           Network_Operations.getRequestById(context, prefs.getString("token"), int.parse( barcode.rawContent.split("?")[1].replaceAll("RequestId=", "")));
+         });
+         // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>WebBrowser(barcode.rawContent)));
+       }
+
+     });
+   } on PlatformException catch (e) {
+     if (e.code == BarcodeScanner.cameraAccessDenied) {
+       Flushbar(
+         message: "Camera Access not Granted",
+         backgroundColor: Colors.red,
+         duration: Duration(seconds: 5),
+       ).show(context);
+     } else {
+       Flushbar(
+         message: e.toString(),
+         backgroundColor: Colors.red,
+         duration: Duration(seconds: 5),
+       ).show(context);
+     }
+   } on FormatException{
+     Flushbar(
+       message: "User returned using the back-button before scanning anything",
+       backgroundColor: Colors.red,
+       duration: Duration(seconds: 5),
+     ).show(context);
+   } catch (e) {
+     Flushbar(
+       message: e,
+       backgroundColor: Colors.red,
+       duration: Duration(seconds: 5),
+     ).show(context);
+   }
+   return barcode;
+ }
 }
