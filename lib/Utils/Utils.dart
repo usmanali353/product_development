@@ -1,12 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:barcode_scan/barcode_scan.dart';
+import 'package:barcode_scan/model/scan_result.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -90,9 +94,9 @@ class Utils{
     return int.parse(hexColor, radix: 16);
   }
   static Future<File> urlToFile(BuildContext context,String imageUrl) async {
-ProgressDialog pd=ProgressDialog(context);
-pd.show();
-try{
+   ProgressDialog pd=ProgressDialog(context);
+   pd.show();
+   try{
   var rng = new Random();
 
   Directory tempDir = await getTemporaryDirectory();
@@ -115,5 +119,47 @@ try{
   print(e.toString());
 }
    return null;
+  }
+ static Future scan(BuildContext context) async {
+    ScanResult  barcode;
+    try {
+      barcode = (await BarcodeScanner.scan());
+      print('Barcode '+barcode.rawContent);
+        barcode = barcode;
+        if(barcode.rawContent!=null){
+          SharedPreferences.getInstance().then((prefs){
+            print(barcode.rawContent.split("?")[1].replaceAll("RequestId=", ""));
+            Network_Operations.getRequestById(context, prefs.getString("token"), int.parse( barcode.rawContent.split("?")[1].replaceAll("RequestId=", "")));
+          });
+          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>WebBrowser(barcode.rawContent)));
+        }
+    } on PlatformException catch (e) {
+      if (e.code == BarcodeScanner.cameraAccessDenied) {
+        Flushbar(
+          message: "Camera Access not Granted",
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 5),
+        ).show(context);
+      } else {
+        Flushbar(
+          message: e.toString(),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 5),
+        ).show(context);
+      }
+    } on FormatException{
+      Flushbar(
+        message: "User returned using the back-button before scanning anything",
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 5),
+      ).show(context);
+    } catch (e) {
+      Flushbar(
+        message: e,
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 5),
+      ).show(context);
+    }
+    return barcode;
   }
 }

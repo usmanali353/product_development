@@ -108,7 +108,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                     title: Text("Scan Barcode"),
                     leading: Icon(FontAwesomeIcons.barcode),
                     onTap: (){
-                      scan();
+                     Utils.scan(context);
                       //Navigator.push(context, MaterialPageRoute(builder: (context)=>QRScanner()));
                     },
                   ),
@@ -870,49 +870,5 @@ class _DashboardState extends ResumableState<Dashboard> {
   void dispose() {
     super.dispose();
   }
- Future scan() async {
-   ScanResult  barcode;
-   try {
-     barcode = (await BarcodeScanner.scan());
-     print('Barcode '+barcode.rawContent);
-     setState(() {
-       barcode = barcode;
-       if(barcode.rawContent!=null){
-         SharedPreferences.getInstance().then((prefs){
-           print(barcode.rawContent.split("?")[1].replaceAll("RequestId=", ""));
-           Network_Operations.getRequestById(context, prefs.getString("token"), int.parse( barcode.rawContent.split("?")[1].replaceAll("RequestId=", "")));
-         });
-         // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>WebBrowser(barcode.rawContent)));
-       }
 
-     });
-   } on PlatformException catch (e) {
-     if (e.code == BarcodeScanner.cameraAccessDenied) {
-       Flushbar(
-         message: "Camera Access not Granted",
-         backgroundColor: Colors.red,
-         duration: Duration(seconds: 5),
-       ).show(context);
-     } else {
-       Flushbar(
-         message: e.toString(),
-         backgroundColor: Colors.red,
-         duration: Duration(seconds: 5),
-       ).show(context);
-     }
-   } on FormatException{
-     Flushbar(
-       message: "User returned using the back-button before scanning anything",
-       backgroundColor: Colors.red,
-       duration: Duration(seconds: 5),
-     ).show(context);
-   } catch (e) {
-     Flushbar(
-       message: e,
-       backgroundColor: Colors.red,
-       duration: Duration(seconds: 5),
-     ).show(context);
-   }
-   return barcode;
- }
 }

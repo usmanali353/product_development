@@ -1,7 +1,5 @@
 import'package:flutter/material.dart';
-import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
-import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/RequestColorsList.dart';
 class RequestImageGallery extends StatefulWidget {
   var request;

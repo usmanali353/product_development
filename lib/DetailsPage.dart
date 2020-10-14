@@ -1,8 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:productdevelopment/DetailPage.dart';
-
 import 'HistoryPage.dart';
 import 'ScheduleListPage.dart';
 
