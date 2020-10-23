@@ -1,8 +1,5 @@
 import 'dart:io';
 import 'package:badges/badges.dart';
-import 'package:barcode_scan/barcode_scan.dart';
-import 'package:flushbar/flushbar.dart';
-import 'package:flutter/services.dart';
 import 'package:productdevelopment/DailyClientSchedule.dart';
 import 'package:productdevelopment/Notifications/NotificationListPage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';

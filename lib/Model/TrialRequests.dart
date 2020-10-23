@@ -13,13 +13,14 @@ class TrialRequests{
   String clientName;
   String modelCode;
   String modelName,newModelName,newModelCode;
+  String currentAction,userAssigned;
   dynamic clientVisitDate;
   dynamic actualClientVisitDate;
   List<dynamic> multipleClients,allRequestClients;
   List<Colors> multipleColors;
   List<String> multipleSizeNames;
   List<Colors> multipleColorNames;
-  List<dynamic> multipleImages;
+  List<dynamic> multipleImages,multipleReasons;
   TrialRequests({
     this.id,
     this.requestId,
@@ -42,7 +43,10 @@ class TrialRequests{
     this.allRequestClients,
     this.newModelName,
     this.newModelCode,
-    this.multipleColorNames
+    this.multipleColorNames,
+    this.currentAction,
+    this.userAssigned,
+    this.multipleReasons
   });
   factory TrialRequests.fromJson(Map<String, dynamic> json) => TrialRequests(
     id: json["id"],
@@ -67,6 +71,9 @@ class TrialRequests{
     allRequestClients:json["allRequestClients"],
     newModelName:json["newModelName"],
     newModelCode:json["newModelCode"],
+    userAssigned: json["userAssigned"],
+      currentAction: json["currentAction"],
+    multipleReasons: json["multipleReasons"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -90,6 +97,9 @@ class TrialRequests{
     "actualClientVisitDate":actualClientVisitDate,
     "allRequestClients":allRequestClients,
     "newModelCode":newModelCode,
-    "newModelName":newModelName
+    "newModelName":newModelName,
+    "currentAction":currentAction,
+    "userAssigned":userAssigned,
+    "multipleReasons":multipleReasons
   };
 }

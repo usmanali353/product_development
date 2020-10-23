@@ -449,14 +449,14 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       Utils.showError(context, e.toString());
     }
   }
-  static Future<void> changeStatusClientWithRemarks(BuildContext context,String token,int requestId,int status,String remarks,DateTime ActualClientVisitDate)async{
+  static Future<void> changeStatusClientWithRemarks(BuildContext context,String token,int requestId,int status,String remarks,DateTime ActualClientVisitDate,List<dynamic> MultipleReasons)async{
     try{
       final body=jsonEncode({
         "StatusId":status,
         "RequestClientId":requestId,
         "Remarks":remarks,
-        "ActualClientVisitDate":ActualClientVisitDate
-
+        "ActualClientVisitDate":ActualClientVisitDate,
+        "MultipleReasons": MultipleReasons
       },toEncodable: Utils.myEncode);
       var response=await http.post(Utils.getBaseUrl()+"Request/SaveRequestRemark",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
@@ -715,6 +715,49 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       if(response.statusCode==200){
         pd.hide();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+      }else{
+        pd.hide();
+        Utils.showError(context,response.statusCode.toString());
+      }
+    }catch(e){
+      pd.hide();
+      Utils.showError(context, e.toString());
+      print(e);
+    }
+  }
+  static Future<List<Dropdown>> getEmployeesDropDown(BuildContext context,String token)async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Account/GetUsersExceptClientDropdown",headers:{"Authorization":"Bearer "+token});
+      var data= jsonDecode(response.body);
+      if(response.statusCode==200){
+        List<Dropdown> list=List();
+        list.clear();
+        for(int i=0;i<data.length;i++){
+          list.add(Dropdown(data[i]["id"],data[i]["name"],data[i]["stringId"]));
+        }
+        print(data.toString());
+        return list;
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static Future<void> assignUserToRejectedModel(BuildContext context,String token,int clientId,String userId)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      final body=jsonEncode({
+        "UserId":userId,
+        "RequestClientId":clientId,
+      },toEncodable: Utils.myEncode);
+      print(body);
+      var response=await http.post(Utils.getBaseUrl()+"Request/UsersForClientsRejectSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        pd.hide();
+        Utils.showSuccess(context,"User Alloted");
+        //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
       }else{
         pd.hide();
         Utils.showError(context,response.statusCode.toString());

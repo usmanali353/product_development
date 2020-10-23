@@ -11,7 +11,7 @@ class Request {
   DateTime dateTime;
   List<Colors> multipleColorNames;
   List<RemarksHistory> remarksHistory,allRequestClientRemarks;
-  List<dynamic> multipleClients, allRequestClients,multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames,multipleImages,currentLoggedInUserStatuses;
+  List<dynamic> multipleClients, allRequestClients,multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames,multipleImages,currentLoggedInUserStatuses,multipleReasons;
   Request({
     this.requestId,
     this.marketId,
@@ -35,7 +35,8 @@ class Request {
     this.customerObservation,
     this.userId,
     this.multipleClients,
-    this.ImageSelectedForColor
+    this.ImageSelectedForColor,
+    this.multipleReasons
   });
   Map<String, dynamic> toJson() {
     var map = new Map<String, dynamic>();
@@ -93,6 +94,7 @@ class Request {
     map['newModelName']=newModelName;
     map['newModelCode']=newModelCode;
     map['multipleColorNames'] = List<dynamic>.from(multipleColorNames.map((x) => x.toJson()));
+    map["multipleReasons"]=multipleReasons;
    // map['allRequestRemarks'] = List<dynamic>.from(remarksHistory.map((x) => x.toJson()));
     return map;
   }
@@ -154,6 +156,7 @@ class Request {
     hasPrevious=data['hasPrevious'];
     newModelName=data['newModelName'];
     newModelCode=data['newModelCode'];
+    multipleReasons=data['multipleReasons'];
   }
 
 }

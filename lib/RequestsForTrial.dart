@@ -1,12 +1,16 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Observations.dart';
 import 'package:productdevelopment/RequestImagesGallery.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'Model/Dropdown.dart';
  class RequestsForTrial extends StatefulWidget {
 int requestId;
 var currentUserRole;
@@ -64,6 +68,20 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                        Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
                      });
                    }
+                 }else if(requests[index].status=="Rejected By Customer"&&requests[index].currentAction=="Pending"){
+                   SharedPreferences.getInstance().then((prefs){
+                     if(currentUserRole["12"]!=null) {
+                       Network_Operations.getEmployeesDropDown(
+                           context, prefs.getString("token")).then((userList) {
+                         showAssignUserDialog(
+                             context, userList, requests[index]);
+                       });
+                     }else{
+                       SharedPreferences.getInstance().then((prefs){
+                         Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
+                       });
+                     }
+                   });
                  }else{
                    SharedPreferences.getInstance().then((prefs){
                      Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
@@ -403,6 +421,110 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                    });
                  },
                ),
+             ],
+           );
+         },
+       ),
+       actions: [
+         cancelButton,
+         detailsPage,
+         approveRejectButton
+       ],
+     );
+
+     // show the dialog
+     showDialog(
+       context: context,
+       builder: (BuildContext context) {
+         return alert;
+       },
+     );
+   }
+   showAssignUserDialog(BuildContext context,List<Dropdown> users,TrialRequests request){
+     Widget cancelButton = FlatButton(
+       child: Text("Cancel"),
+       onPressed: () {
+         Navigator.pop(context);
+       },
+     );
+     Widget detailsPage = FlatButton(
+       child: Text("Go to Details"),
+       onPressed: () {
+         Navigator.pop(context);
+         SharedPreferences.getInstance().then((prefs){
+           Network_Operations.getRequestById(context, prefs.getString("token"), request.requestId);
+         });
+       },
+     );
+     Widget approveRejectButton = FlatButton(
+       child: Text("Set"),
+
+       onPressed: () {
+         Navigator.pop(context);
+         var employeeNames=[],employeeId;
+         for(int i=0;i<users.length;i++){
+           employeeNames.add(users[i].name);
+         }
+         employeeId=users[employeeNames.indexOf(selectedPreference)].stringId;
+         SharedPreferences.getInstance().then((prefs){
+           Network_Operations.assignUserToRejectedModel(context, prefs.getString("token"), request.id, employeeId).then((value){
+             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder:(context)=>Dashboard()), (route) => false);
+           });
+         });
+
+       },
+     );
+     AlertDialog alert = AlertDialog(
+       title: Text("Assign User to Rejected Model"),
+       content: StatefulBuilder(
+         builder: (context, setState) {
+           return Column(
+             mainAxisSize: MainAxisSize.min,
+             children: <Widget>[
+               Container(
+                 width: MediaQuery.of(context).size.width,
+                 height:  MediaQuery.of(context).size.height/3,
+                 child: ListView.builder(
+                     itemCount: users.length,
+                     itemBuilder: (context,int index){
+                       return Column(
+                         mainAxisSize: MainAxisSize.min,
+                         children: [
+                           RadioListTile(
+                             title: Text(users!=null&&users.length>0?users[index].name:''),
+                             value: users!=null&&users.length>0?users[index].name:'',
+                             groupValue: selectedPreference,
+                             onChanged: (choice) {
+                               setState(() {
+                                 this.selectedPreference = choice;
+                               });
+                             },
+                           ),
+                         ],
+                       );
+                     }
+                 ),
+               ),
+               // RadioListTile(
+               //   title: Text("Approve"),
+               //   value: 'Approve',
+               //   groupValue: selectedPreference,
+               //   onChanged: (choice) {
+               //     setState(() {
+               //       this.selectedPreference = choice;
+               //     });
+               //   },
+               // ),
+               // RadioListTile(
+               //   title: Text("Reject"),
+               //   value: 'Reject',
+               //   groupValue: selectedPreference,
+               //   onChanged: (choice) {
+               //     setState(() {
+               //       this.selectedPreference = choice;
+               //     });
+               //   },
+               // ),
              ],
            );
          },
