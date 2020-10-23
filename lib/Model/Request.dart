@@ -1,4 +1,4 @@
-import 'package:productdevelopment/Model/Colors.dart';
+import 'package:productdevelopment/Model/RequestColors.dart';
 import 'package:productdevelopment/Model/RemarksHistory.dart';
 
 class Request {
@@ -9,7 +9,7 @@ class Request {
 
   var image,hasNext,hasPrevious,ImageSelectedForColor;
   DateTime dateTime;
-  List<Colors> multipleColorNames;
+  List<RequestColors> multipleColorNames;
   List<RemarksHistory> remarksHistory,allRequestClientRemarks;
   List<dynamic> multipleClients, allRequestClients,multipleColors,multipleSizes,multipleDesignTopoligies,multipleSuitability,multipleDesigners,multipleSizeNames,multipleDesignTopoligyNames,multipleSuitabilityNames,multipleDesignerNames,multipleClientNames,multipleImages,currentLoggedInUserStatuses,multipleReasons;
   Request({
@@ -125,7 +125,7 @@ class Request {
     userId=data['userId'];
     multipleSizeNames=data['multipleSizeNames'];
     multipleDesignTopoligyNames=data['multipleDesignTopoligyNames'];
-    multipleColorNames=List<Colors>.from(data["multipleColorNames"].map((x) => Colors.fromJson(x)));
+    multipleColorNames=List<RequestColors>.from(data["multipleColorNames"].map((x) => RequestColors.fromJson(x)));
     remarksHistory=data['allRequestRemarks']!=null?List<RemarksHistory>.from(data["allRequestRemarks"].map((x) => RemarksHistory.fromJson(x))):data["allRequestRemarks"];
     allRequestClientRemarks=data['allRequestClientRemarks']!=null?List<RemarksHistory>.from(data["allRequestClientRemarks"].map((x) => RemarksHistory.fromJson(x))):data["allRequestClientRemarks"];
     multipleSuitabilityNames=data['multipleSuitabilityNames'];

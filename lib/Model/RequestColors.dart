@@ -1,8 +1,8 @@
 
 
 
-class Colors{
-  Colors({
+class RequestColors{
+  RequestColors({
     this.id,
     this.colorId,
     this.requestId,
@@ -24,7 +24,7 @@ class Colors{
   dynamic isApi;
   dynamic colorImageFile;
 
-  factory Colors.fromJson(Map<String, dynamic> json) => Colors(
+  factory RequestColors.fromJson(Map<String, dynamic> json) => RequestColors(
     id: json["id"],
     colorId: json["colorId"],
     requestId: json["requestId"],

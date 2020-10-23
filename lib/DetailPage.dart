@@ -112,15 +112,6 @@ class _DetailPageState extends State<DetailPage>{
                               subtitle: Text(request.statusName),
                             ),
                             Divider(),
-                            request.statusName=="Rejected By Customer"&&request.multipleReasons!=null&&request.multipleReasons.length>0?Column(
-                              children: [
-                                ListTile(
-                                  title: Text("Rejection Reason",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  subtitle: Text(request.multipleReasons.toString().replaceAll("[", "").replaceAll("]", "")),
-                                ),
-                                Divider(),
-                              ],
-                            ):Container(),
                             request.customerObservation!=null?Column(
                               children: <Widget>[
                                 ListTile(

@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:productdevelopment/Login.dart';
+import 'package:productdevelopment/Model/AssignedRejectedModels.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
@@ -760,12 +761,25 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
       }else{
         pd.hide();
-        Utils.showError(context,response.statusCode.toString());
+        Utils.showError(context,response.body.toString());
       }
     }catch(e){
       pd.hide();
       Utils.showError(context, e.toString());
       print(e);
     }
+  }
+  static Future<String> getAssignedRejectedModels(BuildContext context,String token,int PageSize,int PageNumber)async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        return response.body;
+      }else
+        return null;
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
   }
 }

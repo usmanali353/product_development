@@ -4,7 +4,7 @@ import 'package:productdevelopment/Login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Dashboard.dart';
 import 'Utils/Utils.dart';
-
+import 'package:productdevelopment/RejectedModelsActions.dart';
 void main() {
   runApp(MyApp());
 }
@@ -101,7 +101,7 @@ class _MyAppState extends State<MyApp> {
 
         ),
 
-        home: isLogin?Dashboard():Login(),
+        home: isLogin?RejectedModelActions():Login(),
 
       ),
     );

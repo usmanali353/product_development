@@ -1,4 +1,4 @@
-import 'package:productdevelopment/Model/Colors.dart';
+import 'package:productdevelopment/Model/RequestColors.dart';
 
 class TrialRequests{
   int id;
@@ -17,9 +17,9 @@ class TrialRequests{
   dynamic clientVisitDate;
   dynamic actualClientVisitDate;
   List<dynamic> multipleClients,allRequestClients;
-  List<Colors> multipleColors;
+  List<RequestColors> multipleColors;
   List<String> multipleSizeNames;
-  List<Colors> multipleColorNames;
+  List<RequestColors> multipleColorNames;
   List<dynamic> multipleImages,multipleReasons;
   TrialRequests({
     this.id,
@@ -62,10 +62,10 @@ class TrialRequests{
     modelCode: json["modelCode"],
     modelName: json["modelName"],
     multipleClients: json["multipleClients"],
-    multipleColors: List<Colors>.from(json["multipleColors"].map((x) => Colors.fromJson(x))),
+    multipleColors: List<RequestColors>.from(json["multipleColors"].map((x) => RequestColors.fromJson(x))),
     multipleSizeNames: List<String>.from(json["multipleSizeNames"].map((x) => x)),
     multipleImages: List<dynamic>.from(json["multipleImages"].map((x) => x)),
-    multipleColorNames: List<Colors>.from(json["multipleColors"].map((x) => Colors.fromJson(x))),
+    multipleColorNames: List<RequestColors>.from(json["multipleColors"].map((x) => RequestColors.fromJson(x))),
     clientVisitDate:json["clientVisitDate"],
     actualClientVisitDate: json["actualClientVisitDate"],
     allRequestClients:json["allRequestClients"],
