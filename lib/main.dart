@@ -101,7 +101,7 @@ class _MyAppState extends State<MyApp> {
 
         ),
 
-        home: isLogin?RejectedModelActions():Login(),
+        home: isLogin?Dashboard():Login(),
 
       ),
     );

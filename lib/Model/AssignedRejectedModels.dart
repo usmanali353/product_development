@@ -5,7 +5,7 @@ class AssignedRejectedModels{
   String surfaceName,clientName,requestDate,modelName,currentAction,image,userAssigned;
   List<String> multipleSizeNames;
   List<dynamic> multipleImages,multipleReasons;
-  List<RequestColors> multipleColors;
+  List<RequestColors> multipleColors,multipleColorNames;
   int id,requestId;
   AssignedRejectedModels({
     this.id,
@@ -20,7 +20,8 @@ class AssignedRejectedModels{
     this.requestId,
     this.multipleReasons,
     this.multipleColors,
-    this.userAssigned
+    this.userAssigned,
+    this.multipleColorNames
   });
   factory AssignedRejectedModels.fromJson(Map<String, dynamic> json) => AssignedRejectedModels(
     id: json["id"],
@@ -30,6 +31,7 @@ class AssignedRejectedModels{
     image: json["image"],
     clientName: json["clientName"],
     modelName: json["modelName"],
+    multipleColorNames: List<RequestColors>.from(json["multipleColors"].map((x) => RequestColors.fromJson(x))),
     multipleColors: List<RequestColors>.from(json["multipleColors"].map((x) => RequestColors.fromJson(x))),
     multipleSizeNames: List<String>.from(json["multipleSizeNames"].map((x) => x)),
     multipleImages: List<dynamic>.from(json["multipleImages"].map((x) => x)),

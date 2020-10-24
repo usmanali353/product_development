@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/AssignedRejectedModels.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'Network_Operations/Network_Operations.dart';
+import 'RequestImagesGallery.dart';
 import 'Utils/Utils.dart';
 
 class RejectedModelActions extends StatefulWidget {
@@ -23,12 +22,15 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
   int pageNum=1,searchPageNum=1;
   TextEditingController _searchQuery;
   bool _isSearching = false;
+  var selectedPreference;
   var req;
   bool isListVisible=false;
   var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
   @override
   void initState() {
-    // TODO: implement initState
+    _searchQuery = TextEditingController();
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
     super.initState();
   }
   @override
@@ -116,6 +118,12 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                       req=jsonDecode(response);
                       for(int i=0;i<req["response"]['allAssignedRequest'].length;i++){
                         requests.add(AssignedRejectedModels.fromJson(req["response"]['allAssignedRequest'][i]['requestClientDetails']));
+                        print(requests[i].currentAction);
+                      }
+                      this.allRequests = requests;
+
+                      if (this.allRequests.length > 0) {
+                        isListVisible = true;
                       }
                       if(req['hasNext']&&req['hasPrevious']){
                         nextButtonVisible=true;
@@ -133,17 +141,18 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                     });
                   });
                 }else{
-                  Network_Operations.getRequestForGMSearchable(context, prefs.getString("token"), 10, searchPageNum,searchQuery).then((response) {
+                  Network_Operations.getAssignedRejectedModelsSearchable(context, prefs.getString("token"), 10, searchPageNum,searchQuery).then((response) {
                     setState(() {
                       requests.clear();
                       req=jsonDecode(response);
                       for(int i=0;i<req["response"]['allAssignedRequest'].length;i++){
-                        requests.add(AssignedRejectedModels.fromJson(req["response"]['allRequests'][i]));
+                        requests.add(AssignedRejectedModels.fromJson(req["response"]['allAssignedRequest'][i]['requestClientDetails']));
                       }
                       this.allRequests = requests;
 
                       if (this.allRequests.length > 0) {
                         isListVisible = true;
+                        print(allRequests[0].modelName);
                       }
                       print(requests.length);
                       if(req['hasNext']&&req['hasPrevious']){
@@ -169,35 +178,43 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
           });
         },
         child: Visibility(
-          visible: isListVisible,
-          child: ListView.builder(
-              itemCount: allRequests != null ? allRequests.length : 0,
-              itemBuilder: (context, int index) {
-                return Card(
-                  elevation: 6,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      //color: Colors.teal,
-                    ),
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width,
-                    height: MediaQuery
-                        .of(context)
-                        .size
-                        .height * 0.21,
+            visible: isListVisible,
+            child: ListView.builder(itemCount:allRequests!=null?allRequests.length:0,itemBuilder:(context,int index){
+              return Card(
+                elevation: 6,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    //color: Colors.teal,
+                  ),
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * 0.21,
 
-                    child: Padding(
-                      padding: const EdgeInsets.all(13.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              CachedNetworkImage(
+                  child: Padding(
+                    padding: const EdgeInsets.all(13.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      //crossAxisAlignment: CrossAxisAlignment.start,
+                      //mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          //crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            InkWell(
+                              onTap: (){
+                                setState(() {
+                                  List<String> imageUrl=[];
+                                  for(int i=0;i<allRequests[index].multipleImages.length;i++){
+                                    if(allRequests[index].multipleImages[i]!=null){
+                                      imageUrl.add(allRequests[index].multipleImages[i]);
+                                    }
+                                  }
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(allRequests[index])));
+                                });
+
+                              },
+                              child: CachedNetworkImage(
                                 imageUrl: allRequests[index].image!=null?allRequests[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
                                 placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
                                 errorWidget: (context, url, error) => Icon(Icons.upload_file),
@@ -215,62 +232,80 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                                   );
                                 },
                               ),
-                              //Padding(padding: EdgeInsets.only(top:2),),
-                              allRequests[index].multipleColors != null &&
-                                  allRequests[index].multipleColors.length > 0
-                                  ? Row(
-                                children: <Widget>[
-                                  for(int i = 0; i <
-                                      allRequests[index].multipleColors
-                                          .length; i++)
-                                    Padding(
-                                      padding: const EdgeInsets.all(2),
-                                      child: Wrap(
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(
-                                                  2),
-                                              color: Color(Utils.getColorFromHex(
-                                                  allRequests[index]
-                                                      .multipleColors[i]
-                                                      .colorCode)),
-                                              //color: Colors.teal,
-                                            ),
-                                            height: 10,
-                                            width: 15,
+                            ),
+                            //Padding(padding: EdgeInsets.only(top:2),),
+                            allRequests[index].multipleColors!=null&&allRequests[index].multipleColors.length>0?Row(
+                              children: <Widget>[
+                                for(int i=0;i<allRequests[index].multipleColors.length;i++)
+                                  Padding(
+                                    padding: const EdgeInsets.all(2),
+                                    child: Wrap(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(2),
+                                            color: Color(Utils.getColorFromHex(allRequests[index].multipleColors[i].colorCode)),
+                                            //color: Colors.teal,
                                           ),
-
-                                        ],
-                                      ),
+                                          height: 10,
+                                          width: 15,
+                                        ),
+                                      ],
                                     ),
-
-
+                                  ),
+                              ],
+                            ):Container(),
+                          ],
+                        ),
+                        VerticalDivider(color: Colors.grey,),
+                        GestureDetector(
+                          onTapDown: (details)async{
+                            if(allRequests[index].currentAction=="Completed"||allRequests[index].currentAction=="Cancelled"){
+                              SharedPreferences.getInstance().then((prefs){
+                                Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                              });
+                            }else{
+                              await showMenu(
+                                context: context,
+                                position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                items: [
+                                  PopupMenuItem<String>(
+                                      child: const Text('Change Status'), value: 'changeStatus'),
+                                  PopupMenuItem<String>(
+                                      child: const Text('See Details'), value: 'Details'),
                                 ],
-                              )
-                                  : Container(),
-                            ],
-                          ),
-                          VerticalDivider(color: Colors.grey,),
-                          Container(
-                            width: MediaQuery
-                                .of(context)
-                                .size
-                                .width * 0.62,
-                            height: MediaQuery
-                                .of(context)
-                                .size
-                                .height * 0.62,
+                                elevation: 8.0,
+                              ).then((selectedItem){
+                                if(selectedItem=="changeStatus"){
+                                  if(allRequests[index].currentAction=="Assigned"){
+                                    SharedPreferences.getInstance().then((prefs){
+                                      Network_Operations.changeStatusOfAssignedModel(context, prefs.getString("token"),allRequests[index].id, 1).then((value){
+                                        WidgetsBinding.instance
+                                            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                                      });
+                                    });
+                                  }else if(allRequests[index].currentAction=="In Progress"){
+                                    showAlertDialog(context,allRequests[index]);
+                                  }
+                                }else if(selectedItem=="Details"){
+                                  SharedPreferences.getInstance().then((prefs){
+                                    Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                  });
+                                }
+                              });
+                            }
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.62,
+                            height: MediaQuery.of(context).size.height * 0.62,
                             color: Colors.white,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Padding(
-                                  padding: const EdgeInsets.only(left: 6, top: 8),
-                                  child: Text((){
-                                      return allRequests[index].modelName;
-                                  }(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                                  padding: const EdgeInsets.only(left: 6, top: 8,bottom: 6),
+                                  child: Text(allRequests[index].modelName!=null?allRequests[index].modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
                                 ),
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -284,50 +319,74 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                                           color: Colors.teal,
                                         ),
                                         Padding(
-                                          padding: EdgeInsets.only(
-                                              left: 2, right: 2),
+                                          padding: EdgeInsets.only(left: 2, right: 2),
                                         ),
-                                        Text(DateFormat("yyyy-MM-dd").format(
-                                            DateTime.parse(
-                                                allRequests[index].requestDate)))
+                                        Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(allRequests[index].requestDate!=null?allRequests[index].requestDate:DateTime.now().toString())))
                                       ],
                                     ),
                                     Padding(
                                       padding: EdgeInsets.only(left: 30),
-                                      child: Row(
-                                        children: <Widget>[
-                                          Icon(
-                                            Icons.layers,
-                                            color: Colors.teal,
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                                left: 2, right: 2),
-                                          ),
-                                          Text(allRequests[index].surfaceName !=
-                                              null ? allRequests[index]
-                                              .surfaceName : '')
-                                        ],
+                                    ),
+                                    Row(
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.layers,
+                                          color: Colors.teal,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 2, right: 2),
+                                        ),
+                                        Text(allRequests[index].surfaceName!=null?requests[index].surfaceName:''),
+                                      ],
 
-                                      ),
+
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: <Widget>[
+                                    Row(
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.zoom_out_map,
+                                          color: Colors.teal,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 2, right: 2),
+                                        ),
+                                        Text(allRequests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""))
+                                      ],
+
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 27),
                                     ),
 
                                   ],
                                 ),
                                 Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  // mainAxisAlignment: MainAxisAlignment.spaceAround,
                                   children: <Widget>[
-                                    Icon(
-                                      Icons.zoom_out_map,
-                                      color: Colors.teal,
+                                    Row(
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.person,
+                                          color: Colors.teal,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 2, right: 2),
+                                        ),
+                                        Text(allRequests[index].clientName)
+                                      ],
+
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.only(left: 2, right: 2),
+                                      padding: EdgeInsets.only(left: 27),
                                     ),
-                                    Text(allRequests[index].multipleSizeNames
-                                        .toString()
-                                        .replaceAll("[", "")
-                                        .replaceAll("]", "")
-                                        .replaceAll(".00", "")),
+
                                   ],
                                 ),
                                 Padding(
@@ -341,28 +400,27 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                                         color: Colors.teal,
                                       ),
                                       Padding(
-                                        padding: EdgeInsets.only(
-                                            left: 3, right: 3),
+                                        padding: EdgeInsets.only(left: 3, right: 3),
                                       ),
-                                      Text(allRequests[index].currentAction != null
-                                          ? allRequests[index].currentAction
-                                          : '')
+                                      Text(allRequests[index].currentAction!=null?allRequests[index].currentAction:'')
                                     ],
+
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-
                   ),
-                );
-              }),
-        ),
+
+                ),
+              );
+            }),
+          ),
       ),
-    );
+      );
   }
   void _startSearch() {
     ModalRoute
@@ -388,12 +446,12 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
         if(query.isNotEmpty){
           this.searchQuery=query;
           SharedPreferences.getInstance().then((prefs){
-            Network_Operations.getRequestForGMSearchable(context,prefs.getString("token"),10,searchPageNum,query).then((response){
+            Network_Operations.getAssignedRejectedModelsSearchable(context,prefs.getString("token"),10,searchPageNum,query).then((response){
               setState(() {
                 requests.clear();
                 req=jsonDecode(response);
-                for(int i=0;i<req["response"]['allRequests'].length;i++){
-                  requests.add(AssignedRejectedModels.fromJson(req["response"]['allRequests'][i]));
+                for(int i=0;i<req["response"]['allAssignedRequest'].length;i++){
+                  requests.add(AssignedRejectedModels.fromJson(req["response"]['allAssignedRequest'][i]['requestClientDetails']));
                 }
                 this.allRequests = requests;
 
@@ -484,6 +542,155 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
           ],
         ),
       ),
+    );
+  }
+  showAlertDialog(BuildContext context,AssignedRejectedModels request) {
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget approveRejectButton = FlatButton(
+      child: Text("Set"),
+      onPressed: () {
+        if(selectedPreference=="Cancelled"){
+          Navigator.pop(context);
+          SharedPreferences.getInstance().then((prefs){
+            Network_Operations.changeStatusOfAssignedModel(context, prefs.getString("token"),request.id, 3).then((value){
+              WidgetsBinding.instance
+                  .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+            });
+          });
+        }else if(selectedPreference=="Completed"){
+          Navigator.pop(context);
+          showJustificationAlertDialog(context,request);
+        }
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Select your Action"),
+      content: StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              RadioListTile(
+                title: Text("Completed"),
+                value: 'Completed',
+                groupValue: selectedPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("Cancelled"),
+                value: 'Cancelled',
+                groupValue: selectedPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedPreference = choice;
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      ),
+      actions: [
+        cancelButton,
+        approveRejectButton
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+  showJustificationAlertDialog(BuildContext context,AssignedRejectedModels request) {
+    // set up the buttons
+    Widget cancelButton = FlatButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget approveRejectButton = FlatButton(
+      child: Text("Set"),
+      onPressed: () {
+         if(selectedPreference=="Yes"){
+          Navigator.pop(context);
+          SharedPreferences.getInstance().then((prefs){
+            Network_Operations.changeStatusOfAssignedModelWithJustification(context, prefs.getString("token"),request.id, 2,1).then((value){
+              WidgetsBinding.instance
+                  .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+            });
+          });
+        }else{
+           Navigator.pop(context);
+           SharedPreferences.getInstance().then((prefs){
+             Network_Operations.changeStatusOfAssignedModelWithJustification(context, prefs.getString("token"),request.id, 2,0).then((value){
+               WidgetsBinding.instance
+                   .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+             });
+           });
+         }
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Was the Rejection Justified?"),
+      content: StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              RadioListTile(
+                title: Text("Yes"),
+                value: 'Yes',
+                groupValue: selectedPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("No"),
+                value: 'No',
+                groupValue: selectedPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedPreference = choice;
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      ),
+      actions: [
+        cancelButton,
+        approveRejectButton
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }

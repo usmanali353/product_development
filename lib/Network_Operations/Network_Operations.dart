@@ -772,14 +772,58 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   static Future<String> getAssignedRejectedModels(BuildContext context,String token,int PageSize,int PageNumber)async{
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
+
       if(response.statusCode==200){
+        print(response.body);
         return response.body;
       }else
+        Utils.showError(context,response.statusCode.toString());
         return null;
     }catch(e){
       print(e);
       Utils.showError(context, e.toString());
     }
     return null;
+  }
+  static Future<String> getAssignedRejectedModelsSearchable(BuildContext context,String token,int PageSize,int PageNumber,String searchQuery)async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
+
+      if(response.statusCode==200){
+        return response.body;
+      }else
+        Utils.showError(context,response.statusCode.toString());
+      return null;
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static Future<void> changeStatusOfAssignedModel(BuildContext context,String token,int clientId,int statusId)async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        Utils.showSuccess(context,"Status Changed");
+      }else{
+        Utils.showError(context, response.body.toString());
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+  }
+  static Future<void> changeStatusOfAssignedModelWithJustification(BuildContext context,String token,int clientId,int statusId,int isJustified)async{
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId&just=$isJustified",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        Utils.showSuccess(context,"Status Changed");
+      }else{
+        Utils.showError(context, response.body.toString());
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
   }
 }

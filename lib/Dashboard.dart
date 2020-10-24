@@ -1,12 +1,14 @@
 import 'dart:io';
 import 'package:badges/badges.dart';
 import 'package:productdevelopment/DailyClientSchedule.dart';
+import 'package:productdevelopment/Model/AssignedRejectedModels.dart';
 import 'package:productdevelopment/Notifications/NotificationListPage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:productdevelopment/RejectedModelsActions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'AllRequestsList.dart';
 import 'ModelRequests.dart';
@@ -110,6 +112,18 @@ class _DashboardState extends ResumableState<Dashboard> {
                     },
                   ),
                   Divider(),
+                  currentUserRoles!=null&&currentUserRoles["11"]!=null?Column(
+                    children: [
+                      ListTile(
+                        title: Text("Model Rejection Actions"),
+                        leading: Icon(FontAwesomeIcons.gavel),
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>RejectedModelActions()));
+                        },
+                      ),
+                      Divider(),
+                    ],
+                  ):Container(),
                   currentUserRoles!=null&&currentUserRoles["11"]!=null?Column(
                     children: [
                       ListTile(
