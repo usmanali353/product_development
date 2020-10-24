@@ -11,6 +11,7 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:productdevelopment/RejectedModelsActions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'AllRequestsList.dart';
+import 'CustomerRejectionPageWithJustification.dart';
 import 'ModelRequests.dart';
 import 'Network_Operations/Network_Operations.dart';
 import 'ProductionManagerRequests.dart';
@@ -112,7 +113,7 @@ class _DashboardState extends ResumableState<Dashboard> {
                     },
                   ),
                   Divider(),
-                  currentUserRoles!=null&&currentUserRoles["11"]!=null?Column(
+                  currentUserRoles!=null&&currentUserRoles["12"]!=null?Column(
                     children: [
                       ListTile(
                         title: Text("Model Rejection Actions"),
@@ -740,6 +741,121 @@ class _DashboardState extends ResumableState<Dashboard> {
                               child: Container(
                                 //margin: EdgeInsets.only(left: 10,top: 5),
                                 child: Text(requestCount!=null&&requestCount['Rejected By Customer']!=null?requestCount['Rejected By Customer'].toString():"0",
+                                  style: TextStyle(
+                                      color:Colors.teal.shade800,
+                                      //Color(0xFF004c4c),
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 15),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                //Today Deliveries
+                InkWell(
+                  onTap:(){
+                    push(context, MaterialPageRoute(builder: (context)=>CustomerRejectionPageWithJustification(1)));
+                  },
+                  child: Card(
+                    elevation: 10,
+                    child: Container(
+                      height: 130,
+                      //width: 185,
+                      width: MediaQuery.of(context).size.width * 0.45 ,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Color(0xFF004c4c),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Container(
+                            //margin: EdgeInsets.only(left: 12),
+                            child: Text("Justified Rejections",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold
+                              ),
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.only(left: 5, right: 5),
+                            height: 30,
+                            width: 150,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              color: Colors.grey.shade100,
+                            ),
+                            child: Center(
+                              child: Container(
+                                //margin: EdgeInsets.only(left: 10,top: 5),
+                                child: Text(requestCount!=null&&requestCount['Rejection Justified']!=null?requestCount['Rejection Justified'].toString():"0", style: TextStyle(color:Color(0xFF004c4c),
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold
+                                ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Weekly Deliveries
+                InkWell(
+                  onTap: (){
+                    push(context, MaterialPageRoute(builder: (context)=>CustomerRejectionPageWithJustification(0)));
+                  },
+                  child: Card(
+                    elevation: 10,
+                    child: Container(
+                      height: 130,
+                      width: MediaQuery.of(context).size.width * 0.45 ,
+                      //width: MediaQuery.of(context).size.width /2.2 ,
+                      //width: 185,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: Color(0xFF004c4c),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Container(
+                            //margin: EdgeInsets.only(left: 12),
+                            child: Text('UnJustified Rejections',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold
+                              ),
+                            ),
+                          ),
+                          Container(
+                            //padding: EdgeInsets.all(3),
+                            margin: EdgeInsets.only(left: 5, right: 5),
+                            height: 30,
+                            width: 145,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              color: Colors.grey.shade100,
+                            ),
+                            child: Center(
+                              child: Container(
+                                //margin: EdgeInsets.only(left: 10,top: 5),
+                                child: Text(requestCount!=null&&requestCount['Rejection UnJustified']!=null?requestCount['Rejection UnJustified'].toString():"0",
                                   style: TextStyle(
                                       color:Colors.teal.shade800,
                                       //Color(0xFF004c4c),

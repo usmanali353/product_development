@@ -826,4 +826,42 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       Utils.showError(context, e.toString());
     }
   }
+  static Future<String> getTrialRequestsWithJustification(BuildContext context,String token,int isJustified,int PageSize,int PageNumber)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+        return response.body;
+      }else{
+        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+        return null;
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static Future<String> getTrialRequestsWithJustificationSearchable(BuildContext context,String token,int isJustified,int PageSize,int PageNumber,String searchQuery)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+        return response.body;
+      }else{
+        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+        return null;
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
 }
