@@ -234,27 +234,37 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                               ),
                             ),
                             //Padding(padding: EdgeInsets.only(top:2),),
-                            allRequests[index].multipleColors!=null&&allRequests[index].multipleColors.length>0?Row(
-                              children: <Widget>[
-                                for(int i=0;i<allRequests[index].multipleColors.length;i++)
-                                  Padding(
-                                    padding: const EdgeInsets.all(2),
-                                    child: Wrap(
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(2),
-                                            color: Color(Utils.getColorFromHex(allRequests[index].multipleColors[i].colorCode)),
-                                            //color: Colors.teal,
+                            allRequests[index].multipleColors!=null&&allRequests[index].multipleColors.length>0
+                                ?Container(
+                                  width: 55,
+                                  height: 15,
+                                  child: ListView(
+                                    scrollDirection: Axis.horizontal,
+                              children: [
+                                  Row(
+                                    children: <Widget>[
+                                      for(int i=0;i<allRequests[index].multipleColors.length;i++)
+                                        Padding(
+                                          padding: const EdgeInsets.all(2),
+                                          child: Wrap(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(2),
+                                                  color: Color(Utils.getColorFromHex(allRequests[index].multipleColors[i].colorCode)),
+                                                  //color: Colors.teal,
+                                                ),
+                                                height: 10,
+                                                width: 15,
+                                              ),
+                                            ],
                                           ),
-                                          height: 10,
-                                          width: 15,
                                         ),
-                                      ],
-                                    ),
-                                  ),
+                                    ],
+                                  )
                               ],
-                            ):Container(),
+                            ),
+                                ) :Container(),
                           ],
                         ),
                         VerticalDivider(color: Colors.grey,),
@@ -356,7 +366,10 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                                         Padding(
                                           padding: EdgeInsets.only(left: 2, right: 2),
                                         ),
-                                        Text(allRequests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""))
+                                        Container(
+                                            padding: EdgeInsets.only(right: 8),
+                                            child: Text(allRequests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 1,overflow: TextOverflow.ellipsis,)
+                                        )
                                       ],
 
                                     ),

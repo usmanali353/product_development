@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
@@ -302,37 +303,45 @@ class _AllRequestListState extends State<AllRequestList> {
                               //Padding(padding: EdgeInsets.only(top:2),),
                               allRequests[index].multipleColorNames != null &&
                                   allRequests[index].multipleColorNames.length > 0
-                                  ? Row(
-                                children: <Widget>[
-                                  for(int i = 0; i <
-                                      allRequests[index].multipleColorNames
-                                          .length; i++)
-                                    Padding(
-                                      padding: const EdgeInsets.all(2),
-                                      child: Wrap(
-                                        children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(
-                                                  2),
-                                              color: Color(Utils.getColorFromHex(
-                                                  allRequests[index]
-                                                      .multipleColorNames[i]
-                                                      .colorCode)),
-                                              //color: Colors.teal,
+                                  ?Container(
+                                width: 55,
+                                    height:15,
+                                    child: ListView(
+                                      scrollDirection: Axis.horizontal,
+                                children: [
+                                    Row(
+                                      children: <Widget>[
+                                        for(int i = 0; i <
+                                            allRequests[index].multipleColorNames
+                                                .length; i++)
+                                          Padding(
+                                            padding: const EdgeInsets.all(2),
+                                            child: Wrap(
+                                              children: [
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(
+                                                        2),
+                                                    color: Color(Utils.getColorFromHex(
+                                                        allRequests[index]
+                                                            .multipleColorNames[i]
+                                                            .colorCode)),
+                                                    //color: Colors.teal,
+                                                  ),
+                                                  height: 10,
+                                                  width: 15,
+                                                ),
+
+                                              ],
                                             ),
-                                            height: 10,
-                                            width: 15,
                                           ),
 
-                                        ],
-                                      ),
-                                    ),
 
-
+                                      ],
+                                    )
                                 ],
-                              )
-                                  : Container(),
+                              ),
+                                  ) : Container(),
                             ],
                           ),
                           VerticalDivider(color: Colors.grey,),
@@ -457,7 +466,7 @@ class _AllRequestListState extends State<AllRequestList> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 6, top: 8),
+                                    padding: const EdgeInsets.only(left: 6, top: 8, bottom: 2),
                                     child: Text((){
                                       if(allRequests[index].newModelName!=null){
                                         return allRequests[index].newModelName;
@@ -519,11 +528,44 @@ class _AllRequestListState extends State<AllRequestList> {
                                       Padding(
                                         padding: EdgeInsets.only(left: 2, right: 2),
                                       ),
-                                      Text(allRequests[index].multipleSizeNames
-                                          .toString()
-                                          .replaceAll("[", "")
-                                          .replaceAll("]", "")
-                                          .replaceAll(".00", "")),
+                                      // Padding(
+                                      //   padding: const EdgeInsets.only(top: 12),
+                                      //   child: Container(
+                                      //     width: 120,
+                                      //     height: 30,
+                                      //     child: Marquee(
+                                      //       text: allRequests[index].multipleSizeNames
+                                      //             .toString()
+                                      //             .replaceAll("[", "")
+                                      //             .replaceAll("]", "")
+                                      //             .replaceAll(".00", ""),
+                                      //       //style: TextStyle(fontWeight: FontWeight.bold),
+                                      //       scrollAxis: Axis.horizontal,
+                                      //       crossAxisAlignment: CrossAxisAlignment.start,
+                                      //       blankSpace: 20.0,
+                                      //       velocity: 40.0,
+                                      //       pauseAfterRound: Duration(seconds: 1),
+                                      //       startPadding: 10.0,
+                                      //       accelerationDuration: Duration(seconds: 1),
+                                      //       accelerationCurve: Curves.linear,
+                                      //       decelerationDuration: Duration(milliseconds: 500),
+                                      //       decelerationCurve: Curves.easeOut,
+                                      //     ),
+                                      //   ),
+                                      // ),
+                                      Flexible(
+                                        child: Container(
+                                          padding: EdgeInsets.only(right: 8),
+                                          child: Text(allRequests[index].multipleSizeNames
+                                              .toString()
+                                              .replaceAll("[", "")
+                                              .replaceAll("]", "")
+                                              .replaceAll(".00", ""),
+                                              maxLines: 1,
+                                             overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                   ),
                                   Padding(

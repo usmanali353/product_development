@@ -142,27 +142,38 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                                ),
                              ),
                              //Padding(padding: EdgeInsets.only(top:2),),
-                             requests[index].multipleColors!=null&&requests[index].multipleColors.length>0?Row(
-                               children: <Widget>[
-                                 for(int i=0;i<requests[index].multipleColors.length;i++)
-                                   Padding(
-                                     padding: const EdgeInsets.all(2),
-                                     child: Wrap(
-                                       children: [
-                                         Container(
-                                           decoration: BoxDecoration(
-                                             borderRadius: BorderRadius.circular(2),
-                                             color: Color(Utils.getColorFromHex(requests[index].multipleColors[i].colorCode)),
-                                             //color: Colors.teal,
-                                           ),
-                                           height: 10,
-                                           width: 15,
-                                         ),
-                                       ],
-                                     ),
+                             requests[index].multipleColors!=null&&requests[index].multipleColors.length>0
+                                 ?
+                                 Container(
+                                   width: 55,
+                                   height: 15,
+                                   child: ListView(
+                                     scrollDirection: Axis.horizontal,
+                                     children: [
+                                       Row(
+                                         children: <Widget>[
+                                           for(int i=0;i<requests[index].multipleColors.length;i++)
+                                             Padding(
+                                               padding: const EdgeInsets.all(2),
+                                               child: Wrap(
+                                                 children: [
+                                                   Container(
+                                                     decoration: BoxDecoration(
+                                                       borderRadius: BorderRadius.circular(2),
+                                                       color: Color(Utils.getColorFromHex(requests[index].multipleColors[i].colorCode)),
+                                                       //color: Colors.teal,
+                                                     ),
+                                                     height: 10,
+                                                     width: 15,
+                                                   ),
+                                                 ],
+                                               ),
+                                             ),
+                                         ],
+                                       )
+                                     ],
                                    ),
-                               ],
-                             ):Container(),
+                                 ) :Container(),
                            ],
                          ),
                          VerticalDivider(color: Colors.grey,),
@@ -227,7 +238,10 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                                        Padding(
                                          padding: EdgeInsets.only(left: 2, right: 2),
                                        ),
-                                       Text(requests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""))
+                                       Container(
+                                         padding: EdgeInsets.only(right: 8),
+                                           child: Text(requests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 1,overflow: TextOverflow.ellipsis,)
+                                       )
                                      ],
 
                                    ),

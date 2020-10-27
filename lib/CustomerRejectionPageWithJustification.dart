@@ -195,7 +195,7 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                    //color: Colors.teal,
                  ),
                  width: MediaQuery.of(context).size.width,
-                 height: MediaQuery.of(context).size.height * 0.21,
+                 height: 175, //MediaQuery.of(context).size.height * 0.21,
 
                  child: Padding(
                    padding: const EdgeInsets.all(13.0),
@@ -241,27 +241,37 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                              ),
                            ),
                            //Padding(padding: EdgeInsets.only(top:2),),
-                           allRequests[index].multipleColors!=null&&allRequests[index].multipleColors.length>0?Row(
-                             children: <Widget>[
-                               for(int i=0;i<allRequests[index].multipleColors.length;i++)
-                                 Padding(
-                                   padding: const EdgeInsets.all(2),
-                                   child: Wrap(
-                                     children: [
-                                       Container(
-                                         decoration: BoxDecoration(
-                                           borderRadius: BorderRadius.circular(2),
-                                           color: Color(Utils.getColorFromHex(allRequests[index].multipleColors[i].colorCode)),
-                                           //color: Colors.teal,
+                           allRequests[index].multipleColors!=null&&allRequests[index].multipleColors.length>0
+                               ?Container(
+                                 width: 55,
+                                 height: 15,
+                                 child: ListView(
+                             scrollDirection: Axis.horizontal,
+                             children: [
+                                 Row(
+                                   children: <Widget>[
+                                     for(int i=0;i<allRequests[index].multipleColors.length;i++)
+                                       Padding(
+                                         padding: const EdgeInsets.all(2),
+                                         child: Wrap(
+                                           children: [
+                                             Container(
+                                               decoration: BoxDecoration(
+                                                 borderRadius: BorderRadius.circular(2),
+                                                 color: Color(Utils.getColorFromHex(allRequests[index].multipleColors[i].colorCode)),
+                                                 //color: Colors.teal,
+                                               ),
+                                               height: 10,
+                                               width: 15,
+                                             ),
+                                           ],
                                          ),
-                                         height: 10,
-                                         width: 15,
                                        ),
-                                     ],
-                                   ),
-                                 ),
+                                   ],
+                                 )
                              ],
-                           ):Container(),
+                           ),
+                               ):Container(),
                          ],
                        ),
                        VerticalDivider(color: Colors.grey,),
@@ -326,7 +336,35 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                                      Padding(
                                        padding: EdgeInsets.only(left: 2, right: 2),
                                      ),
-                                     Text(allRequests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""))
+                                     // Padding(
+                                     //   padding: const EdgeInsets.only(top: 12),
+                                     //   child: Container(
+                                     //     width: 120,
+                                     //     height: 30,
+                                     //     child: Marquee(
+                                     //       text: allRequests[index].multipleSizeNames
+                                     //           .toString()
+                                     //           .replaceAll("[", "")
+                                     //           .replaceAll("]", "")
+                                     //           .replaceAll(".00", ""),
+                                     //       //style: TextStyle(fontWeight: FontWeight.bold),
+                                     //       scrollAxis: Axis.horizontal,
+                                     //       crossAxisAlignment: CrossAxisAlignment.start,
+                                     //       blankSpace: 10.0,
+                                     //       velocity: 40.0,
+                                     //       pauseAfterRound: Duration(seconds: 1),
+                                     //       startPadding: 10.0,
+                                     //       accelerationDuration: Duration(seconds: 1),
+                                     //       accelerationCurve: Curves.linear,
+                                     //       decelerationDuration: Duration(milliseconds: 500),
+                                     //       decelerationCurve: Curves.easeOut,
+                                     //     ),
+                                     //   ),
+                                     // ),
+                                     Container(
+                                       padding: EdgeInsets.only(right: 8),
+                                         child: Text(allRequests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 1,overflow: TextOverflow.ellipsis,)
+                                     )
                                    ],
 
                                  ),
@@ -360,7 +398,7 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                                ],
                              ),
                              Padding(
-                               padding: const EdgeInsets.only(left: 1),
+                               padding: const EdgeInsets.only(left: 1,top: 3),
                                child: Row(
                                  //crossAxisAlignment: CrossAxisAlignment.start,
                                  children: <Widget>[

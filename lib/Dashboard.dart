@@ -761,60 +761,68 @@ class _DashboardState extends ResumableState<Dashboard> {
             Padding(
               padding: EdgeInsets.only(top: 15),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                //Today Deliveries
-                InkWell(
-                  onTap:(){
-                    push(context, MaterialPageRoute(builder: (context)=>CustomerRejectionPageWithJustification(1)));
-                  },
-                  child: Card(
-                    elevation: 10,
-                    child: Container(
-                      height: 130,
-                      //width: 185,
-                      width: MediaQuery.of(context).size.width * 0.45 ,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Color(0xFF004c4c),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Container(
-                            //margin: EdgeInsets.only(left: 12),
-                            child: Text("Justified Rejections",
+            InkWell(
+              onTap: (){
+                push(context, MaterialPageRoute(builder: (context)=>CustomerRejectionPageWithJustification(1)));
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0,right:8.0),
+                child: Card(
+                  elevation: 10,
+                  child: Container(
+                    // margin: EdgeInsets.only(left: 12.5,right: 12.5),
+                    height: 130,
+                    width: 20,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(left: 12),
+                          child: Text("Justified Rejections",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ),
+                        Container(
+                          //margin: EdgeInsets.only(left: 10, top: 5,bottom: 5),
+                          height: 30,
+                          width: MediaQuery.of(context).size.width *0.35,
+                          //width: 145,
+                          decoration: BoxDecoration(
+
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                bottomLeft: Radius.circular(15)
+                            ),
+                            color: Color(0xFF004c4c),
+                          ),
+                          child: Container(margin: EdgeInsets.only(left: 10,top: 5),
+                            child: Text(requestCount!=null&&requestCount['Rejection Justified']!=null?requestCount['Rejection Justified'].toString():"0",
                               style: TextStyle(
-                                  color: Colors.white,
+                                  color:Colors.white,
+                                  //Color(0xFF004c4c),
+                                  fontSize: 15,
                                   fontWeight: FontWeight.bold
                               ),
                             ),
                           ),
-                          Container(
-                            margin: EdgeInsets.only(left: 5, right: 5),
-                            height: 30,
-                            width: 150,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: Colors.grey.shade100,
-                            ),
-                            child: Center(
-                              child: Container(
-                                //margin: EdgeInsets.only(left: 10,top: 5),
-                                child: Text(requestCount!=null&&requestCount['Rejection Justified']!=null?requestCount['Rejection Justified'].toString():"0", style: TextStyle(color:Color(0xFF004c4c),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold
-                                ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 15),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
                 // Weekly Deliveries
                 InkWell(
                   onTap: (){
@@ -871,69 +879,9 @@ class _DashboardState extends ResumableState<Dashboard> {
                     ),
                   ),
                 ),
-              ],
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 15),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                //Today Deliveries
-                InkWell(
-                  onTap:(){
-                    push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(9,"Dashboard",currentUserRoles)));
-                  },
-                  child: Card(
-                    elevation: 10,
-                    child: Container(
-                      height: 130,
-                      //width: 185,
-                      width: MediaQuery.of(context).size.width * 0.45 ,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Color(0xFF004c4c),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Container(
-                            //margin: EdgeInsets.only(left: 12),
-                            child: Text("Production Approved",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold
-                              ),
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(left: 5, right: 5),
-                            height: 30,
-                            width: 150,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: Colors.grey.shade100,
-                            ),
-                            child: Center(
-                              child: Container(
-                                //margin: EdgeInsets.only(left: 10,top: 5),
-                                child: Text(requestCount!=null&&requestCount['Approved For Production']!=null?requestCount['Approved For Production'].toString():"0", style: TextStyle(color:Color(0xFF004c4c),
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.bold
-                                ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                // Weekly Deliveries
                 InkWell(
                   onTap: (){
-                   push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(10,"Dashboard",currentUserRoles)));
+                    push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(10,"Dashboard",currentUserRoles)));
                   },
                   child: Card(
                     elevation: 10,
@@ -987,6 +935,68 @@ class _DashboardState extends ResumableState<Dashboard> {
                   ),
                 ),
               ],
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 15),
+            ),
+            InkWell(
+              onTap: (){
+                push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(9,"Dashboard",currentUserRoles)));
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0,right:8.0),
+                child: Card(
+                  elevation: 10,
+                  child: Container(
+                    // margin: EdgeInsets.only(left: 12.5,right: 12.5),
+                    height: 130,
+                    width: 20,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(left: 12),
+                          child: Text("Production Approved",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),
+                        ),
+                        Container(
+                          //margin: EdgeInsets.only(left: 10, top: 5,bottom: 5),
+                          height: 30,
+                          width: MediaQuery.of(context).size.width *0.35,
+                          //width: 145,
+                          decoration: BoxDecoration(
+
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                bottomLeft: Radius.circular(15)
+                            ),
+                            color: Color(0xFF004c4c),
+                          ),
+                          child: Container(margin: EdgeInsets.only(left: 10,top: 5),
+                            child: Text(requestCount!=null&&requestCount['Approved For Production']!=null?requestCount['Approved For Production'].toString():"0",
+                              style: TextStyle(
+                                  color:Colors.white,
+                                  //Color(0xFF004c4c),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(bottom: 15),
             ),
           ],
         ),
