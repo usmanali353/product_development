@@ -33,67 +33,78 @@ class _RequestColorsListState extends State<RequestColorsList> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: RefreshIndicator(
-          key: refreshIndicatorKey,
-          onRefresh: (){
-            return Utils.check_connectivity().then((isConnected){
-              if(isConnected){
-                SharedPreferences.getInstance().then((prefs){
-                  Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"),widget.request.requestId).then((requestInfo){
-                    setState(() {
-                      widget.request=requestInfo;
-                      if(widget.request!=null){
-                        isVisible=true;
-                      }
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                //colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
+                image: AssetImage('Assets/img/pattren.png'),
+              )
+          ),
+          child: RefreshIndicator(
+            key: refreshIndicatorKey,
+            onRefresh: (){
+              return Utils.check_connectivity().then((isConnected){
+                if(isConnected){
+                  SharedPreferences.getInstance().then((prefs){
+                    Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"),widget.request.requestId).then((requestInfo){
+                      setState(() {
+                        widget.request=requestInfo;
+                        if(widget.request!=null){
+                          isVisible=true;
+                        }
+                      });
                     });
                   });
-                });
 
-              }else{
-                Utils.showError(context,"Network not Available");
-              }
-            });
-          },
-          child: Visibility(
-            visible: isVisible,
-            child: ListView.builder(
-                itemCount: widget.request.multipleColorNames!=null&&widget.request.multipleColorNames.length>0?widget.request.multipleColorNames.length:0,
-                itemBuilder: (context,index){
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ListTile(
-                          title: Text(widget.request.multipleColorNames[index].colorName!=null?widget.request.multipleColorNames[index].colorName:''),
-                          leading: widget.request.multipleColorNames[index].colorImage!=null?Container(width: 50,height: 50,child: CachedNetworkImage(imageUrl:!widget.request.multipleColorNames[index].colorImage.contains("http://192.236.147.77:8088/assets/user-files/")?"http://192.236.147.77:8088/assets/user-files/"+widget.request.multipleColorNames[index].colorImage:widget.request.multipleColorNames[index].colorImage,placeholder: (context, url) => Container(width:40,height: 40,child: Center(child: CircularProgressIndicator())),errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,))):Container(width:50,height:50,color: Color(Utils.getColorFromHex(widget.request.multipleColorNames[index].colorCode)),),
-                          onTap: (){
-                            Utils.getImage().then((imageFile){
-                              if(imageFile!=null){
-                                imageFile.readAsBytes().then((image){
-                                  if(image!=null){
-                                    setState(() {
-                                      _image = File(imageFile.path);
-                                      base64EncodedImage=base64Encode(image);
-                                      showAddColorDialog(widget.request.multipleColorNames[index].id,base64EncodedImage,widget.request.multipleColorNames[index].colorName);
-                                    });
-                                  }
-                                });
-                              }else{
+                }else{
+                  Utils.showError(context,"Network not Available");
+                }
+              });
+            },
+            child: Visibility(
+              visible: isVisible,
+              child: ListView.builder(
+                  itemCount: widget.request.multipleColorNames!=null&&widget.request.multipleColorNames.length>0?widget.request.multipleColorNames.length:0,
+                  itemBuilder: (context,index){
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: ListTile(
+                            title: Text(widget.request.multipleColorNames[index].colorName!=null?widget.request.multipleColorNames[index].colorName:''),
+                            leading: widget.request.multipleColorNames[index].colorImage!=null?Container(width: 50,height: 50,child: CachedNetworkImage(imageUrl:!widget.request.multipleColorNames[index].colorImage.contains("http://192.236.147.77:8088/assets/user-files/")?"http://192.236.147.77:8088/assets/user-files/"+widget.request.multipleColorNames[index].colorImage:widget.request.multipleColorNames[index].colorImage,placeholder: (context, url) => Container(width:40,height: 40,child: Center(child: CircularProgressIndicator())),errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,))):Container(width:50,height:50,color: Color(Utils.getColorFromHex(widget.request.multipleColorNames[index].colorCode)),),
+                            onTap: (){
+                              Utils.getImage().then((imageFile){
+                                if(imageFile!=null){
+                                  imageFile.readAsBytes().then((image){
+                                    if(image!=null){
+                                      setState(() {
+                                        _image = File(imageFile.path);
+                                        base64EncodedImage=base64Encode(image);
+                                        showAddColorDialog(widget.request.multipleColorNames[index].id,base64EncodedImage,widget.request.multipleColorNames[index].colorName);
+                                      });
+                                    }
+                                  });
+                                }else{
 
-                              }
-                            });
-                              //Navigator.push(context, MaterialPageRoute(builder:(context)=>addImageToColors(widget.request)));
-                          },
+                                }
+                              });
+                                //Navigator.push(context, MaterialPageRoute(builder:(context)=>addImageToColors(widget.request)));
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+              ),
             ),
           ),
         ),

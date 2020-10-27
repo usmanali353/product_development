@@ -56,15 +56,103 @@ class _acmcApprovalState extends State<acmcApproval> {
       appBar: AppBar(
         title: Text("Designers Involved"),
       ),
-      body: ListView(
-        children: <Widget>[
-          FormBuilder(
-            key: fbKey,
-            child: Column(
-              children: <Widget>[
-                Form(
-                  key: formState,
-                  child: Visibility(
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              //colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
+              image: AssetImage('Assets/img/pattren.png'),
+            )
+        ),
+        child: ListView(
+          children: <Widget>[
+            FormBuilder(
+              key: fbKey,
+              child: Column(
+                children: <Widget>[
+                  Form(
+                    key: formState,
+                    child: Visibility(
+                      visible: status=="Approve",
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Card(
+                          elevation: 10,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: MultiSelectFormField(
+                            autovalidate: false,
+                            title: Text("Select Designers"),
+                            hintWidget: Text("Select Designers Involved"),
+                            textField: 'display',
+                            valueField: 'value',
+                            okButtonLabel: 'OK',
+                            cancelButtonLabel: 'CANCEL',
+                            dataSource: designers,
+                            border: InputBorder.none,
+                            validator: (value) {
+                              return value == null || value.length == 0?'Please select one or more Designer':null;
+                            },
+                            onSaved: (value){
+                              if (value == null) return;
+                              setState(() {
+                                myDesigners = value;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: status=="Approve",
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: FormBuilderTextField(
+                          attribute: "Designer Observations",
+                          maxLines: 5,
+                          controller: designerObservations,
+                          validators: [FormBuilderValidators.required()],
+                          decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(16),
+                              border: InputBorder.none,
+                              hintText: "Designer Observations"
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: status=="Approve",
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16,right: 16),
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: FormBuilderTextField(
+                          attribute: "Model Name",
+                          controller: modelName,
+                          validators: [FormBuilderValidators.required()],
+                          decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(16),
+                              border: InputBorder.none,
+                              hintText: "Model Name"
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Visibility(
                     visible: status=="Approve",
                     child: Padding(
                       padding: const EdgeInsets.all(16),
@@ -73,142 +161,65 @@ class _acmcApprovalState extends State<acmcApproval> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: MultiSelectFormField(
-                          autovalidate: false,
-                          title: Text("Select Designers"),
-                          hintWidget: Text("Select Designers Involved"),
-                          textField: 'display',
-                          valueField: 'value',
-                          okButtonLabel: 'OK',
-                          cancelButtonLabel: 'CANCEL',
-                          dataSource: designers,
-                          border: InputBorder.none,
-                          validator: (value) {
-                            return value == null || value.length == 0?'Please select one or more Designer':null;
-                          },
-                          onSaved: (value){
-                            if (value == null) return;
-                            setState(() {
-                              myDesigners = value;
-                            });
-                          },
+                        child: FormBuilderTextField(
+                          attribute: "Model Code",
+                          controller: modelCode,
+                          validators: [FormBuilderValidators.required()],
+                          decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(16),
+                              border: InputBorder.none,
+                              hintText: "Model Code"
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-                Visibility(
-                  visible: status=="Approve",
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
+                  Padding(
+                    padding: status=="Approve"?EdgeInsets.only(left: 16,right: 16,bottom: 16):EdgeInsets.all(16),
                     child: Card(
                       elevation: 10,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: FormBuilderTextField(
-                        attribute: "Designer Observations",
+                        attribute: "Remarks",
+                        controller: remarks,
+                        validators: [FormBuilderValidators.required()],
                         maxLines: 5,
-                        controller: designerObservations,
-                        validators: [FormBuilderValidators.required()],
                         decoration: InputDecoration(
+                            hintText: "Remarks",
                             contentPadding: EdgeInsets.all(16),
-                            border: InputBorder.none,
-                            hintText: "Designer Observations"
+                            border: InputBorder.none
                         ),
                       ),
                     ),
                   ),
-                ),
-                Visibility(
-                  visible: status=="Approve",
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16,right: 16),
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: FormBuilderTextField(
-                        attribute: "Model Name",
-                        controller: modelName,
-                        validators: [FormBuilderValidators.required()],
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(16),
-                            border: InputBorder.none,
-                            hintText: "Model Name"
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Visibility(
-                  visible: status=="Approve",
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: FormBuilderTextField(
-                        attribute: "Model Code",
-                        controller: modelCode,
-                        validators: [FormBuilderValidators.required()],
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(16),
-                            border: InputBorder.none,
-                            hintText: "Model Code"
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: status=="Approve"?EdgeInsets.only(left: 16,right: 16,bottom: 16):EdgeInsets.all(16),
-                  child: Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: FormBuilderTextField(
-                      attribute: "Remarks",
-                      controller: remarks,
-                      validators: [FormBuilderValidators.required()],
-                      maxLines: 5,
-                      decoration: InputDecoration(
-                          hintText: "Remarks",
-                          contentPadding: EdgeInsets.all(16),
-                          border: InputBorder.none
-                      ),
-                    ),
-                  ),
-                ),
-                MaterialButton(
-                  color: Color(0xFF004c4c),
-                  child: Text("Proceed",style: TextStyle(color: Colors.white),),
-                  onPressed: (){
-                    if(fbKey.currentState.validate()&&formState.currentState.validate()){
-                      formState.currentState.save();
-                      if(status=='Reject'){
-                        Network_Operations.changeStatusWithRemarks(context, token, request.requestId, 3,remarks.text);
-                      }else{
-                        Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,modelName.text,modelCode.text,remarks.text);
+                  MaterialButton(
+                    color: Color(0xFF004c4c),
+                    child: Text("Proceed",style: TextStyle(color: Colors.white),),
+                    onPressed: (){
+                      if(fbKey.currentState.validate()&&formState.currentState.validate()){
+                        formState.currentState.save();
+                        if(status=='Reject'){
+                          Network_Operations.changeStatusWithRemarks(context, token, request.requestId, 3,remarks.text);
+                        }else{
+                          Network_Operations.addDesignersAndObservationToRequest(context, request.requestId,myDesigners,designerObservations.text,token,modelName.text,modelCode.text,remarks.text);
+                        }
+
                       }
 
-                    }
+                    },
 
-                  },
+                  ),
+                ],
 
-                ),
-              ],
+              ),
 
-            ),
+            )
 
-          )
+          ],
 
-        ],
-
+        ),
       ),
 
     );

@@ -55,208 +55,219 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
       appBar: AppBar(
         title: Text("Approve/Reject for Trial"),
       ),
-      body: ListView(
-        children: [
-           FormBuilder(
-             key: fbKey,
-             child: Column(
-               children: [
-                 Padding(
-                   padding: EdgeInsets.all(16),
-                   child:Card(
-                     elevation: 10,
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(15),
-                     ),
-                     child: FormBuilderDateTimePicker(
-                       attribute: "Actual Start Date",
-                       style: Theme.of(context).textTheme.bodyText1,
-                       inputType: InputType.date,
-                       validators: [FormBuilderValidators.required()],
-                       format: DateFormat("MM-dd-yyyy"),
-                       decoration: InputDecoration(hintText: "Sample Production Actual Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
-                       onChanged: (value){
-                         setState(() {
-                           this.actualStartDate=value;
-                         });
-                       },
-                     ),
-                   ),
-                 ),
-                 Padding(
-                   padding: EdgeInsets.only(left: 16,right: 16),
-                   child:Card(
-                     elevation: 10,
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(15),
-                     ),
-                     child: FormBuilderDateTimePicker(
-                       attribute: "Sample Production Actual End Date",
-                       style: Theme.of(context).textTheme.bodyText1,
-                       inputType: InputType.date,
-                       validators: [FormBuilderValidators.required()],
-                       format: DateFormat("MM-dd-yyyy"),
-                       decoration: InputDecoration(hintText: "Sample Production Actual End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
-                       onChanged: (value){
-                         setState(() {
-                           this.actualEndDate=value;
-                         });
-                       },
-                     ),
-                   ),
-                 ),
-                 Visibility(
-                   visible: status=="Approve",
-                   child: Padding(
-                     padding: const EdgeInsets.only(left: 16,right: 16,top: 16),
-                     child: Card(
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              //colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
+              image: AssetImage('Assets/img/pattren.png'),
+            )
+        ),
+        child: ListView(
+          children: [
+             FormBuilder(
+               key: fbKey,
+               child: Column(
+                 children: [
+                   Padding(
+                     padding: EdgeInsets.all(16),
+                     child:Card(
                        elevation: 10,
                        shape: RoundedRectangleBorder(
                          borderRadius: BorderRadius.circular(15),
                        ),
-                       child: FormBuilderTextField(
-                         attribute: "Model Name",
-                         controller: modelName,
+                       child: FormBuilderDateTimePicker(
+                         attribute: "Actual Start Date",
+                         style: Theme.of(context).textTheme.bodyText1,
+                         inputType: InputType.date,
                          validators: [FormBuilderValidators.required()],
-                         decoration: InputDecoration(
-                             contentPadding: EdgeInsets.all(16),
-                             border: InputBorder.none,
-                             hintText: "Model Name"
-                         ),
-                       ),
-                     ),
-                   ),
-                 ),
-                 Visibility(
-                   visible: status=="Approve",
-                   child: Padding(
-                     padding: const EdgeInsets.all(16),
-                     child: Card(
-                       elevation: 10,
-                       shape: RoundedRectangleBorder(
-                         borderRadius: BorderRadius.circular(15),
-                       ),
-                       child: FormBuilderTextField(
-                         attribute: "Model Code",
-                         controller: modelCode,
-                         validators: [FormBuilderValidators.required()],
-                         decoration: InputDecoration(
-                             contentPadding: EdgeInsets.all(16),
-                             border: InputBorder.none,
-                             hintText: "Model Code"
-                         ),
-                       ),
-                     ),
-                   ),
-                 ),
-
-                 Visibility(
-                   visible: status=="Approve"&&clientNames.length>0,
-                   child: Padding(
-                     padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
-                     child: Card(
-                       elevation: 10,
-                       shape: RoundedRectangleBorder(
-                         borderRadius: BorderRadius.circular(15),
-                       ),
-                       child: MultiSelectFormField(
-                         autovalidate: false,
-                         title: Text("Select Clients"),
-                         hintWidget: Text("Select Clients for the Trial"),
-                         textField: 'display',
-                         valueField: 'value',
-                         okButtonLabel: 'OK',
-                         cancelButtonLabel: 'CANCEL',
-                         dataSource: clients,
-                         border: InputBorder.none,
-                         validator: (value) {
-                           return value == null || value.length == 0?'Please select one or more Clients':null;
-                         },
-                         onSaved: (value){
-                           if (value == null) return;
+                         format: DateFormat("MM-dd-yyyy"),
+                         decoration: InputDecoration(hintText: "Sample Production Actual Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                         onChanged: (value){
                            setState(() {
-                             myClients = value;
+                             this.actualStartDate=value;
                            });
                          },
                        ),
                      ),
                    ),
-                 ),
-                 Padding(
-                   padding: EdgeInsets.only(bottom: 16,left: 16,right: 16),
-                   child:Card(
-                     elevation: 10,
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(15),
-                     ),
-                     child: FormBuilderDateTimePicker(
-                       attribute: "Client Visit Date",
-                       style: Theme.of(context).textTheme.bodyText1,
-                       inputType: InputType.date,
-                       validators: [FormBuilderValidators.required()],
-                       format: DateFormat("MM-dd-yyyy"),
-                       decoration: InputDecoration(hintText: "Client Visit Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
-                       onChanged: (value){
-                         setState(() {
-                           this.clientVisitDate=value;
-                         });
-                       },
-                     ),
-                   ),
-                 ),
-                 Padding(
-                   padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
-                   child: Card(
-                     elevation: 10,
-                     shape: RoundedRectangleBorder(
-                       borderRadius: BorderRadius.circular(15),
-                     ),
-                     child: FormBuilderTextField(
-                       attribute: "Remarks",
-                       controller: remarks,
-                       validators: [FormBuilderValidators.required()],
-                       maxLines: 5,
-                       decoration: InputDecoration(
-                           hintText: "Remarks",
-                           contentPadding: EdgeInsets.all(16),
-                           border: InputBorder.none
+                   Padding(
+                     padding: EdgeInsets.only(left: 16,right: 16),
+                     child:Card(
+                       elevation: 10,
+                       shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(15),
                        ),
-                     ),
-                   ),
-                 ),
-                 Builder(
-                   builder: (BuildContext context){
-                     return Center(
-                       child: MaterialButton(
-                         onPressed: (){
-                           if(fbKey.currentState.validate()){
-                             if(status=="Approve"){
-                               if(actualStartDate.isBefore(actualEndDate)&&actualEndDate.isAfter(actualStartDate)){
-                                 SharedPreferences.getInstance().then((prefs){
-                                   if(request.marketId==2){
-                                     myClients.clear();
-                                     myClients.add(clientId);
-                                   }
-
-                                   Network_Operations.trialClient(context, prefs.getString("token"),myClients, request.requestId,remarks.text,clientVisitDate,actualStartDate,actualEndDate,modelName.text,modelCode.text);
-                                 });
-                               }else{
-                                 Utils.showError(context,"Actual Start Date Should be before Actual End Date and ");
-                               }
-
-                             }
-                           }
+                       child: FormBuilderDateTimePicker(
+                         attribute: "Sample Production Actual End Date",
+                         style: Theme.of(context).textTheme.bodyText1,
+                         inputType: InputType.date,
+                         validators: [FormBuilderValidators.required()],
+                         format: DateFormat("MM-dd-yyyy"),
+                         decoration: InputDecoration(hintText: "Sample Production Actual End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                         onChanged: (value){
+                           setState(() {
+                             this.actualEndDate=value;
+                           });
                          },
-                         color: Color(0xFF004c4c),
-                         child: Text("Proceed",style: TextStyle(color: Colors.white),),
                        ),
-                     );
-                   },
-                 )
-               ],
-             ),
-           )
-        ],
+                     ),
+                   ),
+                   Visibility(
+                     visible: status=="Approve",
+                     child: Padding(
+                       padding: const EdgeInsets.only(left: 16,right: 16,top: 16),
+                       child: Card(
+                         elevation: 10,
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(15),
+                         ),
+                         child: FormBuilderTextField(
+                           attribute: "Model Name",
+                           controller: modelName,
+                           validators: [FormBuilderValidators.required()],
+                           decoration: InputDecoration(
+                               contentPadding: EdgeInsets.all(16),
+                               border: InputBorder.none,
+                               hintText: "Model Name"
+                           ),
+                         ),
+                       ),
+                     ),
+                   ),
+                   Visibility(
+                     visible: status=="Approve",
+                     child: Padding(
+                       padding: const EdgeInsets.all(16),
+                       child: Card(
+                         elevation: 10,
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(15),
+                         ),
+                         child: FormBuilderTextField(
+                           attribute: "Model Code",
+                           controller: modelCode,
+                           validators: [FormBuilderValidators.required()],
+                           decoration: InputDecoration(
+                               contentPadding: EdgeInsets.all(16),
+                               border: InputBorder.none,
+                               hintText: "Model Code"
+                           ),
+                         ),
+                       ),
+                     ),
+                   ),
+
+                   Visibility(
+                     visible: status=="Approve"&&clientNames.length>0,
+                     child: Padding(
+                       padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
+                       child: Card(
+                         elevation: 10,
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(15),
+                         ),
+                         child: MultiSelectFormField(
+                           autovalidate: false,
+                           title: Text("Select Clients"),
+                           hintWidget: Text("Select Clients for the Trial"),
+                           textField: 'display',
+                           valueField: 'value',
+                           okButtonLabel: 'OK',
+                           cancelButtonLabel: 'CANCEL',
+                           dataSource: clients,
+                           border: InputBorder.none,
+                           validator: (value) {
+                             return value == null || value.length == 0?'Please select one or more Clients':null;
+                           },
+                           onSaved: (value){
+                             if (value == null) return;
+                             setState(() {
+                               myClients = value;
+                             });
+                           },
+                         ),
+                       ),
+                     ),
+                   ),
+                   Padding(
+                     padding: EdgeInsets.only(bottom: 16,left: 16,right: 16),
+                     child:Card(
+                       elevation: 10,
+                       shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(15),
+                       ),
+                       child: FormBuilderDateTimePicker(
+                         attribute: "Client Visit Date",
+                         style: Theme.of(context).textTheme.bodyText1,
+                         inputType: InputType.date,
+                         validators: [FormBuilderValidators.required()],
+                         format: DateFormat("MM-dd-yyyy"),
+                         decoration: InputDecoration(hintText: "Client Visit Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                         onChanged: (value){
+                           setState(() {
+                             this.clientVisitDate=value;
+                           });
+                         },
+                       ),
+                     ),
+                   ),
+                   Padding(
+                     padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
+                     child: Card(
+                       elevation: 10,
+                       shape: RoundedRectangleBorder(
+                         borderRadius: BorderRadius.circular(15),
+                       ),
+                       child: FormBuilderTextField(
+                         attribute: "Remarks",
+                         controller: remarks,
+                         validators: [FormBuilderValidators.required()],
+                         maxLines: 5,
+                         decoration: InputDecoration(
+                             hintText: "Remarks",
+                             contentPadding: EdgeInsets.all(16),
+                             border: InputBorder.none
+                         ),
+                       ),
+                     ),
+                   ),
+                   Builder(
+                     builder: (BuildContext context){
+                       return Center(
+                         child: MaterialButton(
+                           onPressed: (){
+                             if(fbKey.currentState.validate()){
+                               if(status=="Approve"){
+                                 if(actualStartDate.isBefore(actualEndDate)&&actualEndDate.isAfter(actualStartDate)){
+                                   SharedPreferences.getInstance().then((prefs){
+                                     if(request.marketId==2){
+                                       myClients.clear();
+                                       myClients.add(clientId);
+                                     }
+
+                                     Network_Operations.trialClient(context, prefs.getString("token"),myClients, request.requestId,remarks.text,clientVisitDate,actualStartDate,actualEndDate,modelName.text,modelCode.text);
+                                   });
+                                 }else{
+                                   Utils.showError(context,"Actual Start Date Should be before Actual End Date and ");
+                                 }
+
+                               }
+                             }
+                           },
+                           color: Color(0xFF004c4c),
+                           child: Text("Proceed",style: TextStyle(color: Colors.white),),
+                         ),
+                       );
+                     },
+                   )
+                 ],
+               ),
+             )
+          ],
+        ),
       ),
     );
   }

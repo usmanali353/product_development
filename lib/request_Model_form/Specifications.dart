@@ -106,196 +106,207 @@ class _SpecificationsState extends State<Specifications> {
       appBar: AppBar(
         title: Text("Specifications"),
       ),
-      body:ListView(
-        children: <Widget>[
-          FormBuilder(
-            key: fbKey,
-            child: Column(
-              children: <Widget>[
-                //ProductName Dropdown
-                //Product Classification Dropdown
-                Visibility(
-                  visible: classificationDropDownVisible,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top:16,left: 16,right:16,bottom: 16),
+      body:Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              //colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
+              image: AssetImage('Assets/img/pattren.png'),
+            )
+        ),
+        child: ListView(
+          children: <Widget>[
+            FormBuilder(
+              key: fbKey,
+              child: Column(
+                children: <Widget>[
+                  //ProductName Dropdown
+                  //Product Classification Dropdown
+                  Visibility(
+                    visible: classificationDropDownVisible,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top:16,left: 16,right:16,bottom: 16),
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: FormBuilderDropdown(
+                          attribute: "Classification",
+                          validators: [FormBuilderValidators.required()],
+                          hint: Text("Select Classification"),
+                          items:classificationName!=null?classificationName.map((horse)=>DropdownMenuItem(
+                            child: Text(horse),
+                            value: horse,
+                          )).toList():[""].map((name) => DropdownMenuItem(
+                              value: name, child: Text("$name")))
+                              .toList(),
+                          style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.all(16),
+                          ),
+                          onChanged: (value){
+                            setState(() {
+                              surfaceVisible=true;
+                              this.selected_classification=value;
+                              this.classification_id=classifications[classificationName.indexOf(value)].id;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  //Product Surface Dropdown
+                  Visibility(
+                    visible: surfaceDropDownVisible,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16,right: 16),
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)
+                        ),
+                        child: FormBuilderDropdown(
+                          attribute: "Surface",
+                          validators: [FormBuilderValidators.required()],
+                          hint: Text('Select Surface'),
+                          items:surfaceName!=null?surfaceName.map((horse)=>DropdownMenuItem(
+                            child: Text(horse),
+                            value: horse,
+                          )).toList():[""].map((name) => DropdownMenuItem(
+                              value: name, child: Text("$name")))
+                              .toList(),
+                          style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(16),
+                              border: InputBorder.none
+                          ),
+                            onChanged: (value){
+                              setState(() {
+                                this.selected_surface=value;
+                                this.surface_id=surface[surfaceName.indexOf(value)].id;
+                                 });
+                              }
+                        ),
+                      ),
+                    ),
+                  ),
+                  //Product Size Dropdown
+                  Visibility(
+                    visible: sizeDropDownVisible,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16,left: 16,right: 16),
+                      child: Form(
+                        key: formKey2,
+                        child: Card(
+                          elevation: 10,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: MultiSelectFormField(
+                            hintWidget: Text("Select Sizes for the Product"),
+                            title: Text("Select Size"),
+                            border: InputBorder.none,
+                            validator: (value) {
+                              return value == null || value.length == 0?'Please select one or more options':null;
+                            },
+                            dataSource: sizes,
+                            textField: 'display',
+                            valueField: 'value',
+                            okButtonLabel: 'OK',
+                            cancelButtonLabel: 'CANCEL',
+                            onSaved: (value) {
+                              if (value == null) return;
+                              setState(() {
+                                selectedSizes = value;
+                              });
+                            },
+
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  //Product Thickness TextBox
+                  Padding(
+                    padding: EdgeInsets.only(top: 16,left: 16,right: 16),
                     child: Card(
                       elevation: 10,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: FormBuilderDropdown(
-                        attribute: "Classification",
+                      child: FormBuilderTextField(
+                        controller: thickness,
+                        attribute: "Thickness",
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
                         validators: [FormBuilderValidators.required()],
-                        hint: Text("Select Classification"),
-                        items:classificationName!=null?classificationName.map((horse)=>DropdownMenuItem(
-                          child: Text(horse),
-                          value: horse,
-                        )).toList():[""].map((name) => DropdownMenuItem(
-                            value: name, child: Text("$name")))
-                            .toList(),
-                        style: Theme.of(context).textTheme.bodyText1,
-                        decoration: InputDecoration(
+                        decoration: InputDecoration(hintText: "Thickness (cm)",
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.all(16),
                         ),
-                        onChanged: (value){
-                          setState(() {
-                            surfaceVisible=true;
-                            this.selected_classification=value;
-                            this.classification_id=classifications[classificationName.indexOf(value)].id;
-                          });
-                        },
                       ),
                     ),
                   ),
-                ),
-                //Product Surface Dropdown
-                Visibility(
-                  visible: surfaceDropDownVisible,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16,right: 16),
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15)
-                      ),
-                      child: FormBuilderDropdown(
-                        attribute: "Surface",
-                        validators: [FormBuilderValidators.required()],
-                        hint: Text('Select Surface'),
-                        items:surfaceName!=null?surfaceName.map((horse)=>DropdownMenuItem(
-                          child: Text(horse),
-                          value: horse,
-                        )).toList():[""].map((name) => DropdownMenuItem(
-                            value: name, child: Text("$name")))
-                            .toList(),
-                        style: Theme.of(context).textTheme.bodyText1,
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(16),
-                            border: InputBorder.none
-                        ),
-                          onChanged: (value){
-                            setState(() {
-                              this.selected_surface=value;
-                              this.surface_id=surface[surfaceName.indexOf(value)].id;
-                               });
-                            }
-                      ),
-                    ),
-                  ),
-                ),
-                //Product Size Dropdown
-                Visibility(
-                  visible: sizeDropDownVisible,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: 16,left: 16,right: 16),
-                    child: Form(
-                      key: formKey2,
+                  //Product Color multiSelect FormField
+                  Visibility(
+                    visible: colorDropDownVisible,
+                    child: Padding(
+                      padding: EdgeInsets.only(top:16,left:16,right:16),
                       child: Card(
                         elevation: 10,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: MultiSelectFormField(
-                          hintWidget: Text("Select Sizes for the Product"),
-                          title: Text("Select Size"),
+                          title: Text("Select Colors"),
+                          hintWidget: Text("Select Colors for the Product"),
                           border: InputBorder.none,
                           validator: (value) {
                             return value == null || value.length == 0?'Please select one or more options':null;
                           },
-                          dataSource: sizes,
+                          dataSource: colors,
                           textField: 'display',
                           valueField: 'value',
                           okButtonLabel: 'OK',
                           cancelButtonLabel: 'CANCEL',
+                          //value: _myActivities,
                           onSaved: (value) {
                             if (value == null) return;
                             setState(() {
-                              selectedSizes = value;
+                              _myActivities = value;
                             });
                           },
-
                         ),
                       ),
                     ),
                   ),
-                ),
-                //Product Thickness TextBox
-                Padding(
-                  padding: EdgeInsets.only(top: 16,left: 16,right: 16),
-                  child: Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: FormBuilderTextField(
-                      controller: thickness,
-                      attribute: "Thickness",
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
-                      validators: [FormBuilderValidators.required()],
-                      decoration: InputDecoration(hintText: "Thickness (cm)",
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(16),
-                      ),
-                    ),
-                  ),
-                ),
-                //Product Color multiSelect FormField
-                Visibility(
-                  visible: colorDropDownVisible,
-                  child: Padding(
-                    padding: EdgeInsets.only(top:16,left:16,right:16),
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: MultiSelectFormField(
-                        title: Text("Select Colors"),
-                        hintWidget: Text("Select Colors for the Product"),
-                        border: InputBorder.none,
-                        validator: (value) {
-                          return value == null || value.length == 0?'Please select one or more options':null;
-                        },
-                        dataSource: colors,
-                        textField: 'display',
-                        valueField: 'value',
-                        okButtonLabel: 'OK',
-                        cancelButtonLabel: 'CANCEL',
-                        //value: _myActivities,
-                        onSaved: (value) {
-                          if (value == null) return;
-                          setState(() {
-                            _myActivities = value;
-                          });
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Center(
+                      child: MaterialButton(
+                        color: Color(0xFF004c4c),
+                        child: Text("Proceed",style: TextStyle(color: Colors.white),),
+                        onPressed: (){
+                          if(fbKey.currentState.validate()&&formKey2.currentState.validate()){
+                            //formKey.currentState.save();
+                            formKey2.currentState.save();
+                            setState(() {
+                              _myActivitiesResult = _myActivities.toString();
+                            });
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>designTopology(market,event,selectedSizes,surface_id,thickness.text,classification_id,_myActivities,myClients,colors)));
+                          }
                         },
                       ),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Center(
-                    child: MaterialButton(
-                      color: Color(0xFF004c4c),
-                      child: Text("Proceed",style: TextStyle(color: Colors.white),),
-                      onPressed: (){
-                        if(fbKey.currentState.validate()&&formKey2.currentState.validate()){
-                          //formKey.currentState.save();
-                          formKey2.currentState.save();
-                          setState(() {
-                            _myActivitiesResult = _myActivities.toString();
-                          });
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>designTopology(market,event,selectedSizes,surface_id,thickness.text,classification_id,_myActivities,myClients,colors)));
-                        }
-                      },
-                    ),
-                  ),
-                )
-              ],
+                  )
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       )
     );
   }

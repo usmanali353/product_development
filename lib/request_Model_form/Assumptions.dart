@@ -96,27 +96,103 @@ class _AssumptionsState extends State<Assumptions> {
 
       ),
 
-      body: ListView(
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              //colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
+              image: AssetImage('Assets/img/pattren.png'),
+            )
+        ),
+        child: ListView(
 
-        children: <Widget>[
+          children: <Widget>[
 
-          FormBuilder(
+            FormBuilder(
 
-            key: _fbKey,
+              key: _fbKey,
 
-            child: Column(
+              child: Column(
 
-              children: <Widget>[
+                children: <Widget>[
 
-                //Market Dropdown
+                  //Market Dropdown
 
-                Visibility(
+                  Visibility(
 
-                  visible: marketDropdownVisible,
+                    visible: marketDropdownVisible,
 
-                  child: Padding(
+                    child: Padding(
 
-                    padding: const EdgeInsets.only(top: 16,left: 16,right:16),
+                      padding: const EdgeInsets.only(top: 16,left: 16,right:16),
+
+                      child: Card(
+
+                        elevation: 10,
+
+                        shape: RoundedRectangleBorder(
+
+                          borderRadius: BorderRadius.circular(15),
+
+                        ),
+
+                        child: FormBuilderDropdown(
+
+                          attribute: "Market",
+
+                          validators: [FormBuilderValidators.required()],
+
+                          hint: Text("Select Market"),
+
+                          items:marketNames!=null?marketNames.map((horse)=>DropdownMenuItem(
+
+                            child: Text(horse),
+
+                            value: horse,
+
+                          )).toList():[""].map((name) => DropdownMenuItem(
+
+                              value: name, child: Text("$name")))
+
+                              .toList(),
+
+                          style: Theme.of(context).textTheme.bodyText1,
+
+                          decoration: InputDecoration(
+
+                            border: InputBorder.none,
+
+                            contentPadding: EdgeInsets.all(16),
+
+                          ),
+
+                          onChanged: (value){
+
+                            setState(() {
+
+                              this.selectedMarket=value;
+
+                              this.marketId=markets[marketNames.indexOf(value)].id;
+
+                            });
+
+                          },
+
+                        ),
+
+                      ),
+
+                    ),
+
+                  ),
+
+                  // Event TextBox
+
+                  Padding(
+
+                    padding: EdgeInsets.only(top: 16,left: 16,right: 16,bottom: 16),
 
                     child: Card(
 
@@ -128,29 +204,15 @@ class _AssumptionsState extends State<Assumptions> {
 
                       ),
 
-                      child: FormBuilderDropdown(
+                      child: FormBuilderTextField(
 
-                        attribute: "Market",
+                        controller: event,
+
+                        attribute: "Event",
 
                         validators: [FormBuilderValidators.required()],
 
-                        hint: Text("Select Market"),
-
-                        items:marketNames!=null?marketNames.map((horse)=>DropdownMenuItem(
-
-                          child: Text(horse),
-
-                          value: horse,
-
-                        )).toList():[""].map((name) => DropdownMenuItem(
-
-                            value: name, child: Text("$name")))
-
-                            .toList(),
-
-                        style: Theme.of(context).textTheme.bodyText1,
-
-                        decoration: InputDecoration(
+                        decoration: InputDecoration(hintText: "Event",
 
                           border: InputBorder.none,
 
@@ -158,189 +220,138 @@ class _AssumptionsState extends State<Assumptions> {
 
                         ),
 
-                        onChanged: (value){
-
-                          setState(() {
-
-                            this.selectedMarket=value;
-
-                            this.marketId=markets[marketNames.indexOf(value)].id;
-
-                          });
-
-                        },
-
                       ),
 
                     ),
 
                   ),
+                    // Client Dropdown
+                  Visibility(
+                    visible:marketId!=null&&marketId==2,
+                    child: Padding(
 
-                ),
+                      padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
 
-                // Event TextBox
+                      child: Card(
 
-                Padding(
+                        elevation: 10,
 
-                  padding: EdgeInsets.only(top: 16,left: 16,right: 16,bottom: 16),
+                        shape: RoundedRectangleBorder(
 
-                  child: Card(
-
-                    elevation: 10,
-
-                    shape: RoundedRectangleBorder(
-
-                      borderRadius: BorderRadius.circular(15),
-
-                    ),
-
-                    child: FormBuilderTextField(
-
-                      controller: event,
-
-                      attribute: "Event",
-
-                      validators: [FormBuilderValidators.required()],
-
-                      decoration: InputDecoration(hintText: "Event",
-
-                        border: InputBorder.none,
-
-                        contentPadding: EdgeInsets.all(16),
-
-                      ),
-
-                    ),
-
-                  ),
-
-                ),
-                  // Client Dropdown
-                Visibility(
-                  visible:marketId!=null&&marketId==2,
-                  child: Padding(
-
-                    padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
-
-                    child: Card(
-
-                      elevation: 10,
-
-                      shape: RoundedRectangleBorder(
-
-                        borderRadius: BorderRadius.circular(15),
-
-                      ),
-
-                      child: FormBuilderDropdown(
-
-                        attribute: "Client",
-
-                        validators: [FormBuilderValidators.required()],
-
-                        hint: Text("Select Client"),
-
-                        items:clientNames!=null?clientNames.map((horse)=>DropdownMenuItem(
-
-                          child: Text(horse),
-
-                          value: horse,
-
-                        )).toList():[""].map((name) => DropdownMenuItem(
-
-                            value: name, child: Text("$name")))
-
-                            .toList(),
-
-                        style: Theme.of(context).textTheme.bodyText1,
-
-                        decoration: InputDecoration(
-
-                          border: InputBorder.none,
-
-                          contentPadding: EdgeInsets.all(16),
+                          borderRadius: BorderRadius.circular(15),
 
                         ),
 
-                        onChanged: (value){
+                        child: FormBuilderDropdown(
 
-                          setState(() {
-                            this.clientId =clients[clientNames.indexOf(value)].stringId;
-                          });
+                          attribute: "Client",
 
-                        },
+                          validators: [FormBuilderValidators.required()],
+
+                          hint: Text("Select Client"),
+
+                          items:clientNames!=null?clientNames.map((horse)=>DropdownMenuItem(
+
+                            child: Text(horse),
+
+                            value: horse,
+
+                          )).toList():[""].map((name) => DropdownMenuItem(
+
+                              value: name, child: Text("$name")))
+
+                              .toList(),
+
+                          style: Theme.of(context).textTheme.bodyText1,
+
+                          decoration: InputDecoration(
+
+                            border: InputBorder.none,
+
+                            contentPadding: EdgeInsets.all(16),
+
+                          ),
+
+                          onChanged: (value){
+
+                            setState(() {
+                              this.clientId =clients[clientNames.indexOf(value)].stringId;
+                            });
+
+                          },
+
+                        ),
 
                       ),
 
                     ),
-
                   ),
-                ),
-                Visibility(
-                  visible:marketId!=null&&marketId!=2,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: MultiSelectFormField(
-                        autovalidate: false,
-                        title: Text("Select Clients"),
-                        hintWidget: Text("Select Clients"),
-                        textField: 'display',
-                        valueField: 'value',
-                        okButtonLabel: 'OK',
-                        cancelButtonLabel: 'CANCEL',
-                        dataSource: clientMultiSelectList,
-                        border: InputBorder.none,
-                        validator: (value) {
-                          return value == null || value.length == 0?'Please select one or more Clients':null;
-                        },
-                        onSaved: (value){
-                          if (value == null) return;
-                          setState(() {
-                            myClients = value;
-                          });
-                        },
+                  Visibility(
+                    visible:marketId!=null&&marketId!=2,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: MultiSelectFormField(
+                          autovalidate: false,
+                          title: Text("Select Clients"),
+                          hintWidget: Text("Select Clients"),
+                          textField: 'display',
+                          valueField: 'value',
+                          okButtonLabel: 'OK',
+                          cancelButtonLabel: 'CANCEL',
+                          dataSource: clientMultiSelectList,
+                          border: InputBorder.none,
+                          validator: (value) {
+                            return value == null || value.length == 0?'Please select one or more Clients':null;
+                          },
+                          onSaved: (value){
+                            if (value == null) return;
+                            setState(() {
+                              myClients = value;
+                            });
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Center(
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Center(
 
-                    child: MaterialButton(
+                      child: MaterialButton(
 
-                      child: Text("Proceed",style: TextStyle(color: Colors.white),),
+                        child: Text("Proceed",style: TextStyle(color: Colors.white),),
 
-                      color: Color(0xFF004c4c),
+                        color: Color(0xFF004c4c),
 
-                      onPressed: (){
+                        onPressed: (){
 
-                        if(_fbKey.currentState.validate()){
-                          if(marketId==2) {
-                            myClients.add(clientId);
+                          if(_fbKey.currentState.validate()){
+                            if(marketId==2) {
+                              myClients.add(clientId);
+                            }
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>Specifications(marketId,event.text,myClients)));
                           }
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>Specifications(marketId,event.text,myClients)));
-                        }
-                      },
+                        },
+
+                      ),
 
                     ),
-
                   ),
-                ),
 
-              ],
+                ],
 
-            ),
+              ),
 
-          )
+            )
 
-        ],
+          ],
 
+        ),
       ),
 
     );

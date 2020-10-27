@@ -117,231 +117,242 @@ int range_id, material_id,technology_id, structure_id, edge_id;
       appBar: AppBar(
         title: Text("More Specifications"),
       ),
-      body: ListView(
-        children: <Widget>[
-          FormBuilder(
-            key: fbkey,
-            child: Column(
-              children: <Widget>[
-                Form(
-                  key: formKey,
-                  child: Visibility(
-                    visible: designTopologyDropDownVisible,
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              //colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
+              image: AssetImage('Assets/img/pattren.png'),
+            )
+        ),
+        child: ListView(
+          children: <Widget>[
+            FormBuilder(
+              key: fbkey,
+              child: Column(
+                children: <Widget>[
+                  Form(
+                    key: formKey,
+                    child: Visibility(
+                      visible: designTopologyDropDownVisible,
+                      child: Padding(
+                        padding: EdgeInsets.only(top:16,left:16,right:16),
+                        child: Card(
+                          elevation: 10,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)
+                          ),
+                          child: MultiSelectFormField(
+                            title: Text("Select Design Topology"),
+                            hintWidget: Text("Select Design Topology"),
+                            border: InputBorder.none,
+                            validator: (value) {
+                              return value == null || value.length == 0?'Please select one or more options':null;
+                            },
+                            dataSource: designTopologies,
+                            textField: 'display',
+                            valueField: 'value',
+                            okButtonLabel: 'OK',
+                            cancelButtonLabel: 'CANCEL',
+                            //value: _myActivities,
+                            onSaved: (value) {
+                              if (value == null) return;
+                              setState(() {
+                                _myMaterials = value;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  //Product Materials
+
+                  //Product Range
+                  Visibility(
+                    visible: rangeDropdownVisible,
                     child: Padding(
-                      padding: EdgeInsets.only(top:16,left:16,right:16),
+                      padding: const EdgeInsets.only(top: 16,left: 16,right:16),
                       child: Card(
                         elevation: 10,
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        child: MultiSelectFormField(
-                          title: Text("Select Design Topology"),
-                          hintWidget: Text("Select Design Topology"),
-                          border: InputBorder.none,
-                          validator: (value) {
-                            return value == null || value.length == 0?'Please select one or more options':null;
-                          },
-                          dataSource: designTopologies,
-                          textField: 'display',
-                          valueField: 'value',
-                          okButtonLabel: 'OK',
-                          cancelButtonLabel: 'CANCEL',
-                          //value: _myActivities,
-                          onSaved: (value) {
-                            if (value == null) return;
+                        child: FormBuilderDropdown(
+                          attribute: "Range",
+                          validators: [FormBuilderValidators.required()],
+                          hint: Text("Select Range"),
+                          items:rangeName!=null?rangeName.map((horse)=>DropdownMenuItem(
+                            child: Text(horse),
+                            value: horse,
+                          )).toList():[""].map((name) => DropdownMenuItem(
+                              value: name, child: Text("$name")))
+                              .toList(),
+                          style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.all(16),
+                          ),
+                          onChanged: (value){
                             setState(() {
-                              _myMaterials = value;
+                              this.selected_range=value;
+                              this.range_id=range[rangeName.indexOf(value)].id;
                             });
                           },
                         ),
                       ),
                     ),
                   ),
-                ),
-                //Product Materials
-
-                //Product Range
-                Visibility(
-                  visible: rangeDropdownVisible,
-                  child: Padding(
+                  //Product Technology
+                  Padding(
                     padding: const EdgeInsets.only(top: 16,left: 16,right:16),
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: FormBuilderDropdown(
-                        attribute: "Range",
-                        validators: [FormBuilderValidators.required()],
-                        hint: Text("Select Range"),
-                        items:rangeName!=null?rangeName.map((horse)=>DropdownMenuItem(
-                          child: Text(horse),
-                          value: horse,
-                        )).toList():[""].map((name) => DropdownMenuItem(
-                            value: name, child: Text("$name")))
-                            .toList(),
-                        style: Theme.of(context).textTheme.bodyText1,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.all(16),
+                    child: Visibility(
+                       visible: technologyDropdownVisible,
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        onChanged: (value){
-                          setState(() {
-                            this.selected_range=value;
-                            this.range_id=range[rangeName.indexOf(value)].id;
-                          });
-                        },
+                        child: FormBuilderDropdown(
+                          attribute: "Technology",
+                          validators: [FormBuilderValidators.required()],
+                          hint: Text("Select Technology"),
+                          items:technologyName!=null?technologyName.map((horse)=>DropdownMenuItem(
+                            child: Text(horse),
+                            value: horse,
+                          )).toList():[""].map((name) => DropdownMenuItem(
+                              value: name, child: Text("$name")))
+                              .toList(),
+                          style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            border:InputBorder.none,
+                            contentPadding: EdgeInsets.all(16),
+                          ),
+                          onChanged: (value){
+                            setState(() {
+                              this.selected_technology=value;
+                              this.technology_id=technology[technologyName.indexOf(value)].id;
+                            });
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
-                //Product Technology
-                Padding(
-                  padding: const EdgeInsets.only(top: 16,left: 16,right:16),
-                  child: Visibility(
-                     visible: technologyDropdownVisible,
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: FormBuilderDropdown(
-                        attribute: "Technology",
-                        validators: [FormBuilderValidators.required()],
-                        hint: Text("Select Technology"),
-                        items:technologyName!=null?technologyName.map((horse)=>DropdownMenuItem(
-                          child: Text(horse),
-                          value: horse,
-                        )).toList():[""].map((name) => DropdownMenuItem(
-                            value: name, child: Text("$name")))
-                            .toList(),
-                        style: Theme.of(context).textTheme.bodyText1,
-                        decoration: InputDecoration(
-                          border:InputBorder.none,
-                          contentPadding: EdgeInsets.all(16),
+                  //Product Structure
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16,right: 16,left: 16),
+                    child: Visibility(
+                       visible: structureDropdownVisible,
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
-                        onChanged: (value){
-                          setState(() {
-                            this.selected_technology=value;
-                            this.technology_id=technology[technologyName.indexOf(value)].id;
-                          });
-                        },
+                        child: FormBuilderDropdown(
+                          attribute: "Structure",
+                          validators: [FormBuilderValidators.required()],
+                          hint: Text("Select Structure"),
+                          items:structureName!=null?structureName.map((horse)=>DropdownMenuItem(
+                            child: Text(horse),
+                            value: horse,
+                          )).toList():[""].map((name) => DropdownMenuItem(
+                              value: name, child: Text("$name")))
+                              .toList(),
+                          style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.all(16)
+                          ),
+                          onChanged: (value){
+                            setState(() {
+                              this.selected_structure=value;
+                              this.structure_id=structure[structureName.indexOf(value)].id;
+                            });
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
-                //Product Structure
-                Padding(
-                  padding: const EdgeInsets.only(top: 16,right: 16,left: 16),
-                  child: Visibility(
-                     visible: structureDropdownVisible,
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: FormBuilderDropdown(
-                        attribute: "Structure",
-                        validators: [FormBuilderValidators.required()],
-                        hint: Text("Select Structure"),
-                        items:structureName!=null?structureName.map((horse)=>DropdownMenuItem(
-                          child: Text(horse),
-                          value: horse,
-                        )).toList():[""].map((name) => DropdownMenuItem(
-                            value: name, child: Text("$name")))
-                            .toList(),
-                        style: Theme.of(context).textTheme.bodyText1,
-                        decoration: InputDecoration(
+                  //Edge
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16,left: 16,right:16),
+                    child: Visibility(
+                       visible: edgeDropdownVisible,
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: FormBuilderDropdown(
+                          attribute: "Edge",
+                          validators: [FormBuilderValidators.required()],
+                          hint: Text("Select Edge"),
+                          items:edgeName!=null?edgeName.map((horse)=>DropdownMenuItem(
+                            child: Text(horse),
+                            value: horse,
+                          )).toList():[""].map((name) => DropdownMenuItem(
+                              value: name, child: Text("$name")))
+                              .toList(),
+                          style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(16)
+                            contentPadding: EdgeInsets.all(16),
+                          ),
+                          onChanged: (value){
+                            setState(() {
+                              this.selected_edge=value;
+                              this.edge_id=edge[edgeName.indexOf(value)].id;
+                            });
+                          },
                         ),
-                        onChanged: (value){
-                          setState(() {
-                            this.selected_structure=value;
-                            this.structure_id=structure[structureName.indexOf(value)].id;
-                          });
+                      ),
+                    ),
+                  ),
+
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: MaterialButton(
+                        color: Color(0xFF004c4c),
+                        child: Text("Proceed",style: TextStyle(color: Colors.white),),
+                        onPressed: (){
+                          if(fbkey.currentState.validate()&&formKey.currentState.validate()){
+                            formKey.currentState.save();
+                            setState(() {
+                              selected_material=_myMaterials.toString();
+                              print(selected_material);
+                            });
+                            print(technology_id.toString());
+                            print( range_id.toString());
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>Suitability(
+                                market,
+                                event,
+                                sizesList,
+                                surfaceId,
+                                thickness,
+                                classification,
+                                colorsList,
+                                technology_id,
+                                structure_id,
+                                edge_id,
+                                range_id,
+                                _myMaterials,
+                                myClients,
+                               colorsDropDown,
+                            )));
+
+                          }
                         },
                       ),
                     ),
-                  ),
-                ),
-                //Edge
-                Padding(
-                  padding: const EdgeInsets.only(top: 16,left: 16,right:16),
-                  child: Visibility(
-                     visible: edgeDropdownVisible,
-                    child: Card(
-                      elevation: 10,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: FormBuilderDropdown(
-                        attribute: "Edge",
-                        validators: [FormBuilderValidators.required()],
-                        hint: Text("Select Edge"),
-                        items:edgeName!=null?edgeName.map((horse)=>DropdownMenuItem(
-                          child: Text(horse),
-                          value: horse,
-                        )).toList():[""].map((name) => DropdownMenuItem(
-                            value: name, child: Text("$name")))
-                            .toList(),
-                        style: Theme.of(context).textTheme.bodyText1,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.all(16),
-                        ),
-                        onChanged: (value){
-                          setState(() {
-                            this.selected_edge=value;
-                            this.edge_id=edge[edgeName.indexOf(value)].id;
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: MaterialButton(
-                      color: Color(0xFF004c4c),
-                      child: Text("Proceed",style: TextStyle(color: Colors.white),),
-                      onPressed: (){
-                        if(fbkey.currentState.validate()&&formKey.currentState.validate()){
-                          formKey.currentState.save();
-                          setState(() {
-                            selected_material=_myMaterials.toString();
-                            print(selected_material);
-                          });
-                          print(technology_id.toString());
-                          print( range_id.toString());
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>Suitability(
-                              market,
-                              event,
-                              sizesList,
-                              surfaceId,
-                              thickness,
-                              classification,
-                              colorsList,
-                              technology_id,
-                              structure_id,
-                              edge_id,
-                              range_id,
-                              _myMaterials,
-                              myClients,
-                             colorsDropDown,
-                          )));
-
-                        }
-                      },
-                    ),
-                  ),
-                )
-              ],
-            ),
-          )
-        ],
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

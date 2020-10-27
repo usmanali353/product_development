@@ -115,217 +115,228 @@ class _Suitability_State extends State<Suitability> {
         appBar: AppBar(
           title: Text("Suitability"),
         ),
-        body:ListView(
-          children: <Widget>[
-            FormBuilder(
-              key: fbKey,
-              child: Column(
-                children: <Widget>[
-                  //ProductName Dropdown
-                  //Product Color multiSelect FormField
-                  Form(
-                    key: formKey,
-                    child: Visibility(
-                      visible: suitibilityDropDownVisible,
-                      child: Padding(
-                        padding: EdgeInsets.only(top:16,left:16,right:16),
-                        child: Card(
-                          elevation: 10,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)
-                          ),
-                          child: MultiSelectFormField(
-                            title: Text("Select Suitibility"),
-                            hintWidget: Text("Select Suitibility for the Product"),
-                            border: InputBorder.none,
-                            validator: (value) {
-                              return value == null || value.length == 0?'Please select one or more options':null;
-                            },
-                            dataSource:suitibilitys,
-                            textField: 'display',
-                            valueField: 'value',
-                            okButtonLabel: 'OK',
-                            cancelButtonLabel: 'CANCEL',
-                            //value: _myActivities,
-                            onSaved: (value) {
-                              if (value == null) return;
-                              setState(() {
-                                _myActivities = value;
-                              });
-                            },
+        body:Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                //colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
+                image: AssetImage('Assets/img/pattren.png'),
+              )
+          ),
+          child: ListView(
+            children: <Widget>[
+              FormBuilder(
+                key: fbKey,
+                child: Column(
+                  children: <Widget>[
+                    //ProductName Dropdown
+                    //Product Color multiSelect FormField
+                    Form(
+                      key: formKey,
+                      child: Visibility(
+                        visible: suitibilityDropDownVisible,
+                        child: Padding(
+                          padding: EdgeInsets.only(top:16,left:16,right:16),
+                          child: Card(
+                            elevation: 10,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15)
+                            ),
+                            child: MultiSelectFormField(
+                              title: Text("Select Suitibility"),
+                              hintWidget: Text("Select Suitibility for the Product"),
+                              border: InputBorder.none,
+                              validator: (value) {
+                                return value == null || value.length == 0?'Please select one or more options':null;
+                              },
+                              dataSource:suitibilitys,
+                              textField: 'display',
+                              valueField: 'value',
+                              okButtonLabel: 'OK',
+                              cancelButtonLabel: 'CANCEL',
+                              //value: _myActivities,
+                              onSaved: (value) {
+                                if (value == null) return;
+                                setState(() {
+                                  _myActivities = value;
+                                });
+                              },
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                   Padding(
-                     padding: EdgeInsets.only(top:16,left:16,right: 16),
-                     child: Card(
-                       elevation: 10,
-                       shape: RoundedRectangleBorder(
-                         borderRadius: BorderRadius.circular(15),
-                       ),
-                       child: FormBuilderTextField(
-                         attribute: "Technical Consideration",
-                         controller: technical_consideration,
-                         maxLines: 8,
-                         validators: [FormBuilderValidators.required()],
-                         decoration: InputDecoration(
-                             contentPadding: EdgeInsets.all(16),
-                             border: InputBorder.none,
-                             hintText: "Technical Consideration"
+                     Padding(
+                       padding: EdgeInsets.only(top:16,left:16,right: 16),
+                       child: Card(
+                         elevation: 10,
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(15),
+                         ),
+                         child: FormBuilderTextField(
+                           attribute: "Technical Consideration",
+                           controller: technical_consideration,
+                           maxLines: 8,
+                           validators: [FormBuilderValidators.required()],
+                           decoration: InputDecoration(
+                               contentPadding: EdgeInsets.all(16),
+                               border: InputBorder.none,
+                               hintText: "Technical Consideration"
+                           ),
                          ),
                        ),
                      ),
-                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.all(16),
-                          height: 100,
-                          width: 80,
-                          child: _image == null ? Text('No image selected.') : Image.file(_image),
-                        ),
-                        MaterialButton(
-                          color: Color(0xFF004c4c),
-                          onPressed: (){
-                            Utils.getImage().then((image_file){
-                              if(image_file!=null){
-                                image_file.readAsBytes().then((image){
-                                  if(image!=null){
-                                    setState(() {
-                                      this.picked_image=image;
-                                      _image = File(image_file.path);
-                                      base64EncodedImage=base64Encode(picked_image);
-                                    });
-                                  }
-                                });
-                              }else{
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.all(16),
+                            height: 100,
+                            width: 80,
+                            child: _image == null ? Text('No image selected.') : Image.file(_image),
+                          ),
+                          MaterialButton(
+                            color: Color(0xFF004c4c),
+                            onPressed: (){
+                              Utils.getImage().then((image_file){
+                                if(image_file!=null){
+                                  image_file.readAsBytes().then((image){
+                                    if(image!=null){
+                                      setState(() {
+                                        this.picked_image=image;
+                                        _image = File(image_file.path);
+                                        base64EncodedImage=base64Encode(picked_image);
+                                      });
+                                    }
+                                  });
+                                }else{
 
+                                }
+                              });
+                            },
+                            child: Text("Select Image",style: TextStyle(color: Colors.white),),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+
+                      padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
+
+                      child: Card(
+
+                        elevation: 10,
+
+                        shape: RoundedRectangleBorder(
+
+                          borderRadius: BorderRadius.circular(15),
+
+                        ),
+
+                        child: FormBuilderDropdown(
+
+                          attribute: "Color",
+
+                          validators: [FormBuilderValidators.required()],
+
+                          hint: Text("Select Color for Image"),
+
+                          items:colorName!=null?colorName.map((horse)=>DropdownMenuItem(
+
+                            child: Text(horse),
+
+                            value: horse,
+
+                          )).toList():[""].map((name) => DropdownMenuItem(
+
+                              value: name, child: Text("$name")))
+
+                              .toList(),
+
+                          style: Theme.of(context).textTheme.bodyText1,
+
+                          decoration: InputDecoration(
+
+                            border: InputBorder.none,
+
+                            contentPadding: EdgeInsets.all(16),
+
+                          ),
+
+                          onChanged: (value){
+
+                            setState(() {
+                              for(int i=0;i<colorDropDown.length;i++){
+                                 if(colorDropDown[i]['display']==value){
+                                   this.colorID =colorDropDown[i]['value'];
+                                 }
                               }
                             });
+
                           },
-                          child: Text("Select Image",style: TextStyle(color: Colors.white),),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-
-                    padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
-
-                    child: Card(
-
-                      elevation: 10,
-
-                      shape: RoundedRectangleBorder(
-
-                        borderRadius: BorderRadius.circular(15),
-
-                      ),
-
-                      child: FormBuilderDropdown(
-
-                        attribute: "Color",
-
-                        validators: [FormBuilderValidators.required()],
-
-                        hint: Text("Select Color for Image"),
-
-                        items:colorName!=null?colorName.map((horse)=>DropdownMenuItem(
-
-                          child: Text(horse),
-
-                          value: horse,
-
-                        )).toList():[""].map((name) => DropdownMenuItem(
-
-                            value: name, child: Text("$name")))
-
-                            .toList(),
-
-                        style: Theme.of(context).textTheme.bodyText1,
-
-                        decoration: InputDecoration(
-
-                          border: InputBorder.none,
-
-                          contentPadding: EdgeInsets.all(16),
 
                         ),
-
-                        onChanged: (value){
-
-                          setState(() {
-                            for(int i=0;i<colorDropDown.length;i++){
-                               if(colorDropDown[i]['display']==value){
-                                 this.colorID =colorDropDown[i]['value'];
-                               }
-                            }
-                          });
-
-                        },
 
                       ),
 
                     ),
-
-                  ),
-                  Builder(
-                    builder: (BuildContext context){
-                      return Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Center(
-                          child: MaterialButton(
-                            color: Color(0xFF004c4c),
-                            child: Text("Proceed",style: TextStyle(color: Colors.white),),
-                            onPressed: (){
-                              if(fbKey.currentState.validate()&&formKey.currentState.validate()&&base64EncodedImage!=null){
-                                formKey.currentState.save();
+                    Builder(
+                      builder: (BuildContext context){
+                        return Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Center(
+                            child: MaterialButton(
+                              color: Color(0xFF004c4c),
+                              child: Text("Proceed",style: TextStyle(color: Colors.white),),
+                              onPressed: (){
+                                if(fbKey.currentState.validate()&&formKey.currentState.validate()&&base64EncodedImage!=null){
+                                  formKey.currentState.save();
 //                                setState(() {
 //                                  _myActivitiesResult = _myActivities.toString();
 //                                });
-                                SharedPreferences.getInstance().then((prefs){
-                                  var claims=Utils.parseJwt(prefs.getString("token"));
-                                  Network_Operations.saveRequest(context,prefs.getString("token") ,Request(
-                                    requestId: 0,
-                                    marketId: market,
-                                    multipleClients: myClient,
-                                    event: event,
-                                    userId: claims['nameid'],
-                                    technicalConcentration: technical_consideration.text,
-                                    statusId: 1,
-                                    thickness: double.parse(thickness),
-                                    surfaceId: surface,
-                                    classificationId: classification,
-                                    rangeId: range,
-                                    technologyId: technologyId,
-                                    structureId: structureId,
-                                    edgeId: edge,
-                                    image: base64EncodedImage,
-                                    multipleColors: colorsList,
-                                    multipleSizes: sizesList,
-                                    ImageSelectedForColor:colorID,
-                                    multipleDesignTopoligies: designTopologies,
-                                    multipleSuitability: _myActivities,
-                                  ));
-                                });
+                                  SharedPreferences.getInstance().then((prefs){
+                                    var claims=Utils.parseJwt(prefs.getString("token"));
+                                    Network_Operations.saveRequest(context,prefs.getString("token") ,Request(
+                                      requestId: 0,
+                                      marketId: market,
+                                      multipleClients: myClient,
+                                      event: event,
+                                      userId: claims['nameid'],
+                                      technicalConcentration: technical_consideration.text,
+                                      statusId: 1,
+                                      thickness: double.parse(thickness),
+                                      surfaceId: surface,
+                                      classificationId: classification,
+                                      rangeId: range,
+                                      technologyId: technologyId,
+                                      structureId: structureId,
+                                      edgeId: edge,
+                                      image: base64EncodedImage,
+                                      multipleColors: colorsList,
+                                      multipleSizes: sizesList,
+                                      ImageSelectedForColor:colorID,
+                                      multipleDesignTopoligies: designTopologies,
+                                      multipleSuitability: _myActivities,
+                                    ));
+                                  });
 
-                              }
-                            },
+                                }
+                              },
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
 
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         )
     );
   }

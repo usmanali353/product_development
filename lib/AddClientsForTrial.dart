@@ -64,158 +64,169 @@ class _AddClientsToTrialState extends State<AddClientsToTrial> {
       appBar: AppBar(
         title: Text("Schedule Client Visit"),
       ),
-      body: ListView(
-        children: [
-          FormBuilder(
-            key: fbkey,
-            child: Column(
-              children: [
-                Visibility(
-                  visible: isModelDropDownVisible,
-                  child: InkWell(
-                    onTap: (){
-                     showSelectModelDialog();
-                    },
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              //colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
+              image: AssetImage('Assets/img/pattren.png'),
+            )
+        ),
+        child: ListView(
+          children: [
+            FormBuilder(
+              key: fbkey,
+              child: Column(
+                children: [
+                  Visibility(
+                    visible: isModelDropDownVisible,
+                    child: InkWell(
+                      onTap: (){
+                       showSelectModelDialog();
+                      },
+                      child: Padding(
+                        padding:EdgeInsets.all(16),
+                        child: Card(
+                          elevation: 10,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: InputDecorator(
+                            decoration: InputDecoration(
+                              filled: true,
+                              errorMaxLines: 4,
+                              fillColor: Theme.of(context).canvasColor,
+                              border: InputBorder.none,
+                            ),
+
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                  Padding(
+                                      padding:EdgeInsets.fromLTRB(0, 2, 0, 0),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text("Select Model"),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 5, right: 5),
+                                          child: Text(
+                                            ' *',
+                                            style: TextStyle(
+                                              color: Colors.red.shade700,
+                                              fontSize: 17.0,
+                                            ),
+                                          ),
+                                        ),
+                                        Icon(
+                                          Icons.arrow_drop_down,
+                                          color: Colors.black87,
+                                          size: 25.0,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                selectedModelNames.length > 0
+                                    ? Wrap(
+                                  spacing: 8.0,
+                                  runSpacing: 0.0,
+                                  children: selectedOptions,
+                                )
+                                    : new Container(
+                                  padding: EdgeInsets.only(top: 4),
+                                  child: Text("Select one or more Models"),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: isClientDropDownVisible,
                     child: Padding(
-                      padding:EdgeInsets.all(16),
+                      padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
                       child: Card(
                         elevation: 10,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: InputDecorator(
-                          decoration: InputDecoration(
-                            filled: true,
-                            errorMaxLines: 4,
-                            fillColor: Theme.of(context).canvasColor,
-                            border: InputBorder.none,
-                          ),
-
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                                Padding(
-                                    padding:EdgeInsets.fromLTRB(0, 2, 0, 0),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text("Select Model"),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.only(top: 5, right: 5),
-                                        child: Text(
-                                          ' *',
-                                          style: TextStyle(
-                                            color: Colors.red.shade700,
-                                            fontSize: 17.0,
-                                          ),
-                                        ),
-                                      ),
-                                      Icon(
-                                        Icons.arrow_drop_down,
-                                        color: Colors.black87,
-                                        size: 25.0,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              selectedModelNames.length > 0
-                                  ? Wrap(
-                                spacing: 8.0,
-                                runSpacing: 0.0,
-                                children: selectedOptions,
-                              )
-                                  : new Container(
-                                padding: EdgeInsets.only(top: 4),
-                                child: Text("Select one or more Models"),
-                              )
-                            ],
-                          ),
+                        child: MultiSelectFormField(
+                          autovalidate: false,
+                          title: Text("Select Clients"),
+                          hintWidget: Text("Select Clients for the Model Approval"),
+                          textField: 'display',
+                          valueField: 'value',
+                          okButtonLabel: 'OK',
+                          required: true,
+                          cancelButtonLabel: 'CANCEL',
+                          dataSource: clients,
+                          border: InputBorder.none,
+                          validator: (value) {
+                            return value == null || value.length == 0?'Please select one or more Clients':null;
+                          },
+                          onSaved: (value){
+                            if (value == null) return;
+                            setState(() {
+                              myClients = value;
+                            });
+                          },
                         ),
                       ),
                     ),
                   ),
-                ),
-                Visibility(
-                  visible: isClientDropDownVisible,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
-                    child: Card(
+                  Padding(
+                    padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
+                    child:Card(
                       elevation: 10,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: MultiSelectFormField(
-                        autovalidate: false,
-                        title: Text("Select Clients"),
-                        hintWidget: Text("Select Clients for the Model Approval"),
-                        textField: 'display',
-                        valueField: 'value',
-                        okButtonLabel: 'OK',
-                        required: true,
-                        cancelButtonLabel: 'CANCEL',
-                        dataSource: clients,
-                        border: InputBorder.none,
-                        validator: (value) {
-                          return value == null || value.length == 0?'Please select one or more Clients':null;
-                        },
-                        onSaved: (value){
-                          if (value == null) return;
+                      child: FormBuilderDateTimePicker(
+                        attribute: "Client Visit Date",
+                        style: Theme.of(context).textTheme.bodyText1,
+                        inputType: InputType.date,
+                        validators: [FormBuilderValidators.required()],
+                        format: DateFormat("MM-dd-yyyy"),
+                        decoration: InputDecoration(hintText: "Client Visit Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                        onChanged: (value){
                           setState(() {
-                            myClients = value;
+                            this.clientVisitDate=value;
                           });
                         },
                       ),
                     ),
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 16,right: 16,bottom: 16),
-                  child:Card(
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: FormBuilderDateTimePicker(
-                      attribute: "Client Visit Date",
-                      style: Theme.of(context).textTheme.bodyText1,
-                      inputType: InputType.date,
-                      validators: [FormBuilderValidators.required()],
-                      format: DateFormat("MM-dd-yyyy"),
-                      decoration: InputDecoration(hintText: "Client Visit Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
-                      onChanged: (value){
-                        setState(() {
-                          this.clientVisitDate=value;
-                        });
-                      },
-                    ),
-                  ),
-                ),
-                Builder(builder:(BuildContext context){
-                  return Center(
-                    child: MaterialButton(
-                      color: Color(0xFF004c4c),
-                        child: Text("Add Clients",style: TextStyle(color: Colors.white),),
-                        onPressed: (){
-                         if(!fbkey.currentState.validate()){
+                  Builder(builder:(BuildContext context){
+                    return Center(
+                      child: MaterialButton(
+                        color: Color(0xFF004c4c),
+                          child: Text("Add Clients",style: TextStyle(color: Colors.white),),
+                          onPressed: (){
+                           if(!fbkey.currentState.validate()){
 
-                         }else if(selectedModelIds.length==0){
-                           Utils.showError(context,"Select one or More Models For seeking client Approval");
-                         }else {
-                           SharedPreferences.getInstance().then((prefs) {
-                             Network_Operations.addClientsToTrial(
-                                 context, prefs.getString("token"),
-                                 selectedModelIds, myClients, clientVisitDate);
-                           });
-                         }
-                        },
-                    ),
-                  );
-                }),
-              ],
-            ),
-          )
-        ],
+                           }else if(selectedModelIds.length==0){
+                             Utils.showError(context,"Select one or More Models For seeking client Approval");
+                           }else {
+                             SharedPreferences.getInstance().then((prefs) {
+                               Network_Operations.addClientsToTrial(
+                                   context, prefs.getString("token"),
+                                   selectedModelIds, myClients, clientVisitDate);
+                             });
+                           }
+                          },
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

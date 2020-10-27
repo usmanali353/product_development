@@ -104,334 +104,345 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
           ],
         ),
       ),
-      body: RefreshIndicator(
-        key: _refreshIndicatorKey,
-        onRefresh: (){
-          return Utils.check_connectivity().then((isConnected){
-            if(isConnected){
-              SharedPreferences.getInstance().then((prefs) {
-                if(!_isSearching){
-                  Network_Operations.getAssignedRejectedModels(
-                      context, prefs.getString("token"), 10, pageNum).then((response) {
-                    setState(() {
-                      requests.clear();
-                      req=jsonDecode(response);
-                      for(int i=0;i<req["response"]['allAssignedRequest'].length;i++){
-                        requests.add(AssignedRejectedModels.fromJson(req["response"]['allAssignedRequest'][i]['requestClientDetails']));
-                        print(requests[i].currentAction);
-                      }
-                      this.allRequests = requests;
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              //colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
+              image: AssetImage('Assets/img/pattren.png'),
+            )
+        ),
+        child: RefreshIndicator(
+          key: _refreshIndicatorKey,
+          onRefresh: (){
+            return Utils.check_connectivity().then((isConnected){
+              if(isConnected){
+                SharedPreferences.getInstance().then((prefs) {
+                  if(!_isSearching){
+                    Network_Operations.getAssignedRejectedModels(
+                        context, prefs.getString("token"), 10, pageNum).then((response) {
+                      setState(() {
+                        requests.clear();
+                        req=jsonDecode(response);
+                        for(int i=0;i<req["response"]['allAssignedRequest'].length;i++){
+                          requests.add(AssignedRejectedModels.fromJson(req["response"]['allAssignedRequest'][i]['requestClientDetails']));
+                          print(requests[i].currentAction);
+                        }
+                        this.allRequests = requests;
 
-                      if (this.allRequests.length > 0) {
-                        isListVisible = true;
-                      }
-                      if(req['hasNext']&&req['hasPrevious']){
-                        nextButtonVisible=true;
-                        previousButtonVisible=true;
-                      }else if(req['hasPrevious']&&!req['hasNext']){
-                        previousButtonVisible=true;
-                        nextButtonVisible=false;
-                      }else if(!req['hasPrevious']&&req['hasNext']){
-                        previousButtonVisible=false;
-                        nextButtonVisible=true;
-                      }else{
-                        previousButtonVisible=false;
-                        nextButtonVisible=false;
-                      }
+                        if (this.allRequests.length > 0) {
+                          isListVisible = true;
+                        }
+                        if(req['hasNext']&&req['hasPrevious']){
+                          nextButtonVisible=true;
+                          previousButtonVisible=true;
+                        }else if(req['hasPrevious']&&!req['hasNext']){
+                          previousButtonVisible=true;
+                          nextButtonVisible=false;
+                        }else if(!req['hasPrevious']&&req['hasNext']){
+                          previousButtonVisible=false;
+                          nextButtonVisible=true;
+                        }else{
+                          previousButtonVisible=false;
+                          nextButtonVisible=false;
+                        }
+                      });
                     });
-                  });
-                }else{
-                  Network_Operations.getAssignedRejectedModelsSearchable(context, prefs.getString("token"), 10, searchPageNum,searchQuery).then((response) {
-                    setState(() {
-                      requests.clear();
-                      req=jsonDecode(response);
-                      for(int i=0;i<req["response"]['allAssignedRequest'].length;i++){
-                        requests.add(AssignedRejectedModels.fromJson(req["response"]['allAssignedRequest'][i]['requestClientDetails']));
-                      }
-                      this.allRequests = requests;
+                  }else{
+                    Network_Operations.getAssignedRejectedModelsSearchable(context, prefs.getString("token"), 10, searchPageNum,searchQuery).then((response) {
+                      setState(() {
+                        requests.clear();
+                        req=jsonDecode(response);
+                        for(int i=0;i<req["response"]['allAssignedRequest'].length;i++){
+                          requests.add(AssignedRejectedModels.fromJson(req["response"]['allAssignedRequest'][i]['requestClientDetails']));
+                        }
+                        this.allRequests = requests;
 
-                      if (this.allRequests.length > 0) {
-                        isListVisible = true;
-                        print(allRequests[0].modelName);
-                      }
-                      print(requests.length);
-                      if(req['hasNext']&&req['hasPrevious']){
-                        nextButtonVisible=true;
-                        previousButtonVisible=true;
-                      }else if(req['hasPrevious']&&!req['hasNext']){
-                        previousButtonVisible=true;
-                        nextButtonVisible=false;
-                      }else if(!req['hasPrevious']&&req['hasNext']){
-                        previousButtonVisible=false;
-                        nextButtonVisible=true;
-                      }else{
-                        previousButtonVisible=false;
-                        nextButtonVisible=false;
-                      }
+                        if (this.allRequests.length > 0) {
+                          isListVisible = true;
+                          print(allRequests[0].modelName);
+                        }
+                        print(requests.length);
+                        if(req['hasNext']&&req['hasPrevious']){
+                          nextButtonVisible=true;
+                          previousButtonVisible=true;
+                        }else if(req['hasPrevious']&&!req['hasNext']){
+                          previousButtonVisible=true;
+                          nextButtonVisible=false;
+                        }else if(!req['hasPrevious']&&req['hasNext']){
+                          previousButtonVisible=false;
+                          nextButtonVisible=true;
+                        }else{
+                          previousButtonVisible=false;
+                          nextButtonVisible=false;
+                        }
+                      });
                     });
-                  });
-                }
-              });
-            }else{
-              Utils.showError(context,"Network Not Available");
-            }
-          });
-        },
-        child: Visibility(
-            visible: isListVisible,
-            child: ListView.builder(itemCount:allRequests!=null?allRequests.length:0,itemBuilder:(context,int index){
-              return Card(
-                elevation: 6,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    //color: Colors.teal,
-                  ),
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height * 0.21,
+                  }
+                });
+              }else{
+                Utils.showError(context,"Network Not Available");
+              }
+            });
+          },
+          child: Visibility(
+              visible: isListVisible,
+              child: ListView.builder(itemCount:allRequests!=null?allRequests.length:0,itemBuilder:(context,int index){
+                return Card(
+                  elevation: 6,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      //color: Colors.teal,
+                    ),
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height * 0.21,
 
-                  child: Padding(
-                    padding: const EdgeInsets.all(13.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      //crossAxisAlignment: CrossAxisAlignment.start,
-                      //mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          //crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            InkWell(
-                              onTap: (){
-                                setState(() {
-                                  List<String> imageUrl=[];
-                                  for(int i=0;i<allRequests[index].multipleImages.length;i++){
-                                    if(allRequests[index].multipleImages[i]!=null){
-                                      imageUrl.add(allRequests[index].multipleImages[i]);
+                    child: Padding(
+                      padding: const EdgeInsets.all(13.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        //crossAxisAlignment: CrossAxisAlignment.start,
+                        //mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            //crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              InkWell(
+                                onTap: (){
+                                  setState(() {
+                                    List<String> imageUrl=[];
+                                    for(int i=0;i<allRequests[index].multipleImages.length;i++){
+                                      if(allRequests[index].multipleImages[i]!=null){
+                                        imageUrl.add(allRequests[index].multipleImages[i]);
+                                      }
                                     }
-                                  }
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(allRequests[index])));
-                                });
-
-                              },
-                              child: CachedNetworkImage(
-                                imageUrl: allRequests[index].image!=null?allRequests[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
-                                placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
-                                errorWidget: (context, url, error) => Icon(Icons.upload_file),
-                                imageBuilder: (context, imageProvider){
-                                  return Container(
-                                    height: 85,
-                                    width: 85,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(8),
-                                        image: DecorationImage(
-                                          image: imageProvider,
-                                          fit: BoxFit.cover,
-                                        )
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            //Padding(padding: EdgeInsets.only(top:2),),
-                            allRequests[index].multipleColors!=null&&allRequests[index].multipleColors.length>0
-                                ?Container(
-                                  width: 55,
-                                  height: 15,
-                                  child: ListView(
-                                    scrollDirection: Axis.horizontal,
-                              children: [
-                                  Row(
-                                    children: <Widget>[
-                                      for(int i=0;i<allRequests[index].multipleColors.length;i++)
-                                        Padding(
-                                          padding: const EdgeInsets.all(2),
-                                          child: Wrap(
-                                            children: [
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(2),
-                                                  color: Color(Utils.getColorFromHex(allRequests[index].multipleColors[i].colorCode)),
-                                                  //color: Colors.teal,
-                                                ),
-                                                height: 10,
-                                                width: 15,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                    ],
-                                  )
-                              ],
-                            ),
-                                ) :Container(),
-                          ],
-                        ),
-                        VerticalDivider(color: Colors.grey,),
-                        GestureDetector(
-                          onTapDown: (details)async{
-                            if(allRequests[index].currentAction=="Completed"||allRequests[index].currentAction=="Cancelled"){
-                              SharedPreferences.getInstance().then((prefs){
-                                Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
-                              });
-                            }else{
-                              await showMenu(
-                                context: context,
-                                position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                items: [
-                                  PopupMenuItem<String>(
-                                      child: const Text('Change Status'), value: 'changeStatus'),
-                                  PopupMenuItem<String>(
-                                      child: const Text('See Details'), value: 'Details'),
-                                ],
-                                elevation: 8.0,
-                              ).then((selectedItem){
-                                if(selectedItem=="changeStatus"){
-                                  if(allRequests[index].currentAction=="Assigned"){
-                                    SharedPreferences.getInstance().then((prefs){
-                                      Network_Operations.changeStatusOfAssignedModel(context, prefs.getString("token"),allRequests[index].id, 1).then((value){
-                                        WidgetsBinding.instance
-                                            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                                      });
-                                    });
-                                  }else if(allRequests[index].currentAction=="In Progress"){
-                                    showAlertDialog(context,allRequests[index]);
-                                  }
-                                }else if(selectedItem=="Details"){
-                                  SharedPreferences.getInstance().then((prefs){
-                                    Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(allRequests[index])));
                                   });
-                                }
-                              });
-                            }
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width * 0.62,
-                            height: MediaQuery.of(context).size.height * 0.62,
-                            color: Colors.white,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 6, top: 8,bottom: 6),
-                                  child: Text(allRequests[index].modelName!=null?allRequests[index].modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+
+                                },
+                                child: CachedNetworkImage(
+                                  imageUrl: allRequests[index].image!=null?allRequests[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
+                                  placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
+                                  errorWidget: (context, url, error) => Icon(Icons.upload_file),
+                                  imageBuilder: (context, imageProvider){
+                                    return Container(
+                                      height: 85,
+                                      width: 85,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(8),
+                                          image: DecorationImage(
+                                            image: imageProvider,
+                                            fit: BoxFit.cover,
+                                          )
+                                      ),
+                                    );
+                                  },
                                 ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  //mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: <Widget>[
-                                    Row(
-                                      //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      children: <Widget>[
-                                        Icon(
-                                          Icons.date_range,
-                                          color: Colors.teal,
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 2, right: 2),
-                                        ),
-                                        Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(allRequests[index].requestDate!=null?allRequests[index].requestDate:DateTime.now().toString())))
-                                      ],
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 30),
-                                    ),
+                              ),
+                              //Padding(padding: EdgeInsets.only(top:2),),
+                              allRequests[index].multipleColors!=null&&allRequests[index].multipleColors.length>0
+                                  ?Container(
+                                    width: 55,
+                                    height: 15,
+                                    child: ListView(
+                                      scrollDirection: Axis.horizontal,
+                                children: [
                                     Row(
                                       children: <Widget>[
-                                        Icon(
-                                          Icons.layers,
-                                          color: Colors.teal,
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 2, right: 2),
-                                        ),
-                                        Text(allRequests[index].surfaceName!=null?requests[index].surfaceName:''),
+                                        for(int i=0;i<allRequests[index].multipleColors.length;i++)
+                                          Padding(
+                                            padding: const EdgeInsets.all(2),
+                                            child: Wrap(
+                                              children: [
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(2),
+                                                    color: Color(Utils.getColorFromHex(allRequests[index].multipleColors[i].colorCode)),
+                                                    //color: Colors.teal,
+                                                  ),
+                                                  height: 10,
+                                                  width: 15,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                       ],
-
-
-                                    ),
+                                    )
+                                ],
+                              ),
+                                  ) :Container(),
+                            ],
+                          ),
+                          VerticalDivider(color: Colors.grey,),
+                          GestureDetector(
+                            onTapDown: (details)async{
+                              if(allRequests[index].currentAction=="Completed"||allRequests[index].currentAction=="Cancelled"){
+                                SharedPreferences.getInstance().then((prefs){
+                                  Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                });
+                              }else{
+                                await showMenu(
+                                  context: context,
+                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                  items: [
+                                    PopupMenuItem<String>(
+                                        child: const Text('Change Status'), value: 'changeStatus'),
+                                    PopupMenuItem<String>(
+                                        child: const Text('See Details'), value: 'Details'),
                                   ],
-                                ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: <Widget>[
-                                    Row(
-                                      children: <Widget>[
-                                        Icon(
-                                          Icons.zoom_out_map,
-                                          color: Colors.teal,
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 2, right: 2),
-                                        ),
-                                        Container(
-                                            padding: EdgeInsets.only(right: 8),
-                                            child: Text(allRequests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 1,overflow: TextOverflow.ellipsis,)
-                                        )
-                                      ],
-
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 27),
-                                    ),
-
-                                  ],
-                                ),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: <Widget>[
-                                    Row(
-                                      children: <Widget>[
-                                        Icon(
-                                          Icons.person,
-                                          color: Colors.teal,
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 2, right: 2),
-                                        ),
-                                        Text(allRequests[index].clientName)
-                                      ],
-
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 27),
-                                    ),
-
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 1),
-                                  child: Row(
-                                    //crossAxisAlignment: CrossAxisAlignment.start,
+                                  elevation: 8.0,
+                                ).then((selectedItem){
+                                  if(selectedItem=="changeStatus"){
+                                    if(allRequests[index].currentAction=="Assigned"){
+                                      SharedPreferences.getInstance().then((prefs){
+                                        Network_Operations.changeStatusOfAssignedModel(context, prefs.getString("token"),allRequests[index].id, 1).then((value){
+                                          WidgetsBinding.instance
+                                              .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                                        });
+                                      });
+                                    }else if(allRequests[index].currentAction=="In Progress"){
+                                      showAlertDialog(context,allRequests[index]);
+                                    }
+                                  }else if(selectedItem=="Details"){
+                                    SharedPreferences.getInstance().then((prefs){
+                                      Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                    });
+                                  }
+                                });
+                              }
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.62,
+                              height: MediaQuery.of(context).size.height * 0.62,
+                              color: Colors.white,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 6, top: 8,bottom: 6),
+                                    child: Text(allRequests[index].modelName!=null?allRequests[index].modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                                  ),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    //mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: <Widget>[
-                                      Icon(
-                                        Icons.done_all,
-                                        //size: 14,
-                                        color: Colors.teal,
+                                      Row(
+                                        //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.date_range,
+                                            color: Colors.teal,
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(left: 2, right: 2),
+                                          ),
+                                          Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(allRequests[index].requestDate!=null?allRequests[index].requestDate:DateTime.now().toString())))
+                                        ],
                                       ),
                                       Padding(
-                                        padding: EdgeInsets.only(left: 3, right: 3),
+                                        padding: EdgeInsets.only(left: 30),
                                       ),
-                                      Text(allRequests[index].currentAction!=null?allRequests[index].currentAction:'')
-                                    ],
+                                      Row(
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.layers,
+                                            color: Colors.teal,
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(left: 2, right: 2),
+                                          ),
+                                          Text(allRequests[index].surfaceName!=null?requests[index].surfaceName:''),
+                                        ],
 
+
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      Row(
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.zoom_out_map,
+                                            color: Colors.teal,
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(left: 2, right: 2),
+                                          ),
+                                          Container(
+                                              padding: EdgeInsets.only(right: 8),
+                                              child: Text(allRequests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 1,overflow: TextOverflow.ellipsis,)
+                                          )
+                                        ],
+
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 27),
+                                      ),
+
+                                    ],
+                                  ),
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      Row(
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.person,
+                                            color: Colors.teal,
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(left: 2, right: 2),
+                                          ),
+                                          Text(allRequests[index].clientName)
+                                        ],
+
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 27),
+                                      ),
+
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 1),
+                                    child: Row(
+                                      //crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.done_all,
+                                          //size: 14,
+                                          color: Colors.teal,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 3, right: 3),
+                                        ),
+                                        Text(allRequests[index].currentAction!=null?allRequests[index].currentAction:'')
+                                      ],
+
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
 
-                ),
-              );
-            }),
-          ),
+                  ),
+                );
+              }),
+            ),
+        ),
       ),
       );
   }
