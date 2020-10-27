@@ -285,147 +285,164 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                            ],
                          ),
                          VerticalDivider(color: Colors.grey,),
-                         Container(
-                           width: MediaQuery.of(context).size.width * 0.62,
-                           height: MediaQuery.of(context).size.height * 0.62,
-                           color: Colors.white,
-                           child: Column(
-                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                             crossAxisAlignment: CrossAxisAlignment.start,
-                             children: <Widget>[
-                               Padding(
-                                 padding: const EdgeInsets.only(left: 6, top: 8,bottom: 6),
-                                 child: Text(allRequests[index].modelName!=null?allRequests[index].modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-                               ),
-                               Row(
-                                 crossAxisAlignment: CrossAxisAlignment.center,
-                                 //mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                 children: <Widget>[
-                                   Row(
-                                     //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                     children: <Widget>[
-                                       Icon(
-                                         Icons.date_range,
-                                         color: Colors.teal,
-                                       ),
-                                       Padding(
-                                         padding: EdgeInsets.only(left: 2, right: 2),
-                                       ),
-                                       Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(allRequests[index].date!=null?allRequests[index].date:DateTime.now().toString())))
-                                     ],
-                                   ),
-                                   Padding(
-                                     padding: EdgeInsets.only(left: 30),
-                                   ),
-                                   Row(
-                                     children: <Widget>[
-                                       Icon(
-                                         Icons.layers,
-                                         color: Colors.teal,
-                                       ),
-                                       Padding(
-                                         padding: EdgeInsets.only(left: 2, right: 2),
-                                       ),
-                                       Text(allRequests[index].surfaceName!=null?requests[index].surfaceName:''),
-                                     ],
-
-
-                                   ),
-                                 ],
-                               ),
-                               Row(
-                                 crossAxisAlignment: CrossAxisAlignment.center,
-                                 // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                 children: <Widget>[
-                                   Row(
-                                     children: <Widget>[
-                                       Icon(
-                                         Icons.zoom_out_map,
-                                         color: Colors.teal,
-                                       ),
-                                       Padding(
-                                         padding: EdgeInsets.only(left: 2, right: 2),
-                                       ),
-                                       // Padding(
-                                       //   padding: const EdgeInsets.only(top: 12),
-                                       //   child: Container(
-                                       //     width: 120,
-                                       //     height: 30,
-                                       //     child: Marquee(
-                                       //       text: allRequests[index].multipleSizeNames
-                                       //           .toString()
-                                       //           .replaceAll("[", "")
-                                       //           .replaceAll("]", "")
-                                       //           .replaceAll(".00", ""),
-                                       //       //style: TextStyle(fontWeight: FontWeight.bold),
-                                       //       scrollAxis: Axis.horizontal,
-                                       //       crossAxisAlignment: CrossAxisAlignment.start,
-                                       //       blankSpace: 10.0,
-                                       //       velocity: 40.0,
-                                       //       pauseAfterRound: Duration(seconds: 1),
-                                       //       startPadding: 10.0,
-                                       //       accelerationDuration: Duration(seconds: 1),
-                                       //       accelerationCurve: Curves.linear,
-                                       //       decelerationDuration: Duration(milliseconds: 500),
-                                       //       decelerationCurve: Curves.easeOut,
-                                       //     ),
-                                       //   ),
-                                       // ),
-                                       Container(
-                                         padding: EdgeInsets.only(right: 8),
-                                           child: Text(allRequests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 1,overflow: TextOverflow.ellipsis,)
-                                       )
-                                     ],
-
-                                   ),
-                                   Padding(
-                                     padding: EdgeInsets.only(left: 27),
-                                   ),
-
-                                 ],
-                               ),
-                               Row(
-                                 crossAxisAlignment: CrossAxisAlignment.center,
-                                 // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                 children: <Widget>[
-                                   Row(
-                                     children: <Widget>[
-                                       Icon(
-                                         Icons.person,
-                                         color: Colors.teal,
-                                       ),
-                                       Padding(
-                                         padding: EdgeInsets.only(left: 2, right: 2),
-                                       ),
-                                       Text(allRequests[index].clientName)
-                                     ],
-
-                                   ),
-                                   Padding(
-                                     padding: EdgeInsets.only(left: 27),
-                                   ),
-
-                                 ],
-                               ),
-                               Padding(
-                                 padding: const EdgeInsets.only(left: 1,top: 3),
-                                 child: Row(
-                                   //crossAxisAlignment: CrossAxisAlignment.start,
+                         GestureDetector(
+                           onTapDown: (details)async{
+                             await showMenu(
+                                 context: context,
+                                 position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                             items: [
+                             PopupMenuItem<String>(
+                             child: const Text('View Rejection Reason'), value: 'rejectionReason'),
+                             ],
+                             elevation: 8.0,
+                             ).then((selectedItem){
+                                if(selectedItem=='rejectionReason'){
+                                  showReasonDialog(allRequests[index]);
+                                }
+                             });
+                           },
+                           child: Container(
+                             width: MediaQuery.of(context).size.width * 0.62,
+                             height: MediaQuery.of(context).size.height * 0.62,
+                             color: Colors.white,
+                             child: Column(
+                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                               crossAxisAlignment: CrossAxisAlignment.start,
+                               children: <Widget>[
+                                 Padding(
+                                   padding: const EdgeInsets.only(left: 6, top: 8,bottom: 6),
+                                   child: Text(allRequests[index].modelName!=null?allRequests[index].modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                                 ),
+                                 Row(
+                                   crossAxisAlignment: CrossAxisAlignment.center,
+                                   //mainAxisAlignment: MainAxisAlignment.spaceAround,
                                    children: <Widget>[
-                                     Icon(
-                                       Icons.done_all,
-                                       //size: 14,
-                                       color: Colors.teal,
+                                     Row(
+                                       //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                       children: <Widget>[
+                                         Icon(
+                                           Icons.date_range,
+                                           color: Colors.teal,
+                                         ),
+                                         Padding(
+                                           padding: EdgeInsets.only(left: 2, right: 2),
+                                         ),
+                                         Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(allRequests[index].date!=null?allRequests[index].date:DateTime.now().toString())))
+                                       ],
                                      ),
                                      Padding(
-                                       padding: EdgeInsets.only(left: 3, right: 3),
+                                       padding: EdgeInsets.only(left: 30),
                                      ),
-                                     Text(allRequests[index].status!=null?allRequests[index].status:'')
-                                   ],
+                                     Row(
+                                       children: <Widget>[
+                                         Icon(
+                                           Icons.layers,
+                                           color: Colors.teal,
+                                         ),
+                                         Padding(
+                                           padding: EdgeInsets.only(left: 2, right: 2),
+                                         ),
+                                         Text(allRequests[index].surfaceName!=null?requests[index].surfaceName:''),
+                                       ],
 
+
+                                     ),
+                                   ],
                                  ),
-                               ),
-                             ],
+                                 Row(
+                                   crossAxisAlignment: CrossAxisAlignment.center,
+                                   // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                   children: <Widget>[
+                                     Row(
+                                       children: <Widget>[
+                                         Icon(
+                                           Icons.zoom_out_map,
+                                           color: Colors.teal,
+                                         ),
+                                         Padding(
+                                           padding: EdgeInsets.only(left: 2, right: 2),
+                                         ),
+                                         // Padding(
+                                         //   padding: const EdgeInsets.only(top: 12),
+                                         //   child: Container(
+                                         //     width: 120,
+                                         //     height: 30,
+                                         //     child: Marquee(
+                                         //       text: allRequests[index].multipleSizeNames
+                                         //           .toString()
+                                         //           .replaceAll("[", "")
+                                         //           .replaceAll("]", "")
+                                         //           .replaceAll(".00", ""),
+                                         //       //style: TextStyle(fontWeight: FontWeight.bold),
+                                         //       scrollAxis: Axis.horizontal,
+                                         //       crossAxisAlignment: CrossAxisAlignment.start,
+                                         //       blankSpace: 10.0,
+                                         //       velocity: 40.0,
+                                         //       pauseAfterRound: Duration(seconds: 1),
+                                         //       startPadding: 10.0,
+                                         //       accelerationDuration: Duration(seconds: 1),
+                                         //       accelerationCurve: Curves.linear,
+                                         //       decelerationDuration: Duration(milliseconds: 500),
+                                         //       decelerationCurve: Curves.easeOut,
+                                         //     ),
+                                         //   ),
+                                         // ),
+                                         Container(
+                                           padding: EdgeInsets.only(right: 8),
+                                             child: Text(allRequests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 1,overflow: TextOverflow.ellipsis,)
+                                         )
+                                       ],
+
+                                     ),
+                                     Padding(
+                                       padding: EdgeInsets.only(left: 27),
+                                     ),
+
+                                   ],
+                                 ),
+                                 Row(
+                                   crossAxisAlignment: CrossAxisAlignment.center,
+                                   // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                   children: <Widget>[
+                                     Row(
+                                       children: <Widget>[
+                                         Icon(
+                                           Icons.person,
+                                           color: Colors.teal,
+                                         ),
+                                         Padding(
+                                           padding: EdgeInsets.only(left: 2, right: 2),
+                                         ),
+                                         Text(allRequests[index].clientName)
+                                       ],
+
+                                     ),
+                                     Padding(
+                                       padding: EdgeInsets.only(left: 27),
+                                     ),
+
+                                   ],
+                                 ),
+                                 Padding(
+                                   padding: const EdgeInsets.only(left: 1,top: 3),
+                                   child: Row(
+                                     //crossAxisAlignment: CrossAxisAlignment.start,
+                                     children: <Widget>[
+                                       Icon(
+                                         Icons.done_all,
+                                         //size: 14,
+                                         color: Colors.teal,
+                                       ),
+                                       Padding(
+                                         padding: EdgeInsets.only(left: 3, right: 3),
+                                       ),
+                                       Text(allRequests[index].status!=null?allRequests[index].status:'')
+                                     ],
+
+                                   ),
+                                 ),
+                               ],
+                             ),
                            ),
                          ),
                        ],
@@ -561,5 +578,44 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
         ),
       ),
     );
+  }
+  showReasonDialog(TrialRequests trialRequests){
+     showDialog(
+       context: context,
+       useSafeArea: true,
+       builder: (BuildContext context) {
+         return AlertDialog(
+           title: Text("Rejection Reasons"),
+           content: Column(
+             children: [
+               Container(
+                 width: MediaQuery.of(context).size.width,
+                 height:  MediaQuery.of(context).size.height/3,
+                 child: ListView.builder(
+                     itemCount: trialRequests.multipleReasons.length,
+                     itemBuilder:(context,index){
+                   return ListTile(
+                     title: Text(trialRequests.multipleReasons[index]),
+                     leading: Container(
+                       height: 20.0,
+                       width: 20.0,
+                       decoration: new BoxDecoration(
+                         color: Colors.black,
+                         shape: BoxShape.circle,
+                       ),
+                     ),
+                   );
+                 }),
+               )
+             ],
+           ),
+           actions: [
+             FlatButton(onPressed: (){
+               Navigator.pop(context);
+             }, child: Text("Ok"))
+           ],
+         );
+       },
+     );
   }
 }
