@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:productdevelopment/Dashboard.dart';
+import 'package:productdevelopment/OldDashboard.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Observations.dart';
@@ -10,6 +10,7 @@ import 'package:productdevelopment/RequestImagesGallery.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'Dashboard.dart';
 import 'Model/Dropdown.dart';
  class RequestsForTrial extends StatefulWidget {
 int requestId;
@@ -594,6 +595,7 @@ RequestsForTrial(this.requestId,this.currentUserRole);
          return AlertDialog(
            title: Text("Rejection Reasons"),
            content: Column(
+             mainAxisSize: MainAxisSize.min,
              children: [
                Container(
                  width: MediaQuery.of(context).size.width,

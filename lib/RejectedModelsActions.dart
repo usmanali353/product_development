@@ -749,6 +749,7 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
         return AlertDialog(
           title: Text("Rejection Reasons"),
           content: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 width: MediaQuery.of(context).size.width,
