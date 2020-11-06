@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:badges/badges.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/DailyClientSchedule.dart';
-import 'package:productdevelopment/Model/AssignedRejectedModels.dart';
 import 'package:productdevelopment/Notifications/NotificationListPage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -241,7 +240,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                 Visibility(
                   visible: claims!=null&&!claims['role'].contains("Client"),
                   child: Padding(
-                    padding: EdgeInsets.only(top: 15),
+                    padding: EdgeInsets.only(top: 10),
                   ),
                 ),
 
