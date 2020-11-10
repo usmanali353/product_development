@@ -243,11 +243,6 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                                if(status=="Approve"){
                                  if(actualStartDate.isBefore(actualEndDate)&&actualEndDate.isAfter(actualStartDate)){
                                    SharedPreferences.getInstance().then((prefs){
-                                     if(request.marketId==2){
-                                       myClients.clear();
-                                       myClients.add(clientId);
-                                     }
-
                                      Network_Operations.trialClient(context, prefs.getString("token"),myClients, request.requestId,remarks.text,clientVisitDate,actualStartDate,actualEndDate,modelName.text,modelCode.text);
                                    });
                                  }else{
