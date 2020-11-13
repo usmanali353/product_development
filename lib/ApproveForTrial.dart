@@ -84,7 +84,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                          inputType: InputType.date,
                          validators: [FormBuilderValidators.required()],
                          format: DateFormat("MM-dd-yyyy"),
-                         decoration: InputDecoration(hintText: "Sample Production Actual Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                         decoration: InputDecoration(hintText: "Sample Actual Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                          onChanged: (value){
                            setState(() {
                              this.actualStartDate=value;
@@ -106,7 +106,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                          inputType: InputType.date,
                          validators: [FormBuilderValidators.required()],
                          format: DateFormat("MM-dd-yyyy"),
-                         decoration: InputDecoration(hintText: "Sample Production Actual End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                         decoration: InputDecoration(hintText: "Sample Actual End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                          onChanged: (value){
                            setState(() {
                              this.actualEndDate=value;

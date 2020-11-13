@@ -61,7 +61,7 @@ class _SchedulePageState extends State<SchedulePage> {
                         inputType: InputType.date,
                         validators: [FormBuilderValidators.required()],
                         format: DateFormat("MM-dd-yyyy"),
-                        decoration: InputDecoration(hintText: "Sample Production Target Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                        decoration: InputDecoration(hintText: "Sample Target Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                         onChanged: (value){
                           setState(() {
                             this.targetStartDate=value;
@@ -89,7 +89,7 @@ class _SchedulePageState extends State<SchedulePage> {
                         inputType: InputType.date,
                         validators: [FormBuilderValidators.required()],
                         format: DateFormat("MM-dd-yyyy"),
-                        decoration: InputDecoration(hintText: "Sample Production Target End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
+                        decoration: InputDecoration(hintText: "Sample Target End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                         onChanged: (value){
                           setState(() {
                             this.targetEndDate=value;
