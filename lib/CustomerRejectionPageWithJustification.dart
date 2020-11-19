@@ -234,7 +234,7 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                                child: CachedNetworkImage(
                                  imageUrl: allRequests[index].image!=null?allRequests[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
                                  placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
-                                 errorWidget: (context, url, error) => Icon(Icons.upload_file),
+                                 errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
                                  imageBuilder: (context, imageProvider){
                                    return Container(
                                      height: 85,
@@ -587,6 +587,7 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
          return AlertDialog(
            title: Text("Rejection Reasons"),
            content: Column(
+             mainAxisSize: MainAxisSize.min,
              children: [
                Container(
                  width: MediaQuery.of(context).size.width,
