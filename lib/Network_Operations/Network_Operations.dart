@@ -21,6 +21,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     var body=jsonEncode({"email":email,"password":password});
     try{
     var response=await http.post(Utils.getBaseUrl()+"Account/Login",body:body,headers: {"Content-type":"application/json"});
+    print(response.statusCode);
      if(response.statusCode==200){
        SharedPreferences.getInstance().then((prefs){
          prefs.setString("token", jsonDecode(response.body)['result']);
@@ -34,7 +35,6 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
 
          });
        });
-
      }else if(response.body!=null){
        pd.hide();
        Utils.showError(context, "Invalid Username or Password");

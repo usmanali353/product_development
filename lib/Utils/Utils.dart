@@ -3,10 +3,10 @@ import 'dart:io';
 import 'dart:math';
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:barcode_scan/model/scan_result.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:data_connection_checker/data_connection_checker.dart';
-import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -33,8 +33,9 @@ class Utils{
   }
   static String getBaseUrl(){
     return "http://192.236.147.77:8086/api/";
+    //return "http://products.arabian-ceramics.com/api/";
   }
-  static void showError(BuildContext context,String message) {
+ static void showError(BuildContext context,String message) {
     Flushbar(
       message: message,
       duration: Duration(seconds: 5),
