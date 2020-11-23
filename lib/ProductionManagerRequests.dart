@@ -173,8 +173,8 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
           child: Visibility(
             visible: isVisible,
             child: ListView.builder(itemCount:requests!=null?requests.length:0,itemBuilder:(context,int index){
-              return InkWell(
-                onTap: (){
+              return GestureDetector(
+                onTapDown: (details) async{
                   if(requests[index].status=="Approved By Customer"){
                     if(currentUserRole["9"]!=null||currentUserRole["10"]!=null) {
                       showProductionApprovalDialog(context, requests[index]);
@@ -206,9 +206,26 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                       });
                     }
                   }else{
-                    SharedPreferences.getInstance().then((prefs){
-                      Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
+                    await showMenu(
+                      context: context,
+                      position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                      items: [
+                        PopupMenuItem<String>(
+                            child: const Text('View Rejection Reason'), value: 'rejectionReason'),
+                        PopupMenuItem<String>(
+                            child: const Text('See Details'), value: 'Details'),
+                      ],
+                      elevation: 8.0,
+                    ).then((selectedItem){
+                      if(selectedItem=="rejectionReason"){
+                        showReasonDialog(requests[index]);
+                      }else if(selectedItem=="Details"){
+                        SharedPreferences.getInstance().then((prefs){
+                          Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
+                        });
+                      }
                     });
+
                   }
                 },
                 child: Card(
@@ -826,6 +843,46 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
       context: context,
       builder: (BuildContext context) {
         return alert;
+      },
+    );
+  }
+  showReasonDialog(TrialRequests trialRequests){
+    showDialog(
+      context: context,
+      useSafeArea: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Rejection Reasons"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height:  MediaQuery.of(context).size.height/3,
+                child: ListView.builder(
+                    itemCount: trialRequests.multipleReasons.length,
+                    itemBuilder:(context,index){
+                      return ListTile(
+                        title: Text(trialRequests.multipleReasons[index]),
+                        leading: Container(
+                          height: 20.0,
+                          width: 20.0,
+                          decoration: new BoxDecoration(
+                            color: Colors.black,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      );
+                    }),
+              )
+            ],
+          ),
+          actions: [
+            FlatButton(onPressed: (){
+              Navigator.pop(context);
+            }, child: Text("Ok"))
+          ],
+        );
       },
     );
   }

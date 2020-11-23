@@ -12,8 +12,8 @@ import 'Network_Operations/Network_Operations.dart';
 import 'Utils/Utils.dart';
 class CustomerRejectionPageWithJustification extends StatefulWidget {
   int isJustifiable;
-
-  CustomerRejectionPageWithJustification(this.isJustifiable);
+  String title;
+  CustomerRejectionPageWithJustification(this.isJustifiable,this.title);
 
   @override
   _CustomerRejectionPageWithJustificationState createState() => _CustomerRejectionPageWithJustificationState();
@@ -573,7 +573,7 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: horizontalTitleAlignment,
           children: <Widget>[
-            const Text('All Requests'),
+             Text(widget.title),
           ],
         ),
       ),

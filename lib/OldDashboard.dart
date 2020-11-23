@@ -774,7 +774,7 @@ class _OldDashboardState extends ResumableState<OldDashboard> {
               ),
               InkWell(
                 onTap: (){
-                  push(context, MaterialPageRoute(builder: (context)=>CustomerRejectionPageWithJustification(1)));
+                  //push(context, MaterialPageRoute(builder: (context)=>CustomerRejectionPageWithJustification(1)));
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(left: 8.0,right:8.0),
@@ -837,7 +837,7 @@ class _OldDashboardState extends ResumableState<OldDashboard> {
                   // Weekly Deliveries
                   InkWell(
                     onTap: (){
-                      push(context, MaterialPageRoute(builder: (context)=>CustomerRejectionPageWithJustification(0)));
+                     // push(context, MaterialPageRoute(builder: (context)=>CustomerRejectionPageWithJustification(0)));
                     },
                     child: Card(
                       elevation: 10,

@@ -1,7 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:productdevelopment/Model/Request.dart';
+import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:productdevelopment/Utils/Utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'Dashboard.dart';
 
 class ScheduleListPage extends StatefulWidget {
   var request;
@@ -13,24 +20,26 @@ class ScheduleListPage extends StatefulWidget {
 }
 
 class _ScheduleListPageState extends State<ScheduleListPage> {
+  DateTime newExpectedDate;
   var request;
-  var isVisible=false;
+  var isVisible = false;
   _ScheduleListPageState(this.request);
- @override
+  @override
   void initState() {
     print(request.allRequestClients.length);
     //print(request.allRequestClients[0]['actualClientVisitDate']);
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text((){
-          if(request.newModelName!=null){
-            return "Schedule for "+request.newModelName;
-          }else if(request.modelName!=null){
-            return "Schedule for "+request.modelName;
+        title: Text(() {
+          if (request.newModelName != null) {
+            return "Schedule for " + request.newModelName;
+          } else if (request.modelName != null) {
+            return "Schedule for " + request.modelName;
           }
         }()),
       ),
@@ -39,41 +48,72 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
             image: DecorationImage(
-              fit: BoxFit.cover,
-              //colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
-              image: AssetImage('Assets/img/pattren.png'),
-            )
-        ),
+          fit: BoxFit.cover,
+          //colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
+          image: AssetImage('Assets/img/pattren.png'),
+        )),
         child: ListView.builder(
-          itemCount:request.allRequestClients!=null?request.allRequestClients.length:0,
+          itemCount: request.allRequestClients != null
+              ? request.allRequestClients.length
+              : 0,
           itemBuilder: (context, index) {
             return Column(
               children: [
-            ExpansionTile(
-            leading: FaIcon(FontAwesomeIcons.calendarCheck, color: Colors.teal.shade800, size: 45),
-            title: Text(request.allRequestClients[index]['clientName']),
-            children: [
-            ListTile(
-            title: Text("Sample Production Start Date"),
-            subtitle: Text(request.actualStartDate!=null?DateFormat("dd MMMM yyyy").format(DateTime.parse(request.actualStartDate)):""),
-            ),
-            Divider(),
-            ListTile(
-            title: Text("Sample Production End Date"),
-            subtitle: Text(request.actualEndDate!=null?DateFormat("dd MMMM yyyy").format(DateTime.parse(request.actualEndDate)):""),
-            ),
-            Divider(),
-            ListTile(
-            title: Text("Expected Client Visit Date"),
-            subtitle: Text(request.allRequestClients[index]['clientVisitDate']!=null?DateFormat("dd MMMM yyyy").format(DateTime.parse(request.allRequestClients[index]['clientVisitDate'].toString())):""),
-            ),
-            Divider(),
-            ListTile(
-            title: Text("Actual Client Visit Date"),
-            subtitle: Text(request.allRequestClients[index]['actualClientVisitDate']!=null?DateFormat("dd MMMM yyyy").format(DateTime.parse(request.allRequestClients[index]['actualClientVisitDate'].toString())):""),
-            ),
-            ],
-            ),
+                ExpansionTile(
+                  leading: FaIcon(FontAwesomeIcons.calendarCheck,
+                      color: Colors.teal.shade800, size: 45),
+                  title: Text(request.allRequestClients[index]['clientName']),
+                  children: [
+                    ListTile(
+                      title: Text("Sample Production Start Date"),
+                      subtitle: Text(request.actualStartDate != null
+                          ? DateFormat("dd MMMM yyyy")
+                              .format(DateTime.parse(request.actualStartDate))
+                          : ""),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text("Sample Production End Date"),
+                      subtitle: Text(request.actualEndDate != null
+                          ? DateFormat("dd MMMM yyyy")
+                              .format(DateTime.parse(request.actualEndDate))
+                          : ""),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text("Expected Client Visit Date"),
+                      subtitle: Text(request.allRequestClients[index]
+                                  ['clientVisitDate'] !=
+                              null
+                          ? DateFormat("dd MMMM yyyy").format(DateTime.parse(
+                              request.allRequestClients[index]
+                                      ['clientVisitDate']
+                                  .toString()))
+                          : ""),
+                      trailing: Visibility(
+                        visible: request.allRequestClients[index]['status']=="Not Approved Nor Rejected",
+                        child: IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () {
+                            showAlertChangeStatus(context, request.allRequestClients[index]);
+                          },
+                        ),
+                      ),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text("Actual Client Visit Date"),
+                      subtitle: Text(request.allRequestClients[index]
+                                  ['actualClientVisitDate'] !=
+                              null
+                          ? DateFormat("dd MMMM yyyy").format(DateTime.parse(
+                              request.allRequestClients[index]
+                                      ['actualClientVisitDate']
+                                  .toString()))
+                          : ""),
+                    ),
+                  ],
+                ),
                 Divider(),
               ],
             );
@@ -139,6 +179,68 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
           },
         ),
       ),
+    );
+  }
+
+  showAlertChangeStatus(BuildContext context,var request) {
+    // set up the buttons
+    Widget Save = FlatButton(
+      child: Text("Set"),
+      onPressed: () {
+          SharedPreferences.getInstance().then((value) {
+            Network_Operations.changeClientExpectedVisitDate(
+                context, value.getString('token'), request['id'],
+                newExpectedDate);
+          });
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Please Select Client Visit Date"),
+      content: Padding(
+                padding: EdgeInsets.all(16),
+                child: Card(
+                  elevation: 10,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: FormBuilderDateTimePicker(
+                    attribute: "Client Visit Date",
+                    initialValue: DateTime.parse(request['clientVisitDate']),
+                    style: Theme.of(context).textTheme.bodyText1,
+                    inputType: InputType.date,
+                    validators: [FormBuilderValidators.required()],
+                    format: DateFormat("MM-dd-yyyy"),
+                    decoration: InputDecoration(
+                        hintText: "Select Client Visit Date",
+                        contentPadding: EdgeInsets.all(16),
+                        border: InputBorder.none),
+                    onChanged: (value) {
+                      setState(() {
+                        this.newExpectedDate = value;
+                      });
+                    },
+                    onSaved: (value) {
+                      setState(() {
+                        this.request['clientVisitDate'] = value;
+                      });
+                    },
+                  ),
+                ),
+              ),
+      //       ],
+      //     );
+      //   },
+      // ),
+      actions: [Save],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }

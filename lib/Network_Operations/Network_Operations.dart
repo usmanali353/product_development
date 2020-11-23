@@ -266,6 +266,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
+        print(response.body);
          return response.body;
       }else
         return null;
@@ -853,6 +854,26 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       if(response.statusCode==200){
         pd.hide();
         return response.body;
+      }else{
+        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+        return null;
+      }
+    }catch(e){
+      print(e);
+      Utils.showError(context, e.toString());
+    }
+    return null;
+  }
+  static Future<void> changeClientExpectedVisitDate(BuildContext context,String token,int id,DateTime newDate)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/ChangeClientExpectedVisitDate?Id="+id.toString()+"&ClientVisitDate="+newDate.toString(),headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+        Utils.showSuccess(context,"Expected Client Visit Date Changed");
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
       }else{
         pd.hide();
         Utils.showError(context, response.statusCode.toString());

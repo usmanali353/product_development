@@ -29,8 +29,15 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
   @override
   void initState() {
     _searchQuery = TextEditingController();
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+    Utils.check_connectivity().then((isConnected){
+      if(isConnected){
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+      }else{
+        Utils.showError(context,"Network not Available");
+      }
+    });
+
     super.initState();
   }
   @override
