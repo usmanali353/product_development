@@ -21,9 +21,8 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
       for(int i=0;i<request.multipleColorNames.length;i++){
         if(request.multipleColorNames[i].colorImage!=null){
           colorNames.add(request.multipleColorNames[i].colorName);
-          if(!request.multipleColorNames[i].colorImage.contains("http://products.arabian-ceramics.com/assets/user-files/")) {
-            imageUrl.add("http://products.arabian-ceramics.com/assets/user-files/" + request.multipleColorNames[i].colorImage);
-
+          if(!request.multipleColorNames[i].colorImage.contains("http://192.236.147.77:8088/assets/user-files/")) {
+            imageUrl.add("http://192.236.147.77:8088/assets/user-files/" + request.multipleColorNames[i].colorImage);
           }else{
             imageUrl.add(request.multipleColorNames[i].colorImage);
           }

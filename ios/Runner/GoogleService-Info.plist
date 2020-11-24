@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>555017522481-otjnc2glj4ttslsmkpvlv5le8vqg6dga.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.555017522481-otjnc2glj4ttslsmkpvlv5le8vqg6dga</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCEMsnhMkk2JquMjfofbDcE6amgUmZ7rjM</string>
+	<key>GCM_SENDER_ID</key>
+	<string>555017522481</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>iib.productdevelopment</string>
+	<key>PROJECT_ID</key>
+	<string>arabian-ceramics</string>
+	<key>STORAGE_BUCKET</key>
+	<string>arabian-ceramics.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:555017522481:ios:00ec9731d84749b8e77410</string>
+	<key>DATABASE_URL</key>
+	<string>https://arabian-ceramics.firebaseio.com</string>
+</dict>
+</plist>
