@@ -397,9 +397,9 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                         //     ),
                                         //   ),
                                         // ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right:8),
-                                          child: Text(requests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 1,overflow: TextOverflow.fade,),
+                                        Container(
+                                          width: MediaQuery.of(context).size.width*0.4,
+                                          child: Text(requests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 3,overflow: TextOverflow.visible,),
                                         )
                                       ],
 

@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:badges/badges.dart';
 import 'package:productdevelopment/DailyClientSchedule.dart';
-import 'package:productdevelopment/Model/AssignedRejectedModels.dart';
 import 'package:productdevelopment/Notifications/NotificationListPage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,6 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:productdevelopment/RejectedModelsActions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'AllRequestsList.dart';
-import 'CustomerRejectionPageWithJustification.dart';
 import 'ModelRequests.dart';
 import 'Network_Operations/Network_Operations.dart';
 import 'ProductionManagerRequests.dart';

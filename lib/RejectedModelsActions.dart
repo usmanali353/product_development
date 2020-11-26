@@ -408,8 +408,8 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                                             padding: EdgeInsets.only(left: 2, right: 2),
                                           ),
                                           Container(
-                                              padding: EdgeInsets.only(right: 8),
-                                              child: Text(allRequests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 1,overflow: TextOverflow.ellipsis,)
+                                              width: MediaQuery.of(context).size.width*0.4,
+                                              child: Text(allRequests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 3,overflow: TextOverflow.visible,)
                                           )
                                         ],
 

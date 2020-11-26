@@ -563,17 +563,15 @@ class _AllRequestListState extends State<AllRequestList> {
                                         //     ),
                                         //   ),
                                         // ),
-                                        Flexible(
-                                          child: Container(
-                                            padding: EdgeInsets.only(right: 8),
-                                            child: Text(allRequests[index].multipleSizeNames
-                                                .toString()
-                                                .replaceAll("[", "")
-                                                .replaceAll("]", "")
-                                                .replaceAll(".00", ""),
-                                                maxLines: 1,
-                                               overflow: TextOverflow.ellipsis,
-                                            ),
+                                        Container(
+                                          width: MediaQuery.of(context).size.width*0.4,
+                                          child: Text(allRequests[index].multipleSizeNames
+                                              .toString()
+                                              .replaceAll("[", "")
+                                              .replaceAll("]", "")
+                                              .replaceAll(".00", ""),
+                                              maxLines: 3,
+                                             overflow: TextOverflow.visible,
                                           ),
                                         ),
                                       ],

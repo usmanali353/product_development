@@ -1,15 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:productdevelopment/OldDashboard.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Observations.dart';
 import 'package:productdevelopment/RequestImagesGallery.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'Dashboard.dart';
 import 'Model/Dropdown.dart';
  class RequestsForTrial extends StatefulWidget {
@@ -255,6 +252,7 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                                  ),
                                  Row(
                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                   mainAxisSize: MainAxisSize.min,
                                    // mainAxisAlignment: MainAxisAlignment.spaceAround,
                                    children: <Widget>[
                                      Row(
@@ -267,8 +265,8 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                                            padding: EdgeInsets.only(left: 2, right: 2),
                                          ),
                                          Container(
-                                           padding: EdgeInsets.only(right: 8),
-                                             child: Text(requests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 1,overflow: TextOverflow.ellipsis,)
+                                             width: MediaQuery.of(context).size.width*0.4,
+                                             child: Text(requests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 3,overflow: TextOverflow.visible,)
                                          )
                                        ],
 

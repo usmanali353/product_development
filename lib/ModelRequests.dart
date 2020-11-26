@@ -584,11 +584,9 @@ class _ModelReState extends State<ModelRequests>{
                                         //     ),
                                         //   ),
                                         // ),
-                                         Flexible(
-                                           child: Container(
-                                               padding: EdgeInsets.only(right: 8),
-                                               child: Text(products[index].multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", ""),maxLines: 1,overflow: TextOverflow.visible,)
-                                           ),
+                                         Container(
+                                             width: MediaQuery.of(context).size.width*0.4,
+                                             child: Text(products[index].multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", ""),maxLines: 3,overflow: TextOverflow.visible,)
                                          ),
                                       ],
                                     ),
