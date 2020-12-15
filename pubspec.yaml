@@ -104,6 +104,8 @@ dependencies:
 
   filter_list: ^0.0.5
 
+  quick_actions: ^0.4.0+10
+
 
 dev_dependencies:
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
+import 'package:productdevelopment/AddClientsForTrial.dart';
 import 'package:productdevelopment/DetailsPage.dart';
 import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
@@ -27,6 +28,19 @@ class _DailyClientScheduleState extends State<DailyClientSchedule> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Client Visit Schedule"),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(40),
+          child: Container(
+            alignment: Alignment.topCenter,
+
+            child:Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(DateFormat("yyyy-MM-dd").format(initialStart)+" - "+DateFormat("yyyy-MM-dd").format(initialEnd),style: TextStyle(color: Colors.white),),
+              ),
+            ),
+          ),
+        ),
         actions: [
           IconButton(
             onPressed: ()async{
@@ -84,6 +98,12 @@ class _DailyClientScheduleState extends State<DailyClientSchedule> {
               print(picked);
             },
             icon: Icon(Icons.filter_list),
+          ),
+          IconButton(
+            icon:Icon(Icons.add_outlined),
+            onPressed: (){
+              Navigator.push(context, MaterialPageRoute(builder:(context)=>AddClientsToTrial()));
+            },
           )
         ],
       ),
