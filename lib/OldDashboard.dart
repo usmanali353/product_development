@@ -106,7 +106,7 @@ class _OldDashboardState extends ResumableState<OldDashboard> {
                     title: Text("Scan Barcode"),
                     leading: Icon(FontAwesomeIcons.barcode),
                     onTap: (){
-                     Utils.scan(context);
+                     //Utils.scan(context);
                       //Navigator.push(context, MaterialPageRoute(builder: (context)=>QRScanner()));
                     },
                   ),

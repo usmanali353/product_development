@@ -70,7 +70,7 @@ dependencies:
 
   intl:
 
-  barcode_scan: ^3.0.1
+  qr_code_scanner: ^0.1.0
 
   flutter_form_builder:
 
