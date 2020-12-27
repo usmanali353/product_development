@@ -15,6 +15,7 @@ class _LoginState extends State<Login> {
   void initState() {
     username=TextEditingController();
     password=TextEditingController();
+    Utils.setupQuickActions(context);
     super.initState();
   }
 
