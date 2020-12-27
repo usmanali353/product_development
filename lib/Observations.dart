@@ -273,7 +273,7 @@ class _ObservationsState extends State<Observations> {
         height: 480,
         allTextList: rejectionReasonName,
         borderRadius: 20,
-        selectedItemTitle: "Reasons Selected",
+       // selectedItemTitle: "Reasons Selected",
         selectedTextBackgroundColor: Colors.teal,
         allResetButonColor: Color(0xFF004c4c),
         applyButonTextBackgroundColor: Color(0xFF004c4c),

@@ -205,7 +205,7 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                       //color: Colors.teal,
                     ),
                     width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height * 0.21,
+
 
                     child: Padding(
                       padding: const EdgeInsets.all(13.0),
@@ -234,10 +234,10 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                                 child: CachedNetworkImage(
                                   imageUrl: allRequests[index].image!=null?allRequests[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
                                   placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
-                                  errorWidget: (context, url, error) => Icon(Icons.upload_file),
+                                  errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
                                   imageBuilder: (context, imageProvider){
                                     return Container(
-                                      height: 85,
+                                      height: 100,
                                       width: 85,
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(8),
@@ -254,7 +254,7 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                               allRequests[index].multipleColors!=null&&allRequests[index].multipleColors.length>0
                                   ?Container(
                                     width: 55,
-                                    height: 15,
+                                    height: 20,
                                     child: ListView(
                                       scrollDirection: Axis.horizontal,
                                 children: [
@@ -262,7 +262,7 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                                       children: <Widget>[
                                         for(int i=0;i<allRequests[index].multipleColors.length;i++)
                                           Padding(
-                                            padding: const EdgeInsets.all(2),
+                                            padding: const EdgeInsets.only(top: 8,left: 2,right: 2),
                                             child: Wrap(
                                               children: [
                                                 Container(
@@ -348,7 +348,7 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                             },
                             child: Container(
                               width: MediaQuery.of(context).size.width * 0.62,
-                              height: MediaQuery.of(context).size.height * 0.62,
+                              height: 160,
                               color: Colors.white,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -378,20 +378,7 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                                       Padding(
                                         padding: EdgeInsets.only(left: 30),
                                       ),
-                                      Row(
-                                        children: <Widget>[
-                                          Icon(
-                                            Icons.layers,
-                                            color: Colors.teal,
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(left: 2, right: 2),
-                                          ),
-                                          Text(allRequests[index].surfaceName!=null?requests[index].surfaceName:''),
-                                        ],
 
-
-                                      ),
                                     ],
                                   ),
                                   Row(
@@ -442,6 +429,20 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                                       ),
 
                                     ],
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      Icon(
+                                        Icons.layers,
+                                        color: Colors.teal,
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(left: 2, right: 2),
+                                      ),
+                                      Text(allRequests[index].surfaceName!=null?requests[index].surfaceName:'',overflow: TextOverflow.ellipsis,maxLines: 1,),
+                                    ],
+
+
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(left: 1),

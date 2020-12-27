@@ -236,7 +236,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                       //color: Colors.teal,
                     ),
                     width: MediaQuery.of(context).size.width,
-                    height: 175, //MediaQuery.of(context).size.height * 0.25,
+                 //   height: 175, //MediaQuery.of(context).size.height * 0.25,
 
                     child: Padding(
                       padding: const EdgeInsets.all(13.0),
@@ -268,7 +268,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                   errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
                                   imageBuilder: (context, imageProvider){
                                     return Container(
-                                      height: 85,
+                                      height: 100,
                                       width: 85,
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(8),
@@ -285,7 +285,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                               requests[index].multipleColors!=null&&requests[index].multipleColors.length>0
                                   ?Container(
                                 width: 55,
-                                    height:15,
+                                    height:20,
                                     child: ListView(
                                       scrollDirection: Axis.horizontal,
                                 children: [
@@ -293,7 +293,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                       children: <Widget>[
                                         for(int i=0;i<requests[index].multipleColors.length;i++)
                                           Padding(
-                                            padding: const EdgeInsets.all(2),
+                                            padding: const EdgeInsets.only(top: 8,left: 2,right: 2),
                                             child: Wrap(
                                               children: [
                                                 Container(
@@ -318,7 +318,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                           VerticalDivider(color: Colors.grey,),
                           Container(
                             width: MediaQuery.of(context).size.width * 0.62,
-                            height: MediaQuery.of(context).size.height * 0.62,
+                            height: 160,
                             color: Colors.white,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -348,18 +348,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                     Padding(
                                       padding: EdgeInsets.only(left: 30),
                                     ),
-                                    Row(
-                                      children: <Widget>[
-                                        Icon(
-                                          Icons.layers,
-                                          color: Colors.teal,
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 2, right: 2),
-                                        ),
-                                        Text(requests[index].surfaceName!=null?requests[index].surfaceName:''),
-                                      ],
-                                    ),
+
                                   ],
                                 ),
                                 Row(
@@ -431,6 +420,18 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                       padding: EdgeInsets.only(left: 27),
                                     ),
 
+                                  ],
+                                ),
+                                Row(
+                                  children: <Widget>[
+                                    Icon(
+                                      Icons.layers,
+                                      color: Colors.teal,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 2, right: 2),
+                                    ),
+                                    Text(requests[index].surfaceName!=null?requests[index].surfaceName:'',overflow: TextOverflow.ellipsis,maxLines: 1,softWrap: true,),
                                   ],
                                 ),
                                 Padding(

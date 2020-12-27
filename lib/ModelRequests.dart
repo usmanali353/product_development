@@ -316,7 +316,6 @@ class _ModelReState extends State<ModelRequests>{
                         //color: Colors.teal,
                       ),
                       width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height * 0.21,
 
                       child: Padding(
                         padding: const EdgeInsets.all(13.0),
@@ -342,7 +341,7 @@ class _ModelReState extends State<ModelRequests>{
                                   child:CachedNetworkImage(
                                     imageUrl: products[index].image!=null?products[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
                                     placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
-                                    errorWidget: (context, url, error) => Icon(Icons.upload_file),
+                                    errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
                                     imageBuilder: (context, imageProvider){
                                        return Container(
                                          height: 85,
@@ -362,7 +361,7 @@ class _ModelReState extends State<ModelRequests>{
                                 products[index].multipleColorNames!=null&&products[index].multipleColorNames.length>0
                                     ?Container(
                                      width: 55,
-                                      height: 15,
+                                      height: 20,
                                       child: ListView(
                                         scrollDirection: Axis.horizontal,
                                   children: [
@@ -370,7 +369,7 @@ class _ModelReState extends State<ModelRequests>{
                                         children: <Widget>[
                                           for(int i=0;i<products[index].multipleColorNames.length;i++)
                                             Padding(
-                                              padding: const EdgeInsets.all(2),
+                                              padding: const EdgeInsets.only(top: 8,left: 2,right: 2),
                                               child: Wrap(
                                                 children: [
                                                   Container(
@@ -500,7 +499,7 @@ class _ModelReState extends State<ModelRequests>{
                               },
                               child: Container(
                                 width: MediaQuery.of(context).size.width * 0.62,
-                                height: MediaQuery.of(context).size.height * 0.62,
+                                height: 130,
                                 color: Colors.white,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -535,22 +534,7 @@ class _ModelReState extends State<ModelRequests>{
                                             Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(products[index].date)))
                                           ],
                                         ),
-                                        Padding(
-                                          padding: EdgeInsets.only(left: 30),
-                                          child: Row(
-                                            children: <Widget>[
-                                              Icon(
-                                                Icons.layers,
-                                                color: Colors.teal,
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.only(left: 2, right: 2),
-                                              ),
-                                              Text(products[index].surfaceName!=null?products[index].surfaceName:'')
-                                            ],
 
-                                          ),
-                                        ),
 
                                       ],
                                     ),
@@ -589,6 +573,19 @@ class _ModelReState extends State<ModelRequests>{
                                              child: Text(products[index].multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", ""),maxLines: 3,overflow: TextOverflow.visible,)
                                          ),
                                       ],
+                                    ),
+                                    Row(
+                                      children: <Widget>[
+                                        Icon(
+                                          Icons.layers,
+                                          color: Colors.teal,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 2, right: 2),
+                                        ),
+                                        Text(products[index].surfaceName!=null?products[index].surfaceName:'',overflow: TextOverflow.ellipsis,maxLines: 2,softWrap: true)
+                                      ],
+
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(left: 1),

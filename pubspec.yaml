@@ -70,9 +70,9 @@ dependencies:
 
   intl:
 
-  barcode_scan: ^3.0.1
+  flutter_barcode_scanner: ^1.0.1
 
-  flutter_form_builder:
+  flutter_form_builder: ^3.7.1
 
   image_picker: ^0.6.7+7
 
@@ -103,6 +103,8 @@ dependencies:
   cached_network_image: ^2.3.2+1
 
   filter_list: ^0.0.5
+
+  quick_actions: ^0.4.0+10
 
 
 dev_dependencies:
