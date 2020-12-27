@@ -100,7 +100,7 @@ class _DailyClientScheduleState extends State<DailyClientSchedule> {
             icon: Icon(Icons.filter_list),
           ),
           IconButton(
-            icon:Icon(Icons.add_outlined),
+            icon:Icon(Icons.add),
             onPressed: (){
               Navigator.push(context, MaterialPageRoute(builder:(context)=>AddClientsToTrial()));
             },
