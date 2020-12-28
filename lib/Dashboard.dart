@@ -275,7 +275,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                           child: Card(
                             elevation: 8,
                             child: Container(
-                              height: MediaQuery.of(context).size.height / 5.8,
+                             // height: 120,
                               width: MediaQuery.of(context).size.width / 2.25,
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -284,7 +284,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                               child: Column(
                                 children: [
                                   Container(
-                                    height: MediaQuery.of(context).size.height / 8.8,
+                                    height: 80,
                                     width: MediaQuery.of(context).size.width,
                                     color: Colors.white,
                                     child: Column(
@@ -332,7 +332,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                           child: Card(
                             elevation: 8,
                             child: Container(
-                              height: MediaQuery.of(context).size.height / 5.8,
+                              //height: MediaQuery.of(context).size.height / 5.8,
                               width: MediaQuery.of(context).size.width / 2.25,
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -341,7 +341,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                               child: Column(
                                 children: [
                                   Container(
-                                    height: MediaQuery.of(context).size.height / 8.8,
+                                    height: 80,
                                     width: MediaQuery.of(context).size.width,
                                     color: Colors.white,
                                     child: Column(
@@ -400,7 +400,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         child: Card(
                           elevation: 8,
                           child: Container(
-                            height: MediaQuery.of(context).size.height / 5.8,
+                            //height: MediaQuery.of(context).size.height / 5.8,
                             width: MediaQuery.of(context).size.width / 2.25,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -409,7 +409,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: MediaQuery.of(context).size.height / 8.8,
+                                  height: 80,
                                   width: MediaQuery.of(context).size.width,
                                   color: Colors.white,
                                   child: Column(
@@ -457,7 +457,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         child: Card(
                           elevation: 8,
                           child: Container(
-                            height: MediaQuery.of(context).size.height / 5.8,
+                            //height: MediaQuery.of(context).size.height / 5.8,
                             width: MediaQuery.of(context).size.width / 2.25,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -466,7 +466,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: MediaQuery.of(context).size.height / 8.8,
+                                  height: 80,
                                   width: MediaQuery.of(context).size.width,
                                   color: Colors.white,
                                   child: Column(
@@ -510,7 +510,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                       // Card(
                       //   elevation: 8,
                       //   child: Container(
-                      //     height: MediaQuery.of(context).size.height / 5.8,
+                      //     //height: MediaQuery.of(context).size.height / 5.8,
                       //     width: MediaQuery.of(context).size.width / 2.25,
                       //     decoration: BoxDecoration(
                       //       color: Colors.white,
@@ -519,7 +519,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                       //     child: Column(
                       //       children: [
                       //         Container(
-                      //           height: MediaQuery.of(context).size.height / 8.8,
+                      //           height: 80,
                       //           width: MediaQuery.of(context).size.width,
                       //           color: Colors.white,
                       //           child: Column(
@@ -575,7 +575,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         child: Card(
                           elevation: 8,
                           child: Container(
-                            height: MediaQuery.of(context).size.height / 5.8,
+                            //height: MediaQuery.of(context).size.height / 5.8,
                             width: MediaQuery.of(context).size.width / 2.25,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -584,7 +584,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: MediaQuery.of(context).size.height / 8.8,
+                                  height: 80,
                                   width: MediaQuery.of(context).size.width,
                                   color: Colors.white,
                                   child: Column(
@@ -632,7 +632,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         child: Card(
                           elevation: 8,
                           child: Container(
-                            height: MediaQuery.of(context).size.height / 5.8,
+                            //height: MediaQuery.of(context).size.height / 5.8,
                             width: MediaQuery.of(context).size.width / 2.25,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -641,7 +641,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: MediaQuery.of(context).size.height / 8.8,
+                                  height: 80,
                                   width: MediaQuery.of(context).size.width,
                                   color: Colors.white,
                                   child: Column(
@@ -683,7 +683,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         ),
                       ),
                       // Container(
-                      //   height: MediaQuery.of(context).size.height / 5.8,
+                      //   //height: MediaQuery.of(context).size.height / 5.8,
                       //   width: MediaQuery.of(context).size.width / 2,
                       //   color: Colors.green,
                       // ),
@@ -704,7 +704,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         child: Card(
                           elevation: 8,
                           child: Container(
-                            height: MediaQuery.of(context).size.height / 5.8,
+                            //height: MediaQuery.of(context).size.height / 5.8,
                             width: MediaQuery.of(context).size.width / 2.25,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -713,7 +713,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: MediaQuery.of(context).size.height / 8.8,
+                                  height: 80,
                                   width: MediaQuery.of(context).size.width,
                                   color: Colors.white,
                                   child: Column(
@@ -761,7 +761,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         child: Card(
                           elevation: 8,
                           child: Container(
-                            height: MediaQuery.of(context).size.height / 5.8,
+                            //height: MediaQuery.of(context).size.height / 5.8,
                             width: MediaQuery.of(context).size.width / 2.25,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -770,7 +770,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: MediaQuery.of(context).size.height / 8.8,
+                                  height: 80,
                                   width: MediaQuery.of(context).size.width,
                                   color: Colors.white,
                                   child: Column(
@@ -827,7 +827,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         child: Card(
                           elevation: 8,
                           child: Container(
-                            height: MediaQuery.of(context).size.height / 5.8,
+                            //height: MediaQuery.of(context).size.height / 5.8,
                             width: MediaQuery.of(context).size.width / 2.25,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -836,7 +836,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: MediaQuery.of(context).size.height / 8.8,
+                                  height: 80,
                                   width: MediaQuery.of(context).size.width,
                                   color: Colors.white,
                                   child: Column(
@@ -884,7 +884,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         child: Card(
                           elevation: 8,
                           child: Container(
-                            height: MediaQuery.of(context).size.height / 5.8,
+                            //height: MediaQuery.of(context).size.height / 5.8,
                             width: MediaQuery.of(context).size.width / 2.25,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -893,7 +893,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: MediaQuery.of(context).size.height / 8.8,
+                                  height: 80,
                                   width: MediaQuery.of(context).size.width,
                                   color: Colors.white,
                                   child: Column(
@@ -951,7 +951,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         child: Card(
                           elevation: 8,
                           child: Container(
-                            height: MediaQuery.of(context).size.height / 5.8,
+                            //height: MediaQuery.of(context).size.height / 5.8,
                             width: MediaQuery.of(context).size.width / 2.25,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -960,7 +960,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: MediaQuery.of(context).size.height / 8.8,
+                                  height: 80,
                                   width: MediaQuery.of(context).size.width,
                                   color: Colors.white,
                                   child: Column(
@@ -1008,7 +1008,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         child: Card(
                           elevation: 8,
                           child: Container(
-                            height: MediaQuery.of(context).size.height / 5.8,
+                            //height: MediaQuery.of(context).size.height / 5.8,
                             width: MediaQuery.of(context).size.width / 2.25,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -1017,7 +1017,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: MediaQuery.of(context).size.height / 8.8,
+                                  height: 80,
                                   width: MediaQuery.of(context).size.width,
                                   color: Colors.white,
                                   child: Column(
@@ -1074,7 +1074,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         child: Card(
                           elevation: 8,
                           child: Container(
-                            height: MediaQuery.of(context).size.height / 5.8,
+                            //height: MediaQuery.of(context).size.height / 5.8,
                             width: MediaQuery.of(context).size.width / 2.25,
                             decoration: BoxDecoration(
                               color: Colors.white,
@@ -1083,7 +1083,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                             child: Column(
                               children: [
                                 Container(
-                                  height: MediaQuery.of(context).size.height / 8.8,
+                                  height: 80,
                                   width: MediaQuery.of(context).size.width,
                                   color: Colors.white,
                                   child: Column(

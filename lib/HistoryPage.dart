@@ -70,6 +70,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   child: Row(
                     children: <Widget>[
                       Column(
+                        mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           Padding(
@@ -89,12 +90,13 @@ class _HistoryPageState extends State<HistoryPage> {
                                     Network_Operations.undoStatus(context,prefs.getString("token"),undoableList[undoableList.length-1].id);
                                   });
                                 },
-                                child: Row(
+                                child:
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: <Widget>[
                                     FaIcon(FontAwesomeIcons.undoAlt, color: Color(0xFF004c4c), size: 15,),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 2, right: 2),
-                                    ),
+
                                     Text("Undo", style: TextStyle(color: Color(0xFF004c4c),),),
                                   ],
                                 ),
@@ -121,9 +123,9 @@ class _HistoryPageState extends State<HistoryPage> {
                                 padding: EdgeInsets.only(left: 5, right: 5),
                               ),
                               Text(remarksHistory[index].statusName.trim()),
-                              Padding(
-                                padding: EdgeInsets.only(left: 100, right: 5),
-                              ),
+//                              Padding(
+//                                padding: EdgeInsets.only(left: 100, right: 5),
+//                              ),
 
                             ],
                           ),
@@ -166,7 +168,7 @@ class _HistoryPageState extends State<HistoryPage> {
                               width: MediaQuery.of(context).size.width / 1.5,
                               //color: Colors.teal,
                               child: Card(color: Colors.white, elevation: 0,
-                                  child: Text(remarksHistory[index].remarks,maxLines: 2,overflow: TextOverflow.ellipsis,)),
+                                  child: Text(remarksHistory[index].remarks,maxLines: 3,overflow: TextOverflow.ellipsis,)),
                             ),
                           ),
                         ],
