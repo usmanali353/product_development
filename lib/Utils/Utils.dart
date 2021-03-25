@@ -243,6 +243,7 @@ class Utils{
 
           if(prefs.getString("token")!=null){
 
+
             var claims=Utils.parseJwt(prefs.getString("token"));
 
             if(DateTime.fromMillisecondsSinceEpoch(int.parse(claims['exp'].toString()+"000")).isAfter(DateTime.now())){
@@ -253,6 +254,8 @@ class Utils{
             }
 
           }
+
+
         });
       }
       else if(shortcutType == "schedule_appointment"){

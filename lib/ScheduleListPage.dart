@@ -42,6 +42,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
+
             image: DecorationImage(
           fit: BoxFit.cover,
           //colorFilter: new ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.dstATop),
@@ -68,7 +69,8 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                     ),
                     Divider(),
                     ListTile(
-                      title: Text("Sample Production End Date"),
+                      title: Text("S"
+                          "ample Production End Date"),
                       subtitle: Text(request.actualEndDate != null
                           ? DateFormat("dd MMMM yyyy")
                               .format(DateTime.parse(request.actualEndDate))

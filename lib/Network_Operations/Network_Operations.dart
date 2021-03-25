@@ -43,6 +43,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
      }
     }catch(e) {
       pd.hide();
+      print(e.toString());
       Utils.showError(context,e.toString());
     }
   }
