@@ -20,7 +20,7 @@
         android:name=".Application"
 
         android:label="ACMC Products"
-
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
 
         <activity

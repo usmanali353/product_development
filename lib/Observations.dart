@@ -271,7 +271,7 @@ class _ObservationsState extends State<Observations> {
     await FilterListDialog.display(
         context,
         height: 480,
-        allTextList: rejectionReasonName,
+        listData: rejectionReasonName,
         borderRadius: 20,
        // selectedItemTitle: "Reasons Selected",
         selectedTextBackgroundColor: Colors.teal,
@@ -281,7 +281,7 @@ class _ObservationsState extends State<Observations> {
         closeIconColor: Color(0xFF004c4c),
         headlineText: "Select Reason",
         searchFieldHintText: "Search Reasons",
-        selectedTextList: selectedReasonNames,
+        selectedListData: selectedReasonNames,
         onApplyButtonClick: (list) {
           if (list != null) {
             setState(() {

@@ -47,39 +47,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
       if(isConnected){
         messaging=FirebaseMessaging();
         messaging.getToken().then((value) =>debugPrint(value));
-        messaging.configure(
-            onMessage:(Map<String, dynamic> message)async{
-              WidgetsBinding.instance
-                  .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-              showOverlayNotification((context) {
-                return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  child: SafeArea(
-                    child: ListTile(
-                      leading:Icon(Icons.notifications,color: Theme.of(context).primaryColor,size: 40,),
-                      title: Text(message['notification']['title']),
-                      subtitle: Text(message['notification']['body']),
-                      onTap: (){
-                        push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
-                      },
-                      trailing: IconButton(
-                          icon: Icon(Icons.close),
-                          onPressed: () {
-                            OverlaySupportEntry.of(context).dismiss();
-                          }),
-                    ),
-                  ),
-                );
-              }, duration: Duration(milliseconds: 5000));
-            },
-            onBackgroundMessage: Platform.isIOS ? null : Network_Operations.myBackgroundMessageHandler,
-            onResume: (Map<String, dynamic> message) async{
-              print(message.toString());
-            },
-            onLaunch: (Map<String, dynamic> message)async{
-              print(message.toString());
-            }
-        );
+
         WidgetsBinding.instance
             .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
       }else{

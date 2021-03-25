@@ -234,7 +234,7 @@ class _AddClientsToTrialState extends State<AddClientsToTrial> {
     await FilterListDialog.display(
         context,
         height: 480,
-        allTextList: modelNames,
+        listData: modelNames,
         borderRadius: 20,
         selectedTextBackgroundColor: Colors.teal,
         allResetButonColor: Color(0xFF004c4c),
@@ -243,7 +243,7 @@ class _AddClientsToTrialState extends State<AddClientsToTrial> {
         closeIconColor: Color(0xFF004c4c),
         headlineText: "Select Model",
         searchFieldHintText: "Search Models",
-        selectedTextList: selectedModelNames,
+        selectedListData: selectedModelNames,
         onApplyButtonClick: (list) {
           if (list != null) {
             setState(() {

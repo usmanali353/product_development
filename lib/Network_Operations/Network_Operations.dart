@@ -611,6 +611,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       pd.hide();
       Utils.showError(context, e.toString());
     }
+
   }
   static Future<List<Notifications>> getUserNotifications(BuildContext context,String token)async{
     try{
