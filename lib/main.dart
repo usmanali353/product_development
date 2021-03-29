@@ -1,12 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:productdevelopment/Login.dart';
 import 'package:productdevelopment/Dashboard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'Network_Operations/MyHttpOverrides.dart';
 import 'OldDashboard.dart';
 import 'Utils/Utils.dart';
 import 'package:productdevelopment/RejectedModelsActions.dart';
 void main() {
+  HttpOverrides.global = new MyHttpOverrides();
   runApp(MyApp());
 }
 

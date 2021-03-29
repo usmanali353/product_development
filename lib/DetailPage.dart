@@ -75,7 +75,7 @@ class _DetailPageState extends State<DetailPage>{
                   width: MediaQuery.of(context).size.width,
                  decoration: BoxDecoration(
                    image: DecorationImage(
-                     image: NetworkImage(request.image!=null?request.image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg"),
+                     image: NetworkImage(request.image!=null?request.image:"http://anokha.world/images/not-found.png"),
                      fit: BoxFit.cover,
                    )
                  ),
@@ -354,7 +354,7 @@ class _DetailPageState extends State<DetailPage>{
                                           padding: const EdgeInsets.all(8.0),
                                           child: RepaintBoundary(
                                             key: globalKey,
-                                              child: CachedNetworkImage(imageUrl:request.qrcodeImage!=null?request.qrcodeImage:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",width: 100,height: 100,placeholder: (context,url)=>Container(width: 80,height:80,child: Center(child: CircularProgressIndicator()),),)
+                                              child: CachedNetworkImage(imageUrl:request.qrcodeImage!=null?request.qrcodeImage:"http://anokha.world/images/not-found.png",width: 100,height: 100,placeholder: (context,url)=>Container(width: 80,height:80,child: Center(child: CircularProgressIndicator()),),)
                                           ),
                                         ),
                                         Column(

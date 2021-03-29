@@ -288,7 +288,7 @@ class _AllRequestListState extends State<AllRequestList> {
                                     });
                                   },
                                   child: CachedNetworkImage(
-                                    imageUrl: allRequests[index].image!=null?allRequests[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
+                                    imageUrl: allRequests[index].image!=null?allRequests[index].image:"http://anokha.world/images/not-found.png",
                                     placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
                                     errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
                                     imageBuilder: (context, imageProvider){

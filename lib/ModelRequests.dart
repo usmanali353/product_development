@@ -339,7 +339,7 @@ class _ModelReState extends State<ModelRequests>{
                                     });
                                   },
                                   child:CachedNetworkImage(
-                                    imageUrl: products[index].image!=null?products[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
+                                    imageUrl: products[index].image!=null?products[index].image:"http://anokha.world/images/not-found.png",
                                     placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
                                     errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
                                     imageBuilder: (context, imageProvider){
