@@ -28,6 +28,8 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
   FirebaseMessaging messaging;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
+
+  
   @override
   void onResume() {
     Utils.check_connectivity().then((isConnected){
@@ -45,8 +47,43 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
   void initState() {
     Utils.check_connectivity().then((isConnected){
       if(isConnected){
-        messaging=FirebaseMessaging();
-        messaging.getToken().then((value) =>debugPrint(value));
+        if(Platform.isAndroid){
+          messaging=FirebaseMessaging();
+          messaging.getToken().then((value) =>debugPrint(value));
+          messaging.configure(
+              onMessage:(Map<String, dynamic> message)async{
+                WidgetsBinding.instance
+                    .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                showOverlayNotification((context) {
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    child: SafeArea(
+                      child: ListTile(
+                        leading:Icon(Icons.notifications,color: Theme.of(context).primaryColor,size: 40,),
+                        title: Text(message['notification']['title']),
+                        subtitle: Text(message['notification']['body']),
+                        onTap: (){
+                          push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
+                        },
+                        trailing: IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () {
+                              OverlaySupportEntry.of(context).dismiss();
+                            }),
+                      ),
+                    ),
+                  );
+                }, duration: Duration(milliseconds: 5000));
+              },
+              onBackgroundMessage: Platform.isIOS ? null : Network_Operations.myBackgroundMessageHandler,
+              onResume: (Map<String, dynamic> message) async{
+                print(message.toString());
+              },
+              onLaunch: (Map<String, dynamic> message)async{
+                print(message.toString());
+              }
+          );
+        }
 
         WidgetsBinding.instance
             .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
@@ -125,14 +162,20 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                     title: Text("Sign Out"),
                     leading: Icon(FontAwesomeIcons.signOutAlt),
                     onTap: (){
-                      SharedPreferences.getInstance().then((prefs){
-
-                        messaging.getToken().then((fcmToken){
-                          Network_Operations.deleteFCMToken(context, claims["nameid"],fcmToken, prefs.getString("token")).then((value){
-                            prefs.remove("token");
+                      if(Platform.isAndroid){
+                        SharedPreferences.getInstance().then((prefs){
+                          messaging.getToken().then((fcmToken){
+                            Network_Operations.deleteFCMToken(context, claims["nameid"],fcmToken, prefs.getString("token")).then((value){
+                              prefs.remove("token");
+                            });
                           });
                         });
-                      });
+                      }else{
+                        SharedPreferences.getInstance().then((prefs){
+                          prefs.remove("token");
+                        });
+                      }
+
                     },
                   ),
 

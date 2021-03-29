@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -26,14 +27,19 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
          prefs.setString("token", jsonDecode(response.body)['result']);
          prefs.setString("email", email);
        });
-       var claims=Utils.parseJwt(jsonDecode(response.body)['result']);
-       //Utils.showSuccess(context, "Login Successful");
-       FirebaseMessaging().getToken().then((token){
-         pd.hide();
-         addFCMToken(context, claims['nameid'], token, jsonDecode(response.body)['result']).then((value){
+       if(Platform.isAndroid){
+         var claims=Utils.parseJwt(jsonDecode(response.body)['result']);
+         //Utils.showSuccess(context, "Login Successful");
+         FirebaseMessaging().getToken().then((token){
+           pd.hide();
+           addFCMToken(context, claims['nameid'], token, jsonDecode(response.body)['result']).then((value){
 
+           });
          });
-       });
+       }else if(Platform.isIOS){
+         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+       }
+
      }else if(response.body!=null){
        pd.hide();
        Utils.showError(context, "Invalid Username or Password");
@@ -237,55 +243,86 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
 
   }
   static Future<String> getRequestForGM(BuildContext context,String token,int PageSize,int PageNumber)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
+        pd.hide();
          return response.body;
-      }else
-        return null;
+      }else {
+        pd.hide();
+        Utils.showError(context,"No Requests Found");
+      }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
   static Future<String> getRequestForGMSearchable(BuildContext context,String token,int PageSize,int PageNumber,String searchQuery)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
+        pd.hide();
         return response.body;
-      }else
-        return null;
+      }else {
+        pd.hide();
+        Utils.showError(context,"No Requests Found");
+      }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
   static Future<String> getRequestByStatusGM(BuildContext context,String token,int statusId,int pageNumber,int pageSize) async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
+        pd.hide();
         print(response.body);
          return response.body;
-      }else
-        return null;
+      }else{
+        pd.hide();
+        Utils.showError(context,"No Requests Found");
+      }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
   static Future<String> getRequestByStatusGMSearchable(BuildContext context,String token,int statusId,int pageNumber,int pageSize,String query) async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
+        pd.hide();
         return response.body;
-      }else
-        return null;
+      }else{
+        Utils.showError(context,"No Requests Found");
+      }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
@@ -407,33 +444,50 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     return null;
   }
   static Future<String> getRequestByStatusIndividualUser(BuildContext context,String token,int statusId,int pageNumber,int pageSize) async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId?PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
+        pd.hide();
         return response.body;
-      }else
-        return null;
+      }else{
+       pd.hide();
+       Utils.showError(context,"No Requests Found");
+      }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
   static Future<String> getRequestByStatusIndividualUserSearchable(BuildContext context,String token,int statusId,String query,int pageNumber,int pageSize) async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId&SearchString=$query&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
+        pd.hide();
         return response.body;
       }else {
+        pd.hide();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
   static Future<void> changeStatusWithRemarks(BuildContext context,String token,int requestId,int status,String remarks)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       final body=jsonEncode({
         "StatusId":status,
@@ -442,16 +496,23 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       },toEncodable: Utils.myEncode);
       var response=await http.post(Utils.getBaseUrl()+"Request/SaveRequestRemark",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
+        pd.hide();
         Utils.showSuccess(context, "Status Changed");
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
       }else{
+        pd.hide();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
+      pd.hide();
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
   }
   static Future<void> changeStatusClientWithRemarks(BuildContext context,String token,int requestId,int status,String remarks,DateTime ActualClientVisitDate,List<dynamic> MultipleReasons)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       final body=jsonEncode({
         "StatusId":status,
@@ -462,42 +523,62 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       },toEncodable: Utils.myEncode);
       var response=await http.post(Utils.getBaseUrl()+"Request/SaveRequestRemark",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
+        pd.hide();
         Utils.showSuccess(context, "Status Changed");
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
-      }else if(response.body!=null){
+      }else if(response.body!=null&&response.body.isNotEmpty){
+        pd.hide();
         Utils.showError(context,response.body);
       }else{
+        pd.hide();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
+      pd.hide();
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
   }
   static Future<String> getClientRequestsByStatus(BuildContext context,String token,int statusId,int pageNumber,int pageSize)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
+        pd.hide();
         return response.body;
       }else{
+        pd.hide();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
   static Future<String> getClientRequestsByStatusSearchable(BuildContext context,String token,int statusId,int pageNumber,int pageSize,String searchQuery)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
+        pd.hide();
         return response.body;
       }else{
+        pd.hide();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
@@ -615,34 +696,48 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
 
   }
   static Future<List<Notifications>> getUserNotifications(BuildContext context,String token)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response =await http.get(Utils.getBaseUrl()+"Account/GetAllNotificationsOfUser",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
+        pd.hide();
         List<Notifications> notifications=[];
         for(int i=0;i<jsonDecode(response.body).length;i++){
           notifications.add(Notifications.fromJson(jsonDecode(response.body)[i]));
         }
         return notifications;
       }else{
+        pd.hide();
         Utils.showError(context,"No Notifications Found");
       }
     }catch(e){
+      pd.hide();
       print(e.toString());
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
   static Future<void> readNotification(BuildContext context,String token,int notificationId,int requestId) async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Account/ReadNotification/$notificationId",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
+        pd.hide();
         //getRequestById(context, token, requestId);
       }else{
+        pd.hide();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
   }
   static Future<Request> getRequestByIdNotifications(BuildContext context,String token,int requestId) async{

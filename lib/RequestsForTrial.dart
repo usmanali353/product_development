@@ -148,7 +148,7 @@ RequestsForTrial(this.requestId,this.currentUserRole);
 
                                  },
                                  child: CachedNetworkImage(
-                                   imageUrl: requests[index].image!=null?requests[index].image:"https://cidco-smartcity.niua.org/wp-content/uploads/2017/08/No-image-found.jpg",
+                                   imageUrl: requests[index].image!=null?requests[index].image:"http://anokha.world/images/not-found.png",
                                    placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
                                    errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
                                    imageBuilder: (context, imageProvider){
@@ -600,10 +600,10 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                  width: MediaQuery.of(context).size.width,
                  height:  MediaQuery.of(context).size.height/3,
                  child: ListView.builder(
-                     itemCount: trialRequests.multipleReasons.length,
+                     itemCount: trialRequests.multipleReasons!=null?trialRequests.multipleReasons.length:0,
                      itemBuilder:(context,index){
                        return ListTile(
-                         title: Text(trialRequests.multipleReasons[index]),
+                         title: Text(trialRequests.multipleReasons[index]!=null?trialRequests.multipleReasons[index]:""),
                          leading: Container(
                            height: 20.0,
                            width: 20.0,
