@@ -14,7 +14,8 @@ class ProductionManagerRequests extends StatefulWidget {
   int statusId;
   String type;
   var currentUserRole;
-  ProductionManagerRequests(this.statusId,this.type,this.currentUserRole);
+  String name;
+  ProductionManagerRequests(this.statusId,this.type,this.currentUserRole,{this.name});
 
   @override
   _ProductionManagerRequestsState createState() => _ProductionManagerRequestsState(statusId,type,currentUserRole);
@@ -736,7 +737,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: horizontalTitleAlignment,
           children: <Widget>[
-            const Text('Model Requests'),
+             Text(widget.name!=null?widget.name:"Model Requests"),
           ],
         ),
       ),

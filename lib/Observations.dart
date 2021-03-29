@@ -17,7 +17,8 @@ class _ObservationsState extends State<Observations> {
   String token;
   int status;
   var request,selectedRejectionReason,selectedReasonId;
-  List<String> rejectionReasonName=[],selectedReasonNames=[],selectedReasonIds=[];
+  List<dynamic> selectedReasonNames=[];
+  List<String> rejectionReasonName=[],selectedReasonIds=[];
   List<Dropdown> rejectionReasonDropdown=[];
   bool rejectionReasonVisible=false;
   DateTime visitDate=DateTime.now();
@@ -272,8 +273,22 @@ class _ObservationsState extends State<Observations> {
         context,
         height: 480,
         listData: rejectionReasonName,
+        label: (item) {
+          return item;
+        },
+        validateSelectedItem: (list, val) {
+          return list.contains(val);
+        },
+        onItemSearch: (list, text) {
+          if (list.any((element) =>
+              element.toLowerCase().contains(text.toLowerCase()))) {
+            return list
+                .where((element) =>
+                element.toLowerCase().contains(text.toLowerCase()))
+                .toList();
+          }
+        },
         borderRadius: 20,
-       // selectedItemTitle: "Reasons Selected",
         selectedTextBackgroundColor: Colors.teal,
         allResetButonColor: Color(0xFF004c4c),
         applyButonTextBackgroundColor: Color(0xFF004c4c),
@@ -281,7 +296,6 @@ class _ObservationsState extends State<Observations> {
         closeIconColor: Color(0xFF004c4c),
         headlineText: "Select Reason",
         searchFieldHintText: "Search Reasons",
-        selectedListData: selectedReasonNames,
         onApplyButtonClick: (list) {
           if (list != null) {
             setState(() {

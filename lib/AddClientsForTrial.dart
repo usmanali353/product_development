@@ -20,7 +20,8 @@ class _AddClientsToTrialState extends State<AddClientsToTrial> {
   DateTime clientVisitDate=DateTime.now();
   bool isClientDropDownVisible=false,isModelDropDownVisible=false;
   List<Dropdown> clientsDropdown=[],modelDropDowns=[];
-  List<String> clientNames=[],modelNames=[],selectedModelNames=[],selectedModelIds=[];
+  List<dynamic> selectedModelNames=[];
+  List<String> clientNames=[],modelNames=[],selectedModelIds=[];
   List<Widget> selectedOptions = [];
   @override
   void initState() {
@@ -235,6 +236,21 @@ class _AddClientsToTrialState extends State<AddClientsToTrial> {
         context,
         height: 480,
         listData: modelNames,
+        label: (item) {
+          return item;
+        },
+        validateSelectedItem: (list, val) {
+          return list.contains(val);
+        },
+        onItemSearch: (list, text) {
+          if (list.any((element) =>
+              element.toLowerCase().contains(text.toLowerCase()))) {
+            return list
+                .where((element) =>
+                element.toLowerCase().contains(text.toLowerCase()))
+                .toList();
+          }
+        },
         borderRadius: 20,
         selectedTextBackgroundColor: Colors.teal,
         allResetButonColor: Color(0xFF004c4c),
@@ -243,7 +259,6 @@ class _AddClientsToTrialState extends State<AddClientsToTrial> {
         closeIconColor: Color(0xFF004c4c),
         headlineText: "Select Model",
         searchFieldHintText: "Search Models",
-        selectedListData: selectedModelNames,
         onApplyButtonClick: (list) {
           if (list != null) {
             setState(() {

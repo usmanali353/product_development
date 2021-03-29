@@ -338,7 +338,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         ),
                         InkWell(
                           onTap:(){
-                            push(context, MaterialPageRoute(builder: (context)=>ModelRequests(1,currentUserRoles)));
+                            push(context, MaterialPageRoute(builder: (context)=>ModelRequests(1,currentUserRoles,name: "New Requests",)));
                           },
                           child: Card(
                             elevation: 8,
@@ -406,7 +406,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                     children: [
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(3,currentUserRoles)));
+                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(3,currentUserRoles,name: "ACMC Rejected",)));
                         },
                         child: Card(
                           elevation: 8,
@@ -463,7 +463,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                       ),
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(2,currentUserRoles)));
+                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(2,currentUserRoles,name: "ACMC Approved",)));
                         },
                         child: Card(
                           elevation: 8,
@@ -581,7 +581,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                     children: [
                       InkWell(
                         onTap:(){
-                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(4,currentUserRoles)));
+                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(4,currentUserRoles,name: "Samples Scheduled",)));
                         },
                         child: Card(
                           elevation: 8,
@@ -638,7 +638,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                       ),
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(6,currentUserRoles)));
+                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(6,currentUserRoles,name:"Rejected Models")));
                         },
                         child: Card(
                           elevation: 8,
@@ -710,7 +710,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                     children: [
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(5,currentUserRoles)));
+                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(5,currentUserRoles,name: "Approved Models",)));
                         },
                         child: Card(
                           elevation: 8,
@@ -767,7 +767,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                       ),
                       InkWell(
                         onTap:(){
-                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(7,"Dashboard",currentUserRoles)));
+                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(7,"Dashboard",currentUserRoles,name: "Customer Approved",)));
                         },
                         child: Card(
                           elevation: 8,
@@ -833,7 +833,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                     children: [
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(8,"Dashboard",currentUserRoles)));
+                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(8,"Dashboard",currentUserRoles,name: "Customer Rejected",)));
                         },
                         child: Card(
                           elevation: 8,
@@ -1014,7 +1014,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                       ),
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(10,"Dashboard",currentUserRoles)));
+                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(10,"Dashboard",currentUserRoles,name: "Production Rejected",)));
                         },
                         child: Card(
                           elevation: 8,
@@ -1080,7 +1080,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                     children: [
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(9,"Dashboard",currentUserRoles)));
+                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(9,"Dashboard",currentUserRoles,name: "Production Approved",)));
                         },
                         child: Card(
                           elevation: 8,

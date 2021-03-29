@@ -24,7 +24,8 @@ class ModelRequests extends StatefulWidget {
 
   int statusId;
   var currentUserRoles;
-  ModelRequests(this.statusId,this.currentUserRoles);
+  String name;
+  ModelRequests(this.statusId,this.currentUserRoles,{this.name});
 
 
   @override
@@ -1115,7 +1116,7 @@ class _ModelReState extends State<ModelRequests>{
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: horizontalTitleAlignment,
           children: <Widget>[
-            const Text('Model Requests'),
+             Text(widget.name!=null?widget.name:"Model Requests"),
           ],
         ),
       ),

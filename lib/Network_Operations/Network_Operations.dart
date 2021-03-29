@@ -203,7 +203,9 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
          "IsUpdateMode":IsUpdateMode,
         "Remarks":remarks
       },toEncodable: Utils.myEncode);
+      print(body);
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestSetSchedule",body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+
       if(response.statusCode==200){
         pd.hide();
         Utils.showSuccess(context, response.body.toString());
@@ -327,6 +329,8 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     return null;
   }
   static Future<void> trialClient(BuildContext context,String token,List<dynamic> clientIds,int requestId,String remarks,DateTime ClientVisitDate,DateTime actualStartDate,DateTime actualEndDate,String newModelName,String newModelCode)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       final body=jsonEncode({
        "requestId":requestId,
@@ -341,16 +345,21 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       print(body);
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestClientSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
+        pd.hide();
         Utils.showSuccess(context, "Request Saved Successfully");
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
       }else{
+        pd.hide();
         if(response.body!=null){
           print(response.body);
         }
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
+      pd.hide();
       print(e.toString());
+    }finally{
+      pd.hide();
     }
   }
   static Future<List<TrialRequests>> getTrialRequests(BuildContext context,String token,int requestId)async{
@@ -370,8 +379,11 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
@@ -395,17 +407,23 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     return null;
   }
   static Future<Map<String,dynamic>> getRequestCount(BuildContext context,String token)async{
-
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestsCountForDashboard",headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
+        pd.hide();
         print(response.body.toString());
         return jsonDecode(response.body);
       }else{
+        pd.hide();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
+      pd.hide();
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
    return null;
   }
@@ -431,15 +449,22 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
   }
   static Future<Map<String,dynamic>> getRequestCountIndividualUser(BuildContext context,String token)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestsCountForIndividual",headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
+        pd.hide();
         return jsonDecode(response.body);
       }else{
+        pd.hide();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
+      pd.hide();
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
@@ -599,8 +624,11 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
@@ -762,9 +790,12 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
 
   }
   static Future<List<ClientVisitSchedule>> getClientVisitSchedule(BuildContext context,String token,String date,String endDate)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response =await http.get(Utils.getBaseUrl()+"Request/GetRequestClientsSchedule?Date=$date&&endDate=$endDate",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
+        pd.hide();
         print(response.body);
         List<ClientVisitSchedule> clientVisitSchedule=[];
         for(int i=0;i<jsonDecode(response.body)['result'].length;i++){
@@ -772,11 +803,15 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         }
         return clientVisitSchedule;
       }else{
+        pd.hide();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
+      pd.hide();
       print(e.toString());
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
@@ -824,10 +859,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
   }
   static Future<List<Dropdown>> getEmployeesDropDown(BuildContext context,String token)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Account/GetUsersExceptClientDropdown",headers:{"Authorization":"Bearer "+token});
       var data= jsonDecode(response.body);
       if(response.statusCode==200){
+        pd.hide();
         List<Dropdown> list=List();
         list.clear();
         for(int i=0;i<data.length;i++){
@@ -835,10 +873,16 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         }
         print(data.toString());
         return list;
+      }else{
+        pd.hide();
+        Utils.showError(context,"No Employees Found");
       }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
@@ -867,60 +911,86 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
   }
   static Future<String> getAssignedRejectedModels(BuildContext context,String token,int PageSize,int PageNumber)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
 
       if(response.statusCode==200){
+        pd.hide();
         print(response.body);
         return response.body;
-      }else
-        Utils.showError(context,response.statusCode.toString());
-        return null;
+      }else {
+        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+      }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
   static Future<String> getAssignedRejectedModelsSearchable(BuildContext context,String token,int PageSize,int PageNumber,String searchQuery)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
 
       if(response.statusCode==200){
+        pd.hide();
         return response.body;
-      }else
-        Utils.showError(context,response.statusCode.toString());
-      return null;
+      }else {
+        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+      }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
     }
     return null;
   }
   static Future<void> changeStatusOfAssignedModel(BuildContext context,String token,int clientId,int statusId)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
+        pd.hide();
         Utils.showSuccess(context,"Status Changed");
       }else{
+        pd.hide();
         Utils.showError(context, response.body.toString());
       }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
   }
   static Future<void> changeStatusOfAssignedModelWithJustification(BuildContext context,String token,int clientId,int statusId,int isJustified)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId&just=$isJustified",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
+        pd.hide();
         Utils.showSuccess(context,"Status Changed");
       }else{
+        pd.hide();
         Utils.showError(context, response.body.toString());
       }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
   }
   static Future<String> getTrialRequestsWithJustification(BuildContext context,String token,int isJustified,int PageSize,int PageNumber)async{
@@ -937,8 +1007,11 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         return null;
       }
     }catch(e){
+      pd.hide();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
     }
     return null;
   }
