@@ -381,6 +381,7 @@ class _DetailPageState extends State<DetailPage>{
                                                     build: (pw.Context context) {
                                                       return pw.Column(
                                                         children: [
+
                                                           pw.Center(
                                                               child: pw.Image(imgLogo,width: 150,height:150)
                                                           ),
@@ -390,7 +391,7 @@ class _DetailPageState extends State<DetailPage>{
                                                           ),
                                                           pw.Padding(padding: pw.EdgeInsets.all(8.0)),
                                                           pw.Center(
-                                                              child: pw.Text("Please Scan this QR Code to get Details of this Model",style: pw.TextStyle(fontSize: 15))
+                                                              child: pw.Text("Please Scan this QR Code to get Details of this Model",style: pw.TextStyle(fontSize: 15),)
                                                           ),
                                                         ]
                                                       );
