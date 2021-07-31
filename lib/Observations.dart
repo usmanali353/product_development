@@ -273,9 +273,10 @@ class _ObservationsState extends State<Observations> {
         context,
         height: 480,
         listData: rejectionReasonName,
-        label: (item) {
+        choiceChipLabel: (item){
           return item;
         },
+        headerTextColor: Color(0xFF004c4c),
         validateSelectedItem: (list, val) {
           return list.contains(val);
         },
@@ -289,10 +290,11 @@ class _ObservationsState extends State<Observations> {
           }
         },
         borderRadius: 20,
+
         selectedTextBackgroundColor: Colors.teal,
-        allResetButonColor: Color(0xFF004c4c),
+        //allResetButonColor: Color(0xFF004c4c),
         applyButonTextBackgroundColor: Color(0xFF004c4c),
-        headerTextColor: Color(0xFF004c4c),
+        //headerTextColor: Color(0xFF004c4c),
         closeIconColor: Color(0xFF004c4c),
         headlineText: "Select Reason",
         searchFieldHintText: "Search Reasons",

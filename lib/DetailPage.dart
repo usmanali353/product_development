@@ -310,28 +310,28 @@ class _DetailPageState extends State<DetailPage>{
                                 title: Text("Technology", style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                 ),),
-                                subtitle: Text(request.technologyName),
+                                subtitle: Text(request.technologyName!=null?request.technologyName:""),
                               ),
                               Divider(),
                               ListTile(
                                 title: Text("Structure", style: TextStyle(
                                     fontWeight: FontWeight.bold
                                 ),),
-                                subtitle: Text(request.structureName),
+                                subtitle: Text(request.structureName!=null?request.structureName:""),
                               ),
                               Divider(),
                               ListTile(
                                 title: Text("Edge", style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                 ),),
-                                subtitle: Text(request.edgeName),
+                                subtitle: Text(request.edgeName!=null?request.edgeName:""),
                               ),
                               Divider(),
                               ListTile(
                                 title: Text("Classification", style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),),
-                                subtitle: Text(request.classificationName),
+                                subtitle: Text(request.classificationName!=null?request.classificationName:""),
                               ),
                               Divider(),
                               ListTile(

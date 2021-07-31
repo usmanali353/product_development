@@ -999,7 +999,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                                     color: Color(0xff383838),
                                     borderRadius: BorderRadius.circular(4),
                                   ),
-                                  child: Center(child: Text(requestCount!=null&&requestCount['Rejections UnJustified']!=null?requestCount['Rejections UnJustified'].toString():"0",
+                                  child: Center(child: Text(requestCount!=null&&requestCount['Rejections Unjustified']!=null?requestCount['Rejections Unjustified'].toString():"0",
                                     style: TextStyle(
                                         fontSize: 15,
                                         color: Colors.white,

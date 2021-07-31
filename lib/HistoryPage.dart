@@ -122,7 +122,7 @@ class _HistoryPageState extends State<HistoryPage> {
                               Padding(
                                 padding: EdgeInsets.only(left: 5, right: 5),
                               ),
-                              Text(remarksHistory[index].statusName.trim()),
+                              Text(remarksHistory[index].statusName!=null?remarksHistory[index].statusName.trim():""),
 //                              Padding(
 //                                padding: EdgeInsets.only(left: 100, right: 5),
 //                              ),

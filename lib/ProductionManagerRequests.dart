@@ -174,150 +174,148 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
           child: Visibility(
             visible: isVisible,
             child: ListView.builder(itemCount:requests!=null?requests.length:0,itemBuilder:(context,int index){
-              return GestureDetector(
-                onTapDown: (details) async{
-                  if(requests[index].status=="Approved By Customer"){
-                    if(currentUserRole["9"]!=null||currentUserRole["10"]!=null) {
-                      showProductionApprovalDialog(context, requests[index]);
-                    }else{
-                      SharedPreferences.getInstance().then((prefs){
-                        Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
-                      });
-                    }
-                  }else if(requests[index].status=="Not Approved Nor Rejected"){
-                    if(currentUserRole["7"]!=null||currentUserRole["8"]!=null){
-                      showTrialApprovalDialog(context, requests[index]);
-                    }else{
-                      SharedPreferences.getInstance().then((prefs){
-                        Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
-                      });
-                    }
-                  }else if(requests[index].status=="Rejected By Customer"&&requests[index].currentAction=="Pending"){
-                    if(currentUserRole['12']!=null) {
-                      SharedPreferences.getInstance().then((prefs) {
-                        Network_Operations.getEmployeesDropDown(
-                            context, prefs.getString("token")).then((userList) {
-                          showAssignUserDialog(
-                              context, userList, requests[index]);
-                        });
-                      });
-                    }else{
-                      SharedPreferences.getInstance().then((prefs){
-                        Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
-                      });
-                    }
-                  }else{
-                    await showMenu(
-                      context: context,
-                      position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                      items: [
-                        PopupMenuItem<String>(
-                            child: const Text('View Rejection Reason'), value: 'rejectionReason'),
-                        PopupMenuItem<String>(
-                            child: const Text('See Details'), value: 'Details'),
-                      ],
-                      elevation: 8.0,
-                    ).then((selectedItem){
-                      if(selectedItem=="rejectionReason"){
-                        showReasonDialog(requests[index]);
-                      }else if(selectedItem=="Details"){
-                        SharedPreferences.getInstance().then((prefs){
-                          Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
-                        });
-                      }
-                    });
+              return Card(
+                elevation: 6,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    //color: Colors.teal,
+                  ),
+                  width: MediaQuery.of(context).size.width,
+               //   height: 175, //MediaQuery.of(context).size.height * 0.25,
 
-                  }
-                },
-                child: Card(
-                  elevation: 6,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      //color: Colors.teal,
-                    ),
-                    width: MediaQuery.of(context).size.width,
-                 //   height: 175, //MediaQuery.of(context).size.height * 0.25,
-
-                    child: Padding(
-                      padding: const EdgeInsets.all(13.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        //crossAxisAlignment: CrossAxisAlignment.start,
-                        //mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            //crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              InkWell(
-                                onTap: (){
-                                  setState(() {
-                                    List<String> imageUrl=[];
-                                    for(int i=0;i<requests[index].multipleImages.length;i++){
-                                      if(requests[index].multipleImages[i]!=null){
-                                        imageUrl.add(requests[index].multipleImages[i]);
-                                      }
+                  child: Padding(
+                    padding: const EdgeInsets.all(13.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      //crossAxisAlignment: CrossAxisAlignment.start,
+                      //mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          //crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            InkWell(
+                              onTap: (){
+                                setState(() {
+                                  List<String> imageUrl=[];
+                                  for(int i=0;i<requests[index].multipleImages.length;i++){
+                                    if(requests[index].multipleImages[i]!=null){
+                                      imageUrl.add(requests[index].multipleImages[i]);
                                     }
-                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(requests[index])));
-                                  });
+                                  }
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(requests[index])));
+                                });
 
+                              },
+                              child: CachedNetworkImage(
+                                imageUrl:requests[index].image!=null?requests[index].image:"http://anokha.world/images/not-found.png",
+                                placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
+                                errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
+                                imageBuilder: (context, imageProvider){
+                                  return Container(
+                                    height: 100,
+                                    width: 85,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover,
+                                        )
+                                    ),
+                                  );
                                 },
-                                child: CachedNetworkImage(
-                                  imageUrl:requests[index].image,
-                                  placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
-                                  errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
-                                  imageBuilder: (context, imageProvider){
-                                    return Container(
-                                      height: 100,
-                                      width: 85,
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(8),
-                                          image: DecorationImage(
-                                            image: imageProvider,
-                                            fit: BoxFit.cover,
-                                          )
-                                      ),
-                                    );
-                                  },
-                                ),
                               ),
-                              //Padding(padding: EdgeInsets.only(top:2),),
-                              requests[index].multipleColors!=null&&requests[index].multipleColors.length>0
-                                  ?Container(
-                                width: 55,
-                                    height:20,
-                                    child: ListView(
-                                      scrollDirection: Axis.horizontal,
-                                children: [
-                                    Row(
-                                      children: <Widget>[
-                                        for(int i=0;i<requests[index].multipleColors.length;i++)
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 8,left: 2,right: 2),
-                                            child: Wrap(
-                                              children: [
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(2),
-                                                    color: Color(Utils.getColorFromHex(requests[index].multipleColors[i].colorCode)),
-                                                    //color: Colors.teal,
-                                                  ),
-                                                  height: 10,
-                                                  width: 15,
+                            ),
+                            //Padding(padding: EdgeInsets.only(top:2),),
+                            requests[index].multipleColors!=null&&requests[index].multipleColors.length>0
+                                ?Container(
+                              width: 55,
+                                  height:20,
+                                  child: ListView(
+                                    scrollDirection: Axis.horizontal,
+                              children: [
+                                  Row(
+                                    children: <Widget>[
+                                      for(int i=0;i<requests[index].multipleColors.length;i++)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 8,left: 2,right: 2),
+                                          child: Wrap(
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius: BorderRadius.circular(2),
+                                                  color: Color(Utils.getColorFromHex(requests[index].multipleColors[i].colorCode)),
+                                                  //color: Colors.teal,
                                                 ),
-                                              ],
-                                            ),
+                                                height: 10,
+                                                width: 15,
+                                              ),
+                                            ],
                                           ),
-                                      ],
-                                    )
+                                        ),
+                                    ],
+                                  )
+                              ],
+                            ),
+                                ) :Container(),
+                          ],
+                        ),
+                        VerticalDivider(color: Colors.grey,),
+                        GestureDetector(
+                          onTapDown:(details)async{
+                            if(requests[index].status=="Approved By Customer"){
+                              if(currentUserRole["9"]!=null||currentUserRole["10"]!=null) {
+                                showProductionApprovalDialog(context, requests[index]);
+                              }else{
+                                SharedPreferences.getInstance().then((prefs){
+                                  Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
+                                });
+                              }
+                            }else if(requests[index].status=="Not Approved Nor Rejected"){
+                              if(currentUserRole["7"]!=null||currentUserRole["8"]!=null){
+                                showTrialApprovalDialog(context, requests[index]);
+                              }else{
+                                SharedPreferences.getInstance().then((prefs){
+                                  Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
+                                });
+                              }
+                            }else if(requests[index].status=="Rejected By Customer"&&requests[index].currentAction=="Pending"){
+                              if(currentUserRole['12']!=null) {
+                                SharedPreferences.getInstance().then((prefs) {
+                                  Network_Operations.getEmployeesDropDown(
+                                      context, prefs.getString("token")).then((userList) {
+                                    showAssignUserDialog(
+                                        context, userList, requests[index]);
+                                  });
+                                });
+                              }else{
+                                SharedPreferences.getInstance().then((prefs){
+                                  Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
+                                });
+                              }
+                            }else{
+                              await showMenu(
+                                context: context,
+                                position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                items: [
+                                  PopupMenuItem<String>(
+                                      child: const Text('See Details'), value: 'Details'),
                                 ],
-                              ),
-                                  ) :Container(),
-                            ],
-                          ),
-                          VerticalDivider(color: Colors.grey,),
-                          Container(
+                                elevation: 8.0,
+                              ).then((selectedItem){
+                                // if(selectedItem=="rejectionReason"){
+                                //   showReasonDialog(requests[index]);
+                                // }else
+                                if(selectedItem=="Details"){
+                                  SharedPreferences.getInstance().then((prefs){
+                                    Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
+                                  });
+                                }
+                              });
+                            }
+                          },
+                          child: Container(
                             width: MediaQuery.of(context).size.width * 0.62,
                             height: 160,
                             color: Colors.white,
@@ -456,11 +454,11 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                               ],
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-
                   ),
+
                 ),
               );
             }),
@@ -672,7 +670,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                 if(requests.length>0){
                   isVisible=true;
                 }else{
-                  Utils.showSuccess(context, "No Requests Found");
+                  Utils.showError(context, "No Requests Found");
                 }
               });
             });
@@ -862,7 +860,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                 width: MediaQuery.of(context).size.width,
                 height:  MediaQuery.of(context).size.height/3,
                 child: ListView.builder(
-                    itemCount: trialRequests.multipleReasons.length,
+                    itemCount:trialRequests!=null&& trialRequests.multipleReasons!=null?trialRequests.multipleReasons.length:0,
                     itemBuilder:(context,index){
                       return ListTile(
                         title: Text(trialRequests.multipleReasons[index]),

@@ -413,7 +413,10 @@ class _ModelReState extends State<ModelRequests>{
                                       if(selectedItem=="changeStatus"){
                                         showAlertDialog(context,products[index]);
                                       }else if(selectedItem=="Details"){
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                        // Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), products[index].requestId);
+                                        });
                                       }else if(selectedItem=="addImage"){
                                         Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(products[index])));
                                       }
@@ -431,7 +434,10 @@ class _ModelReState extends State<ModelRequests>{
                                       elevation: 8.0,
                                     ).then((selectedItem){
                                        if(selectedItem=="Details"){
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                        //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                         SharedPreferences.getInstance().then((prefs){
+                                           Network_Operations.getRequestById(context, prefs.getString("token"), products[index].requestId);
+                                         });
                                       }else if(selectedItem=="addImage"){
                                         Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(products[index])));
                                       }
@@ -455,7 +461,10 @@ class _ModelReState extends State<ModelRequests>{
                                      if(selectedItem=="changeStatus"){
                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products[index])));
                                      }else if(selectedItem=="Details"){
-                                       Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
+                                       //Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
+                                       SharedPreferences.getInstance().then((prefs){
+                                         Network_Operations.getRequestById(context, prefs.getString("token"), products[index].requestId);
+                                       });
                                      }
                                    });
                                  }else{
@@ -479,7 +488,10 @@ class _ModelReState extends State<ModelRequests>{
                                       if(selectedItem=="changeStatus"){
                                         showAlertChangeStatus(context,products[index]);
                                       }else if(selectedItem=="Details"){
-                                        Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
+                                        //Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), products[index].requestId);
+                                        });
                                       }else if(selectedItem=="updateschedule"){
                                         Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products[index])));
                                       }
@@ -492,10 +504,16 @@ class _ModelReState extends State<ModelRequests>{
                                   if(currentUserRoles["7"]!=null||currentUserRoles["8"]!=null){
                                     Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products[index].requestId,currentUserRoles)));
                                   }else{
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                    //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                    SharedPreferences.getInstance().then((prefs){
+                                      Network_Operations.getRequestById(context, prefs.getString("token"), products[index].requestId);
+                                    });
                                   }
                                 }else {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                  //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                  SharedPreferences.getInstance().then((prefs){
+                                    Network_Operations.getRequestById(context, prefs.getString("token"), products[index].requestId);
+                                  });
                                 }
                               },
                               child: Container(
@@ -782,7 +800,10 @@ class _ModelReState extends State<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
+        //Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
+        SharedPreferences.getInstance().then((prefs){
+          Network_Operations.getRequestById(context, prefs.getString("token"), request.requestId);
+        });
       },
     );
     Widget approveRejectButton = FlatButton(
@@ -854,7 +875,10 @@ class _ModelReState extends State<ModelRequests>{
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
+        //Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
+        SharedPreferences.getInstance().then((prefs){
+          Network_Operations.getRequestById(context, prefs.getString("token"), request.requestId);
+        });
       },
     );
     Widget approveRejectButton = FlatButton(

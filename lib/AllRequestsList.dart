@@ -371,7 +371,10 @@ class _AllRequestListState extends State<AllRequestList> {
                                       if(selectedItem=="changeStatus"){
                                         showAlertDialog(context,allRequests[index]);
                                       }else if(selectedItem=="Details"){
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                        //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                        });
                                       }else if(selectedItem=="addImage"){
                                         Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(allRequests[index])));
                                       }
@@ -389,7 +392,10 @@ class _AllRequestListState extends State<AllRequestList> {
                                       elevation: 8.0,
                                     ).then((selectedItem){
                                       if(selectedItem=="Details"){
-                                        Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                        //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                        });
                                       }else if(selectedItem=="addImage"){
                                         Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(allRequests[index])));
                                       }
@@ -413,7 +419,10 @@ class _AllRequestListState extends State<AllRequestList> {
                                       if(selectedItem=="changeStatus"){
                                         Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(allRequests[index])));
                                       }else if(selectedItem=="Details"){
-                                        Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests[index])));
+                                        //Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests[index])));
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                        });
                                       }
                                     });
                                   }else{
@@ -438,7 +447,10 @@ class _AllRequestListState extends State<AllRequestList> {
                                       if(selectedItem=="changeStatus"){
                                         showAlertChangeStatus(context,allRequests[index]);
                                       }else if(selectedItem=="Details"){
-                                        Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests[index])));
+                                       // Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests[index])));
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                        });
                                       }else if(selectedItem=="updateschedule"){
                                         Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(allRequests[index])));
                                       }
@@ -451,10 +463,14 @@ class _AllRequestListState extends State<AllRequestList> {
                                   if(widget.currentUserRoles["7"]!=null||widget.currentUserRoles["8"]!=null){
                                     Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(allRequests[index].requestId,widget.currentUserRoles)));
                                   }else{
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                    SharedPreferences.getInstance().then((prefs){
+                                      Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                    });
                                   }
                                 }else {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                  SharedPreferences.getInstance().then((prefs){
+                                    Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                  });
                                 }
                               },
                               child: Container(
@@ -741,7 +757,9 @@ class _AllRequestListState extends State<AllRequestList> {
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
+        SharedPreferences.getInstance().then((prefs){
+          Network_Operations.getRequestById(context, prefs.getString("token"),request.id);
+        });
       },
     );
     Widget approveRejectButton = FlatButton(
@@ -813,7 +831,9 @@ class _AllRequestListState extends State<AllRequestList> {
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
+        SharedPreferences.getInstance().then((prefs){
+          Network_Operations.getRequestById(context, prefs.getString("token"),request.id);
+        });
       },
     );
     Widget approveRejectButton = FlatButton(

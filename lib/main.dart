@@ -10,7 +10,7 @@ import 'OldDashboard.dart';
 import 'Utils/Utils.dart';
 import 'package:productdevelopment/RejectedModelsActions.dart';
 void main() {
-  HttpOverrides.global = new MyHttpOverrides();
+  //HttpOverrides.global = new MyHttpOverrides();
   runApp(MyApp());
 }
 

@@ -18,12 +18,22 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
   @override
   void initState() {
     setState(() {
-      for(int i=0;i<request.multipleColorNames.length;i++){
-        if(request.multipleColorNames[i].colorImage!=null){
-          colorNames.add(request.multipleColorNames[i].colorName);
+      if(request.multipleColorNames!=null&&request.multipleColorNames.length>0){
+        for(int i=0;i<request.multipleColorNames.length;i++){
+          if(request.multipleColorNames[i].colorImage!=null){
+            colorNames.add(request.multipleColorNames[i].colorName);
             imageUrl.add(request.multipleColorNames[i].colorImage);
+          }
+        }
+      }else if(request.multipleColors!=null&&request.multipleColors.length>0){
+        for(int i=0;i<request.multipleColors.length;i++){
+          if(request.multipleColors[i].colorImage!=null){
+            colorNames.add(request.multipleColors[i].colorName);
+            imageUrl.add(request.multipleColors[i].colorImage);
+          }
         }
       }
+
     });
     super.initState();
   }
@@ -32,7 +42,7 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-          title: Text("${colorNames[num]} ("+count.toString()+"/"+imageUrl.length.toString()+")"),
+          title: Text(colorNames!=null&&colorNames.length>0?"${colorNames[num]} ("+count.toString()+"/"+imageUrl.length.toString()+")":"Gallery"),
            actions: [
              InkWell(
                child: Center(child: Padding(

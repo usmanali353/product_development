@@ -236,7 +236,8 @@ class _AddClientsToTrialState extends State<AddClientsToTrial> {
         context,
         height: 480,
         listData: modelNames,
-        label: (item) {
+        headerTextColor: Color(0xFF004c4c),
+        choiceChipLabel: (item){
           return item;
         },
         validateSelectedItem: (list, val) {
@@ -252,10 +253,10 @@ class _AddClientsToTrialState extends State<AddClientsToTrial> {
           }
         },
         borderRadius: 20,
-        selectedTextBackgroundColor: Colors.teal,
-        allResetButonColor: Color(0xFF004c4c),
+         selectedTextBackgroundColor: Color(0xFF004c4c),
+        // allResetButonColor: Color(0xFF004c4c),
         applyButonTextBackgroundColor: Color(0xFF004c4c),
-        headerTextColor: Color(0xFF004c4c),
+       // headerTextColor: Color(0xFF004c4c),
         closeIconColor: Color(0xFF004c4c),
         headlineText: "Select Model",
         searchFieldHintText: "Search Models",

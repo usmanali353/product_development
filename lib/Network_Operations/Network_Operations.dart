@@ -366,6 +366,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
+      print(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId");
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.hide();
@@ -636,6 +637,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
+      print(Utils.getBaseUrl()+"Request/ClientVisibility/$remarkId");
       var response=await http.get(Utils.getBaseUrl()+"Request/ClientVisibility/$remarkId",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.hide();
@@ -997,6 +999,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
+      print(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber");
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.hide();
