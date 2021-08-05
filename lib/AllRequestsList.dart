@@ -205,6 +205,9 @@ class _AllRequestListState extends State<AllRequestList> {
                           previousButtonVisible=false;
                           nextButtonVisible=false;
                         }
+                        if(allRequests.length==0){
+                          Utils.showError(context,"No Requests Found");
+                        }
                       });
                     });
                   }else{
@@ -233,6 +236,9 @@ class _AllRequestListState extends State<AllRequestList> {
                         }else{
                           previousButtonVisible=false;
                           nextButtonVisible=false;
+                        }
+                        if(allRequests.length==0){
+                          Utils.showError(context,"No Requests Found");
                         }
                       });
                     });
@@ -673,6 +679,9 @@ class _AllRequestListState extends State<AllRequestList> {
                   previousButtonVisible=false;
                   nextButtonVisible=false;
                 }
+                if(allRequests.length==0){
+                  Utils.showError(context,"No Requests Found");
+                }
               });
             });
           });
@@ -747,13 +756,13 @@ class _AllRequestListState extends State<AllRequestList> {
   }
   showAlertChangeStatus(BuildContext context,Request request){
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
-    Widget detailsPage = FlatButton(
+    Widget detailsPage = TextButton(
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
@@ -762,7 +771,7 @@ class _AllRequestListState extends State<AllRequestList> {
         });
       },
     );
-    Widget approveRejectButton = FlatButton(
+    Widget approveRejectButton = TextButton(
       child: Text("Set"),
       onPressed: () {
         if(selectedPreference=="Approve"){
@@ -821,13 +830,13 @@ class _AllRequestListState extends State<AllRequestList> {
   }
   showAlertDialog(BuildContext context,Request request) {
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
-    Widget detailsPage = FlatButton(
+    Widget detailsPage = TextButton(
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
@@ -836,7 +845,7 @@ class _AllRequestListState extends State<AllRequestList> {
         });
       },
     );
-    Widget approveRejectButton = FlatButton(
+    Widget approveRejectButton = TextButton(
       child: Text("Set"),
       onPressed: () {
         if(selectedPreference=="Approve"){

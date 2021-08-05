@@ -251,6 +251,9 @@ class _AddClientsToTrialState extends State<AddClientsToTrial> {
                 element.toLowerCase().contains(text.toLowerCase()))
                 .toList();
           }
+          else{
+            return [];
+          }
         },
         borderRadius: 20,
          selectedTextBackgroundColor: Color(0xFF004c4c),

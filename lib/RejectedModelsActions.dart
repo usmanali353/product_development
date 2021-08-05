@@ -155,6 +155,9 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                           previousButtonVisible=false;
                           nextButtonVisible=false;
                         }
+                        if(requests.length==0) {
+                          Utils.showError(context, "No Assigned Rejections Found");
+                        }
                       });
                     });
                   }else{
@@ -184,6 +187,9 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                         }else{
                           previousButtonVisible=false;
                           nextButtonVisible=false;
+                        }
+                        if(requests.length==0) {
+                          Utils.showError(context, "No Assigned Rejections Found");
                         }
                       });
                     });
@@ -528,6 +534,9 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                   previousButtonVisible=false;
                   nextButtonVisible=false;
                 }
+                if(requests.length==0) {
+                  Utils.showError(context, "No Assigned Rejections Found");
+                }
               });
             });
           });
@@ -602,13 +611,13 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
   }
   showAlertDialog(BuildContext context,AssignedRejectedModels request) {
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
-    Widget approveRejectButton = FlatButton(
+    Widget approveRejectButton = TextButton(
       child: Text("Set"),
       onPressed: () {
         if(selectedPreference=="Cancelled"){
@@ -674,13 +683,13 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
   }
   showJustificationAlertDialog(BuildContext context,AssignedRejectedModels request) {
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
-    Widget approveRejectButton = FlatButton(
+    Widget approveRejectButton = TextButton(
       child: Text("Set"),
       onPressed: () {
          if(selectedPreference=="Yes"){
@@ -781,7 +790,7 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
             ],
           ),
           actions: [
-            FlatButton(onPressed: (){
+            TextButton(onPressed: (){
               Navigator.pop(context);
             }, child: Text("Ok"))
           ],

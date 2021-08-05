@@ -208,6 +208,9 @@ class _ModelReState extends State<ModelRequests>{
                           previousButtonVisible=false;
                           nextButtonVisible=false;
                         }
+                        if(products.length==0){
+                          Utils.showError(context,"No Request Found");
+                        }
                       });
                     });
                   }
@@ -235,6 +238,9 @@ class _ModelReState extends State<ModelRequests>{
                         }else{
                           previousButtonVisible=false;
                           nextButtonVisible=false;
+                        }
+                        if(products.length==0){
+                          Utils.showError(context,"No Request Found");
                         }
                       });
                     });
@@ -266,6 +272,9 @@ class _ModelReState extends State<ModelRequests>{
                           previousButtonVisible=false;
                           nextButtonVisible=false;
                         }
+                        if(products.length==0){
+                          Utils.showError(context,"No Request Found");
+                        }
                       });
                     });
                   }
@@ -293,6 +302,9 @@ class _ModelReState extends State<ModelRequests>{
                         }else{
                           previousButtonVisible=false;
                           nextButtonVisible=false;
+                        }
+                        if(products.length==0){
+                          Utils.showError(context,"No Request Found");
                         }
                       });
                     });
@@ -641,20 +653,20 @@ class _ModelReState extends State<ModelRequests>{
 
   }
   showCustomerApprovalDialog(BuildContext context,Request request){
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
-    Widget detailsPage = FlatButton(
+    Widget detailsPage = TextButton(
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
        Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
       },
     );
-    Widget approveRejectButton = FlatButton(
+    Widget approveRejectButton = TextButton(
       child: Text("Set"),
       onPressed: () {
         if(selectedPreference=="Approve") {
@@ -718,20 +730,20 @@ class _ModelReState extends State<ModelRequests>{
     );
   }
   showTrialApprovalDialog(BuildContext context,Request request){
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
-    Widget detailsPage = FlatButton(
+    Widget detailsPage = TextButton(
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
         Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
       },
     );
-    Widget approveRejectButton = FlatButton(
+    Widget approveRejectButton = TextButton(
       child: Text("Set"),
       onPressed: () {
         Navigator.pop(context);
@@ -790,13 +802,13 @@ class _ModelReState extends State<ModelRequests>{
   }
   showAlertChangeStatus(BuildContext context,Request request){
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
-    Widget detailsPage = FlatButton(
+    Widget detailsPage = TextButton(
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
@@ -806,7 +818,7 @@ class _ModelReState extends State<ModelRequests>{
         });
       },
     );
-    Widget approveRejectButton = FlatButton(
+    Widget approveRejectButton = TextButton(
       child: Text("Set"),
       onPressed: () {
         if(selectedPreference=="Approve"){
@@ -865,13 +877,13 @@ class _ModelReState extends State<ModelRequests>{
   }
   showAlertDialog(BuildContext context,Request request) {
     // set up the buttons
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
-    Widget detailsPage = FlatButton(
+    Widget detailsPage = TextButton(
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
@@ -881,7 +893,7 @@ class _ModelReState extends State<ModelRequests>{
         });
       },
     );
-    Widget approveRejectButton = FlatButton(
+    Widget approveRejectButton = TextButton(
       child: Text("Set"),
       onPressed: () {
         if(selectedPreference=="Approve"){
@@ -988,6 +1000,9 @@ class _ModelReState extends State<ModelRequests>{
                   previousButtonVisible=false;
                   nextButtonVisible=false;
                 }
+                if(products.length==0){
+                  Utils.showError(context,"No Request Found");
+                }
               });
             });
           }else {
@@ -1014,6 +1029,9 @@ class _ModelReState extends State<ModelRequests>{
                 }else{
                   previousButtonVisible=false;
                   nextButtonVisible=false;
+                }
+                if(products.length==0){
+                  Utils.showError(context,"No Request Found");
                 }
               });
             });
@@ -1044,6 +1062,9 @@ class _ModelReState extends State<ModelRequests>{
                   previousButtonVisible=false;
                   nextButtonVisible=false;
                 }
+                if(products.length==0){
+                  Utils.showError(context,"No Request Found");
+                }
               });
             });
           }else {
@@ -1070,6 +1091,9 @@ class _ModelReState extends State<ModelRequests>{
                 }else{
                   previousButtonVisible=false;
                   nextButtonVisible=false;
+                }
+                if(products.length==0){
+                  Utils.showError(context,"No Request Found");
                 }
               });
             });

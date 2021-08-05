@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
@@ -45,9 +46,10 @@ class _Suitability_State extends State<Suitability> {
   final formKey = new GlobalKey<FormState>();
   final fbKey = new GlobalKey<FormBuilderState>();
   List<Dropdown> suitibility=[];
-  List<String> suitibilityName=[],colorName=[];
-  List<dynamic> suitibilitys=[],colorDropDown=[],colorIds=[];
+  List<String> suitibilityName=[],colorName=[],selectedSuitibilityIds=[];
+  List<dynamic> suitibilitys=[],colorDropDown=[],colorIds=[],selectedSuitibilityNames=[];
   bool suitibilityDropDownVisible=false,colorDropDownVisible=false;
+  List<Widget> selectedSuitibilityOptions=[];
   List<Dropdown> colorsDropDown=[];
   TextEditingController technical_consideration;
   List<dynamic> designTopologies=[],sizesList=[],colorsList=[];
@@ -133,36 +135,67 @@ class _Suitability_State extends State<Suitability> {
                   children: <Widget>[
                     //ProductName Dropdown
                     //Product Color multiSelect FormField
-                    Form(
-                      key: formKey,
-                      child: Visibility(
-                        visible: suitibilityDropDownVisible,
+                    Visibility(
+                      visible: suitibilityDropDownVisible,
+                      child: InkWell(
+                        onTap: (){
+                          showSelectSuitibilityDialog();
+                        },
                         child: Padding(
-                          padding: EdgeInsets.only(top:16,left:16,right:16),
+                          padding: const EdgeInsets.only(top: 16,left: 16,right:16),
                           child: Card(
                             elevation: 10,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15)
+                              borderRadius: BorderRadius.circular(15),
                             ),
-                            child: MultiSelectFormField(
-                              title: Text("Select Suitibility"),
-                              hintWidget: Text("Select Suitibility for the Product"),
-                              border: InputBorder.none,
-                              validator: (value) {
-                                return value == null || value.length == 0?'Please select one or more options':null;
-                              },
-                              dataSource:suitibilitys,
-                              textField: 'display',
-                              valueField: 'value',
-                              okButtonLabel: 'OK',
-                              cancelButtonLabel: 'CANCEL',
-                              //value: _myActivities,
-                              onSaved: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  _myActivities = value;
-                                });
-                              },
+                            child: InputDecorator(
+                              decoration: InputDecoration(
+                                filled: true,
+                                errorMaxLines: 4,
+                                fillColor: Theme.of(context).canvasColor,
+                                border: InputBorder.none,
+                              ),
+
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding:EdgeInsets.fromLTRB(0, 2, 0, 0),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text("Select Suitibility"),
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(top: 5, right: 5),
+                                          child: Text(
+                                            ' *',
+                                            style: TextStyle(
+                                              color: Colors.red.shade700,
+                                              fontSize: 17.0,
+                                            ),
+                                          ),
+                                        ),
+                                        Icon(
+                                          Icons.arrow_drop_down,
+                                          color: Colors.black87,
+                                          size: 25.0,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  selectedSuitibilityNames.length > 0
+                                      ? Wrap(
+                                    spacing: 8.0,
+                                    runSpacing: 0.0,
+                                    children: selectedSuitibilityOptions,
+                                  )
+                                      : new Container(
+                                    padding: EdgeInsets.only(top: 4),
+                                    child: Text("Select one or more Suitibilities"),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -293,8 +326,7 @@ class _Suitability_State extends State<Suitability> {
                               color: Color(0xFF004c4c),
                               child: Text("Proceed",style: TextStyle(color: Colors.white),),
                               onPressed: (){
-                                if(fbKey.currentState.validate()&&formKey.currentState.validate()&&base64EncodedImage!=null){
-                                  formKey.currentState.save();
+                                if(fbKey.currentState.validate()&&base64EncodedImage!=null&&selectedSuitibilityIds!=null&&selectedSuitibilityIds.length>0){
 //                                setState(() {
 //                                  _myActivitiesResult = _myActivities.toString();
 //                                });
@@ -320,10 +352,12 @@ class _Suitability_State extends State<Suitability> {
                                       multipleSizes: sizesList,
                                       ImageSelectedForColor:colorID,
                                       multipleDesignTopoligies: designTopologies,
-                                      multipleSuitability: _myActivities,
+                                      multipleSuitability: selectedSuitibilityIds,
                                     ));
                                   });
 
+                                }else{
+                                  Utils.showError(context,"Please Provide All Required Information");
                                 }
                               },
                             ),
@@ -339,5 +373,56 @@ class _Suitability_State extends State<Suitability> {
           ),
         )
     );
+  }
+  showSelectSuitibilityDialog()async{
+    await FilterListDialog.display(
+        context,
+        height: 480,
+        listData: suitibilityName,
+        headerTextColor: Color(0xFF004c4c),
+        choiceChipLabel: (item){
+          return item;
+        },
+        validateSelectedItem: (list, val) {
+          return list.contains(val);
+        },
+        onItemSearch: (list, text) {
+          if (list.any((element) =>
+              element.toLowerCase().contains(text.toLowerCase()))) {
+            return list
+                .where((element) =>
+                element.toLowerCase().contains(text.toLowerCase()))
+                .toList();
+          }
+          else{
+            return [];
+          }
+        },
+        borderRadius: 20,
+        selectedTextBackgroundColor: Color(0xFF004c4c),
+        // allResetButonColor: Color(0xFF004c4c),
+        applyButonTextBackgroundColor: Color(0xFF004c4c),
+        // headerTextColor: Color(0xFF004c4c),
+        closeIconColor: Color(0xFF004c4c),
+        headlineText: "Select Suitibility",
+        searchFieldHintText: "Search Suitibility",
+        onApplyButtonClick: (list) {
+          if (list != null) {
+            setState(() {
+              selectedSuitibilityNames.clear();
+              selectedSuitibilityOptions.clear();
+              selectedSuitibilityIds.clear();
+              this.selectedSuitibilityNames = list;
+              for(int i=0;i<selectedSuitibilityNames.length;i++){
+                selectedSuitibilityOptions.add(
+                    Chip(label: Text(selectedSuitibilityNames[i],overflow: TextOverflow.ellipsis,))
+                );
+                selectedSuitibilityIds.add(suitibility[suitibilityName.indexOf(selectedSuitibilityNames[i])].id.toString());
+                print(selectedSuitibilityIds.toString());
+              }
+            });
+          }
+          Navigator.pop(context);
+        });
   }
 }

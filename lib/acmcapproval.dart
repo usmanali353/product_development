@@ -54,7 +54,7 @@ class _acmcApprovalState extends State<acmcApproval> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Designers Involved"),
+        title: Text("ACMC Approval"),
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,

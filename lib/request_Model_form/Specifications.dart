@@ -1,8 +1,10 @@
+import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:productdevelopment/request_Model_form/designTopology.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class Specifications extends StatefulWidget {
@@ -17,11 +19,12 @@ class Specifications extends StatefulWidget {
 class _SpecificationsState extends State<Specifications> {
   var market,event,other,myClients;
   TextEditingController thickness;
-  List<dynamic> sizes=[],colors=[];
+  List<dynamic> colors=[], selectedSizeNames=[],selectedColorNames=[];
+  List<Widget> selectedSizeOptions=[],selectedColorOptions=[];
   bool classificationDropDownVisible=false,surfaceDropDownVisible=false,sizeDropDownVisible=false,colorDropDownVisible=false;
   List<Dropdown> classifications=[],surface=[],size=[],color=[];
   bool sizeVisible=false,surfaceVisible=false,thicknessVisible=false,colorVisible=false;
-  List<String> selectedColorNames=[], colorName=[], surfaceName=[],sizeName=[], product_name =["Alma","Apollo","Aqua","Aragon","Arcadia","Area","Artic","Atrium","Avenue","Baikal","Barsha","Bistro","Bologna","Brada","Bronze","CalaCatta","Canica","Capri","carrara","Cement","Circle","Code","Coliseo","Cotto","Cotton","Daka","Darco","Dayana","Devon","Diverse","Dogana","Duomo","Finnis","Joly","Maria","Tiera","Venecia"],classificationName=[];
+  List<String> colorName=[], surfaceName=[],sizeName=[],classificationName=[],selectedSizeIds=[],selectedColorIds=[];
 
   String selected_product_name, selected_surface, selected_size,selected_classification;
   int product_name_id, surface_id, size_id,classification_id;
@@ -64,12 +67,6 @@ class _SpecificationsState extends State<Specifications> {
            this.size=sizeDropDown;
            for(var s in size){
              sizeName.add(s.name);
-             sizes.add(
-               {
-                 "display":s.name,
-                  "value": s.id.toString()
-               }
-             );
            }
            if(sizeName.length>0){
              sizeDropDownVisible=true;
@@ -197,34 +194,65 @@ class _SpecificationsState extends State<Specifications> {
                   //Product Size Dropdown
                   Visibility(
                     visible: sizeDropDownVisible,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 16,left: 16,right: 16),
-                      child: Form(
-                        key: formKey2,
+                    child: InkWell(
+                      onTap: (){
+                        showSelectSizeDialog();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 16,left: 16,right:16),
                         child: Card(
                           elevation: 10,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          child: MultiSelectFormField(
-                            hintWidget: Text("Select Sizes for the Product"),
-                            title: Text("Select Size"),
-                            border: InputBorder.none,
-                            validator: (value) {
-                              return value == null || value.length == 0?'Please select one or more options':null;
-                            },
-                            dataSource: sizes,
-                            textField: 'display',
-                            valueField: 'value',
-                            okButtonLabel: 'OK',
-                            cancelButtonLabel: 'CANCEL',
-                            onSaved: (value) {
-                              if (value == null) return;
-                              setState(() {
-                                selectedSizes = value;
-                              });
-                            },
+                          child: InputDecorator(
+                            decoration: InputDecoration(
+                              filled: true,
+                              errorMaxLines: 4,
+                              fillColor: Theme.of(context).canvasColor,
+                              border: InputBorder.none,
+                            ),
 
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding:EdgeInsets.fromLTRB(0, 2, 0, 0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text("Select Sizes"),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 5, right: 5),
+                                        child: Text(
+                                          ' *',
+                                          style: TextStyle(
+                                            color: Colors.red.shade700,
+                                            fontSize: 17.0,
+                                          ),
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.arrow_drop_down,
+                                        color: Colors.black87,
+                                        size: 25.0,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                selectedSizeNames.length > 0
+                                    ? Wrap(
+                                  spacing: 8.0,
+                                  runSpacing: 0.0,
+                                  children: selectedSizeOptions,
+                                )
+                                    : new Container(
+                                  padding: EdgeInsets.only(top: 4),
+                                  child: Text("Select one or more Sizes"),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -253,35 +281,69 @@ class _SpecificationsState extends State<Specifications> {
                   //Product Color multiSelect FormField
                   Visibility(
                     visible: colorDropDownVisible,
-                    child: Padding(
-                      padding: EdgeInsets.only(top:16,left:16,right:16),
-                      child: Card(
-                        elevation: 10,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: MultiSelectFormField(
-                          title: Text("Select Colors"),
-                          hintWidget: Text("Select Colors for the Product"),
-                          border: InputBorder.none,
-                          validator: (value) {
-                            return value == null || value.length == 0?'Please select one or more options':null;
-                          },
-                          dataSource: colors,
-                          textField: 'display',
-                          valueField: 'value',
-                          okButtonLabel: 'OK',
-                          cancelButtonLabel: 'CANCEL',
-                          //value: _myActivities,
-                          onSaved: (value) {
-                            if (value == null) return;
-                            setState(() {
-                              _myActivities = value;
-                            });
-                          },
+                    child: InkWell(
+                      onTap: (){
+                        showSelectColorDialog();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 16,left: 16,right:16),
+                        child: Card(
+                          elevation: 10,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: InputDecorator(
+                            decoration: InputDecoration(
+                              filled: true,
+                              errorMaxLines: 4,
+                              fillColor: Theme.of(context).canvasColor,
+                              border: InputBorder.none,
+                            ),
+
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding:EdgeInsets.fromLTRB(0, 2, 0, 0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text("Select Colors"),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 5, right: 5),
+                                        child: Text(
+                                          ' *',
+                                          style: TextStyle(
+                                            color: Colors.red.shade700,
+                                            fontSize: 17.0,
+                                          ),
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.arrow_drop_down,
+                                        color: Colors.black87,
+                                        size: 25.0,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                selectedColorNames.length > 0
+                                    ? Wrap(
+                                  spacing: 8.0,
+                                  runSpacing: 0.0,
+                                  children: selectedColorOptions,
+                                )
+                                    : new Container(
+                                  padding: EdgeInsets.only(top: 4),
+                                  child: Text("Select one or more Colors for Product"),
+                                )
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    )
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16),
@@ -290,13 +352,27 @@ class _SpecificationsState extends State<Specifications> {
                         color: Color(0xFF004c4c),
                         child: Text("Proceed",style: TextStyle(color: Colors.white),),
                         onPressed: (){
-                          if(fbKey.currentState.validate()&&formKey2.currentState.validate()){
+                          if(fbKey.currentState.validate()){
                             //formKey.currentState.save();
-                            formKey2.currentState.save();
-                            setState(() {
-                              _myActivitiesResult = _myActivities.toString();
-                            });
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>designTopology(market,event,selectedSizes,surface_id,thickness.text,classification_id,_myActivities,myClients,colors)));
+                            //formKey2.currentState.save();
+                            if(selectedSizeIds==null||selectedSizeIds.length==0){
+                              Utils.showError(context,"Please Select Sizes");
+                            }else if(selectedColorIds==null||selectedColorIds.length==0){
+                              Utils.showError(context,"Please Select Colors");
+                            }else {
+                              Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) =>
+                                      designTopology(
+                                          market,
+                                          event,
+                                          selectedSizeIds,
+                                          surface_id,
+                                          thickness.text,
+                                          classification_id,
+                                          selectedColorIds,
+                                          myClients,
+                                          colors)));
+                            }
                           }
                         },
                       ),
@@ -310,13 +386,106 @@ class _SpecificationsState extends State<Specifications> {
       )
     );
   }
-  _saveForm() {
-    var form = formKey.currentState;
-    if (form.validate()) {
-      form.save();
-      setState(() {
-        _myActivitiesResult = _myActivities.toString();
-      });
-    }
+  showSelectSizeDialog()async{
+    await FilterListDialog.display(
+        context,
+        height: 480,
+        listData: sizeName,
+        headerTextColor: Color(0xFF004c4c),
+        choiceChipLabel: (item){
+          return item;
+        },
+        validateSelectedItem: (list, val) {
+          return list.contains(val);
+        },
+        onItemSearch: (list, text) {
+          if (list.any((element) =>
+              element.toLowerCase().contains(text.replaceAll(".00","").toLowerCase()))) {
+            return list
+                .where((element) =>
+                element.toLowerCase().contains(text.toLowerCase()))
+                .toList();
+          }
+          else{
+            return [];
+          }
+        },
+        borderRadius: 20,
+        selectedTextBackgroundColor: Color(0xFF004c4c),
+        // allResetButonColor: Color(0xFF004c4c),
+        applyButonTextBackgroundColor: Color(0xFF004c4c),
+        // headerTextColor: Color(0xFF004c4c),
+        closeIconColor: Color(0xFF004c4c),
+        headlineText: "Select Sizes",
+        searchFieldHintText: "Search Sizes",
+        onApplyButtonClick: (list) {
+          if (list != null) {
+            setState(() {
+              selectedSizeNames.clear();
+              selectedSizeOptions.clear();
+              selectedSizeIds.clear();
+              this.selectedSizeNames = list;
+              for(int i=0;i<selectedSizeNames.length;i++){
+                selectedSizeOptions.add(
+                    Chip(label: Text(selectedSizeNames[i],overflow: TextOverflow.ellipsis,))
+                );
+                selectedSizeIds.add(size[sizeName.indexOf(selectedSizeNames[i])].id.toString());
+                print(selectedSizeIds.toString());
+              }
+            });
+          }
+          Navigator.pop(context);
+        });
+  }
+  showSelectColorDialog()async{
+    await FilterListDialog.display(
+        context,
+        height: 480,
+        listData: colorName,
+        headerTextColor: Color(0xFF004c4c),
+        choiceChipLabel: (item){
+          return item;
+        },
+        validateSelectedItem: (list, val) {
+          return list.contains(val);
+        },
+        onItemSearch: (list, text) {
+          if (list.any((element) =>
+              element.toLowerCase().contains(text.toLowerCase()))) {
+            return list
+                .where((element) =>
+                element.toLowerCase().contains(text.toLowerCase()))
+                .toList();
+          }
+          else{
+            return [];
+          }
+        },
+        borderRadius: 20,
+        selectedTextBackgroundColor: Color(0xFF004c4c),
+        // allResetButonColor: Color(0xFF004c4c),
+        applyButonTextBackgroundColor: Color(0xFF004c4c),
+        // headerTextColor: Color(0xFF004c4c),
+        closeIconColor: Color(0xFF004c4c),
+        headlineText: "Select Colors",
+        searchFieldHintText: "Search Colors",
+        onApplyButtonClick: (list) {
+          if (list != null) {
+            setState(() {
+              selectedColorNames.clear();
+              selectedColorOptions.clear();
+              selectedColorIds.clear();
+              this.selectedColorNames = list;
+              for(int i=0;i<selectedColorNames.length;i++){
+                selectedColorOptions.add(
+                    Chip(label: Text(selectedColorNames[i],overflow: TextOverflow.ellipsis,))
+                );
+                selectedColorIds.add(color[colorName.indexOf(selectedColorNames[i])].id.toString());
+                print(selectedColorIds.toString());
+              }
+            });
+          }
+          Navigator.pop(context);
+        });
   }
 }

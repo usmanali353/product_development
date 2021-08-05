@@ -1,8 +1,10 @@
+import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Suitability.dart';
@@ -22,8 +24,9 @@ class _designTopologyState extends State<designTopology> {
   final formKey = new GlobalKey<FormState>();
   bool rangeDropdownVisible=false,technologyDropdownVisible=false,edgeDropdownVisible=false,structureDropdownVisible=false;
  List<Dropdown> designTopology=[], range=[], material=[],structure=[], edge=[],technology=[];
- List<String> designTopologyName=[], rangeName=[], materialName=[],structureName=[], edgeName=[],technologyName=[],colorNames=[];
- List<dynamic> designTopologies=[],sizesList=[],colorsList=[],colorsDropDown=[];
+ List<String> designTopologyName=[], rangeName=[], materialName=[],structureName=[], edgeName=[],technologyName=[],colorNames=[],selectedDesigntopologyIds=[];
+ List<dynamic> designTopologies=[],sizesList=[],colorsList=[],colorsDropDown=[],electedDesigntopologyName=[];
+ List<Widget> selectedDesignTopologyoptions=[];
  var market,event,other,size,surfaceId,name,thickness,classification,color;
 String selected_technology, selected_structure, selected_edge,selected_range, selected_material;
 GlobalKey<FormBuilderState> fbkey=GlobalKey();
@@ -133,36 +136,67 @@ int range_id, material_id,technology_id, structure_id, edge_id;
               key: fbkey,
               child: Column(
                 children: <Widget>[
-                  Form(
-                    key: formKey,
-                    child: Visibility(
-                      visible: designTopologyDropDownVisible,
+                  Visibility(
+                    visible: designTopologyDropDownVisible,
+                    child: InkWell(
+                      onTap: (){
+                        showSelectDesignTopologyDialog();
+                      },
                       child: Padding(
-                        padding: EdgeInsets.only(top:16,left:16,right:16),
+                        padding: const EdgeInsets.only(top: 16,left: 16,right:16),
                         child: Card(
                           elevation: 10,
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)
+                            borderRadius: BorderRadius.circular(15),
                           ),
-                          child: MultiSelectFormField(
-                            title: Text("Select Design Topology"),
-                            hintWidget: Text("Select Design Topology"),
-                            border: InputBorder.none,
-                            validator: (value) {
-                              return value == null || value.length == 0?'Please select one or more options':null;
-                            },
-                            dataSource: designTopologies,
-                            textField: 'display',
-                            valueField: 'value',
-                            okButtonLabel: 'OK',
-                            cancelButtonLabel: 'CANCEL',
-                            //value: _myActivities,
-                            onSaved: (value) {
-                              if (value == null) return;
-                              setState(() {
-                                _myMaterials = value;
-                              });
-                            },
+                          child: InputDecorator(
+                            decoration: InputDecoration(
+                              filled: true,
+                              errorMaxLines: 4,
+                              fillColor: Theme.of(context).canvasColor,
+                              border: InputBorder.none,
+                            ),
+
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding:EdgeInsets.fromLTRB(0, 2, 0, 0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text("Select Design Topology"),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 5, right: 5),
+                                        child: Text(
+                                          ' *',
+                                          style: TextStyle(
+                                            color: Colors.red.shade700,
+                                            fontSize: 17.0,
+                                          ),
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.arrow_drop_down,
+                                        color: Colors.black87,
+                                        size: 25.0,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                electedDesigntopologyName.length > 0
+                                    ? Wrap(
+                                  spacing: 8.0,
+                                  runSpacing: 0.0,
+                                  children: selectedDesignTopologyoptions,
+                                )
+                                    : new Container(
+                                  padding: EdgeInsets.only(top: 4),
+                                  child: Text("Select one or more Design Topologies"),
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -318,31 +352,29 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                         color: Color(0xFF004c4c),
                         child: Text("Proceed",style: TextStyle(color: Colors.white),),
                         onPressed: (){
-                          if(fbkey.currentState.validate()&&formKey.currentState.validate()){
-                            formKey.currentState.save();
-                            setState(() {
-                              selected_material=_myMaterials.toString();
-                              print(selected_material);
-                            });
-                            print(technology_id.toString());
-                            print( range_id.toString());
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>Suitability(
-                                market,
-                                event,
-                                sizesList,
-                                surfaceId,
-                                thickness,
-                                classification,
-                                colorsList,
-                                technology_id,
-                                structure_id,
-                                edge_id,
-                                range_id,
-                                _myMaterials,
-                                myClients,
-                               colorsDropDown,
-                            )));
-
+                          if(fbkey.currentState.validate()){
+                            if(selectedDesigntopologyIds==null||selectedDesigntopologyIds.length==0){
+                              Utils.showError(context,"Please Select one or more Design Topologies");
+                            }else {
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) =>
+                                      Suitability(
+                                        market,
+                                        event,
+                                        sizesList,
+                                        surfaceId,
+                                        thickness,
+                                        classification,
+                                        colorsList,
+                                        technology_id,
+                                        structure_id,
+                                        edge_id,
+                                        range_id,
+                                        selectedDesigntopologyIds,
+                                        myClients,
+                                        colorsDropDown,
+                                      )));
+                            }
                           }
                         },
                       ),
@@ -355,5 +387,56 @@ int range_id, material_id,technology_id, structure_id, edge_id;
         ),
       ),
     );
+  }
+  showSelectDesignTopologyDialog()async{
+    await FilterListDialog.display(
+        context,
+        height: 480,
+        listData: designTopologyName,
+        headerTextColor: Color(0xFF004c4c),
+        choiceChipLabel: (item){
+          return item;
+        },
+        validateSelectedItem: (list, val) {
+          return list.contains(val);
+        },
+        onItemSearch: (list, text) {
+          if (list.any((element) =>
+              element.toLowerCase().contains(text.replaceAll(".00","").toLowerCase()))) {
+            return list
+                .where((element) =>
+                element.toLowerCase().contains(text.toLowerCase()))
+                .toList();
+          }
+          else{
+            return [];
+          }
+        },
+        borderRadius: 20,
+        selectedTextBackgroundColor: Color(0xFF004c4c),
+        // allResetButonColor: Color(0xFF004c4c),
+        applyButonTextBackgroundColor: Color(0xFF004c4c),
+        // headerTextColor: Color(0xFF004c4c),
+        closeIconColor: Color(0xFF004c4c),
+        headlineText: "Design Topology",
+        searchFieldHintText: "Search Design Topology",
+        onApplyButtonClick: (list) {
+          if (list != null) {
+            setState(() {
+              electedDesigntopologyName.clear();
+              selectedDesignTopologyoptions.clear();
+              selectedDesigntopologyIds.clear();
+              this.electedDesigntopologyName = list;
+              for(int i=0;i<electedDesigntopologyName.length;i++){
+                selectedDesignTopologyoptions.add(
+                    Chip(label: Text(electedDesigntopologyName[i],overflow: TextOverflow.ellipsis,))
+                );
+                selectedDesigntopologyIds.add(designTopology[designTopologyName.indexOf(electedDesigntopologyName[i])].id.toString());
+                print(selectedDesigntopologyIds.toString());
+              }
+            });
+          }
+          Navigator.pop(context);
+        });
   }
 }

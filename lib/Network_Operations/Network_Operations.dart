@@ -80,6 +80,8 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         for(int i=0;i<data.length;i++){
           list.add(Dropdown(data[i]["id"],data[i]["name"],data[i]["stringId"]));
         }
+        final ids = list.map((e) => e.name).toSet();
+        list.retainWhere((x) => ids.remove(x.name));
         print(data.toString());
         return list;
       }
@@ -128,7 +130,6 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "marketId": request.marketId,
         "event": request.event,
         "userId": request.userId,
-        "image":request.image,
         "technicalConcentration": request.technicalConcentration,
         "statusId": request.statusId,
         "classificationId": request.classificationId,
@@ -147,8 +148,9 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "customerObservation": request.customerObservation,
         "multipleClients":request.multipleClients,
         "ImageSelectedForColor":request.ImageSelectedForColor,
+        "image":request.image,
       }, toEncodable: Utils.myEncode);
-       print(body);
+       debugPrint(body);
        var response =await http.post(Utils.getBaseUrl()+"Request/RequestSave",body: body,headers:{"Content-Type": "application/json", "Authorization": "Bearer " + token});
        if(response.statusCode==200){
          pd.hide();
@@ -362,19 +364,35 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       pd.hide();
     }
   }
-  static Future<List<TrialRequests>> getTrialRequests(BuildContext context,String token,int requestId)async{
+  static Future<String> getTrialRequests(BuildContext context,String token,int requestId,int pageNumber,int pageSize)async{
     ProgressDialog pd=ProgressDialog(context);
     pd.show();
     try{
-      print(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId");
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.hide();
-        List<TrialRequests> requests=[];
-        for(int i=0;i<jsonDecode(response.body)['response'].length;i++){
-          requests.add(TrialRequests.fromJson(jsonDecode(response.body)['response'][i]));
-        }
-        return requests;
+        return response.body;
+      }else{
+        pd.hide();
+        Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      pd.hide();
+      print(e);
+      Utils.showError(context, e.toString());
+    }finally{
+      pd.hide();
+    }
+    return null;
+  }
+  static Future<String> getTrialRequestsSearchable(BuildContext context,String token,int requestId,int pageNumber,pageSize,String query)async{
+    ProgressDialog pd=ProgressDialog(context);
+    pd.show();
+    try{
+      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query",headers:{"Authorization":"Bearer "+token});
+      if(response.statusCode==200){
+        pd.hide();
+        return response.body;
       }else{
         pd.hide();
         Utils.showError(context, response.statusCode.toString());

@@ -155,6 +155,9 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                            previousButtonVisible=false;
                            nextButtonVisible=false;
                          }
+                         if(requests.length==0) {
+                           Utils.showError(context, "No Rejections Found");
+                         }
                        });
                      });
                    }else{
@@ -185,6 +188,9 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                            previousButtonVisible=false;
                            nextButtonVisible=false;
                          }
+                         if(requests.length==0) {
+                           Utils.showError(context, "No Rejections Found");
+                         }
                        });
                      });
                    }
@@ -205,7 +211,7 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                      //color: Colors.teal,
                    ),
                    width: MediaQuery.of(context).size.width,
-                   height: 175, //MediaQuery.of(context).size.height * 0.21,
+                   height: 200, //MediaQuery.of(context).size.height * 0.21,
 
                    child: Padding(
                      padding: const EdgeInsets.all(13.0),
@@ -237,7 +243,7 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                                  errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
                                  imageBuilder: (context, imageProvider){
                                    return Container(
-                                     height: 85,
+                                     height: 100,
                                      width: 85,
                                      decoration: BoxDecoration(
                                          borderRadius: BorderRadius.circular(8),
@@ -313,7 +319,7 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                                    padding: const EdgeInsets.only(left: 6, top: 8,bottom: 6),
                                    child: Text(allRequests[index].modelName!=null?allRequests[index].modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
                                  ),
-                                 Row(
+                                 Column(
                                    crossAxisAlignment: CrossAxisAlignment.center,
                                    //mainAxisAlignment: MainAxisAlignment.spaceAround,
                                    children: <Widget>[
@@ -507,6 +513,9 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                   previousButtonVisible=false;
                   nextButtonVisible=false;
                 }
+                if(requests.length==0) {
+                  Utils.showError(context, "No Rejections Found");
+                }
               });
             });
           });
@@ -611,7 +620,7 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
              ],
            ),
            actions: [
-             FlatButton(onPressed: (){
+             TextButton(onPressed: (){
                Navigator.pop(context);
              }, child: Text("Ok"))
            ],

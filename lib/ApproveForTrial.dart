@@ -53,7 +53,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Approve/Reject for Trial"),
+        title: Text("Approve Model"),
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,

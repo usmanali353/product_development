@@ -140,8 +140,21 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                         }
                         if(requests.length>0){
                           isVisible=true;
+                          if(req['hasNext']&&req['hasPrevious']){
+                            nextButtonVisible=true;
+                            previousButtonVisible=true;
+                          }else if(req['hasPrevious']&&!req['hasNext']){
+                            previousButtonVisible=true;
+                            nextButtonVisible=false;
+                          }else if(!req['hasPrevious']&&req['hasNext']){
+                            previousButtonVisible=false;
+                            nextButtonVisible=true;
+                          }else{
+                            previousButtonVisible=false;
+                            nextButtonVisible=false;
+                          }
                         }else{
-                          Utils.showSuccess(context, "No Requests Found");
+                          Utils.showError(context, "No Requests Found");
                         }
                       });
                     });
@@ -158,8 +171,21 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                         }
                         if(requests.length>0){
                           isVisible=true;
+                          if(req['hasNext']&&req['hasPrevious']){
+                            nextButtonVisible=true;
+                            previousButtonVisible=true;
+                          }else if(req['hasPrevious']&&!req['hasNext']){
+                            previousButtonVisible=true;
+                            nextButtonVisible=false;
+                          }else if(!req['hasPrevious']&&req['hasNext']){
+                            previousButtonVisible=false;
+                            nextButtonVisible=true;
+                          }else{
+                            previousButtonVisible=false;
+                            nextButtonVisible=false;
+                          }
                         }else{
-                          Utils.showSuccess(context, "No Requests Found");
+                          Utils.showError(context, "No Requests Found");
                         }
                       });
                     });
@@ -468,13 +494,13 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
     );
   }
   showTrialApprovalDialog(BuildContext context,TrialRequests request){
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
-    Widget detailsPage = FlatButton(
+    Widget detailsPage = TextButton(
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
@@ -483,7 +509,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
         });
       },
     );
-    Widget approveRejectButton = FlatButton(
+    Widget approveRejectButton = TextButton(
       child: Text("Set"),
       onPressed: () {
         Navigator.pop(context);
@@ -543,13 +569,13 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
     );
   }
   showProductionApprovalDialog(BuildContext context,TrialRequests request){
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
-    Widget detailsPage = FlatButton(
+    Widget detailsPage = TextButton(
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
@@ -558,7 +584,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
         });
       },
     );
-    Widget approveRejectButton = FlatButton(
+    Widget approveRejectButton = TextButton(
       child: Text("Set"),
       onPressed: () {
         Navigator.pop(context);
@@ -651,8 +677,21 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                 }
                 if(requests.length>0){
                   isVisible=true;
+                  if(req['hasNext']&&req['hasPrevious']){
+                    nextButtonVisible=true;
+                    previousButtonVisible=true;
+                  }else if(req['hasPrevious']&&!req['hasNext']){
+                    previousButtonVisible=true;
+                    nextButtonVisible=false;
+                  }else if(!req['hasPrevious']&&req['hasNext']){
+                    previousButtonVisible=false;
+                    nextButtonVisible=true;
+                  }else{
+                    previousButtonVisible=false;
+                    nextButtonVisible=false;
+                  }
                 }else{
-                  Utils.showSuccess(context, "No Requests Found");
+                  Utils.showError(context, "No Requests Found");
                 }
               });
             });
@@ -669,6 +708,19 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                 }
                 if(requests.length>0){
                   isVisible=true;
+                  if(req['hasNext']&&req['hasPrevious']){
+                    nextButtonVisible=true;
+                    previousButtonVisible=true;
+                  }else if(req['hasPrevious']&&!req['hasNext']){
+                    previousButtonVisible=true;
+                    nextButtonVisible=false;
+                  }else if(!req['hasPrevious']&&req['hasNext']){
+                    previousButtonVisible=false;
+                    nextButtonVisible=true;
+                  }else{
+                    previousButtonVisible=false;
+                    nextButtonVisible=false;
+                  }
                 }else{
                   Utils.showError(context, "No Requests Found");
                 }
@@ -742,13 +794,13 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
     );
   }
   showAssignUserDialog(BuildContext context,List<Dropdown> users,TrialRequests request){
-    Widget cancelButton = FlatButton(
+    Widget cancelButton = TextButton(
       child: Text("Cancel"),
       onPressed: () {
         Navigator.pop(context);
       },
     );
-    Widget detailsPage = FlatButton(
+    Widget detailsPage = TextButton(
       child: Text("Go to Details"),
       onPressed: () {
         Navigator.pop(context);
@@ -757,7 +809,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
         });
       },
     );
-    Widget approveRejectButton = FlatButton(
+    Widget approveRejectButton = TextButton(
       child: Text("Set"),
 
       onPressed: () {
@@ -878,7 +930,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
             ],
           ),
           actions: [
-            FlatButton(onPressed: (){
+            TextButton(onPressed: (){
               Navigator.pop(context);
             }, child: Text("Ok"))
           ],

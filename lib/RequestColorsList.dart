@@ -119,7 +119,7 @@ class _RequestColorsListState extends State<RequestColorsList> {
           title: Text("Add Image to Color"),
           content: Text("are you sure you want to add Image to Color $colorName?"),
           actions: [
-            FlatButton(
+            TextButton(
                 child: Text("Add"),
                 onPressed: (){
                   SharedPreferences.getInstance().then((prefs){
@@ -132,7 +132,7 @@ class _RequestColorsListState extends State<RequestColorsList> {
                   });
                 },
             ),
-            FlatButton(
+            TextButton(
                 child: Text("Cancel"),
                 onPressed: (){
                      Navigator.pop(context);

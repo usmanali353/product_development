@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'Utils/Utils.dart';
 
@@ -10,7 +11,7 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
 
   TextEditingController username,password;
-
+  bool isVisible=true;
   @override
   void initState() {
     username=TextEditingController();
@@ -78,10 +79,20 @@ class _LoginState extends State<Login> {
                   child: TextField(
                       controller: password,
                       style: TextStyle(color: Colors.white),
-                      obscureText: true,
+                      obscureText: isVisible,
                       decoration: new InputDecoration(
                           labelStyle: TextStyle(color:Colors.white),
                           prefixIcon: Icon(Icons.lock,color: Colors.white,),
+                          suffixIcon: IconButton(icon: Icon(isVisible?Icons.visibility:Icons.visibility_off,color: Colors.white,size: 27),onPressed: () {
+                          setState(() {
+                            if(isVisible){
+                              isVisible=false;
+                            }else{
+                              isVisible=true;
+                            }
+                          });
+                        },//(Icons.https,color: yellowColor,size: 27,)
+                      ),
                           border: new OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide(color: Colors.white, width: 10),

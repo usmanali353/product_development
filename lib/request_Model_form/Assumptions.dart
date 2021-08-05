@@ -1,13 +1,15 @@
+import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:multiselect_formfield/multiselect_formfield.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Specifications.dart';
 
 class Assumptions extends StatefulWidget {
-
+ bool isUpdate;
+ Assumptions({isUpdate});
   @override
 
   _AssumptionsState createState() => _AssumptionsState();
@@ -32,9 +34,11 @@ class _AssumptionsState extends State<Assumptions> {
 
   List<String> marketNames=[];
 
-  List<String> clientNames=[];
+  List<String> clientNames=[],selectedClientIds=[];
 
-  List<dynamic> clientMultiSelectList=[],myClients=[];
+  List<Widget> selectedOptions=[];
+
+  List<dynamic> selectedClientNames=[];
 
   String selectedMarket,selectedClient="Client 1";
 
@@ -68,10 +72,6 @@ class _AssumptionsState extends State<Assumptions> {
                this.clients=clientDropDown;
                for(var c in clients){
                  clientNames.add(c.name);
-                 clientMultiSelectList.add({
-                   "display":c.name,
-                   "value":c.stringId
-                 });
                }
              }
            });
@@ -227,7 +227,7 @@ class _AssumptionsState extends State<Assumptions> {
                   ),
                     // Client Dropdown
                   Visibility(
-                    visible:marketId!=null&&marketId==2,
+                    visible:selectedMarket!=null&&selectedMarket=="Local Exclusive",
                     child: Padding(
 
                       padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
@@ -287,33 +287,67 @@ class _AssumptionsState extends State<Assumptions> {
                     ),
                   ),
                   Visibility(
-                    visible:marketId!=null&&marketId!=2,
+                    visible:selectedMarket!=null&&selectedMarket!="Local Exclusive",
                     child: Padding(
                       padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
-                      child: Card(
-                        elevation: 10,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: MultiSelectFormField(
-                          autovalidate: false,
-                          title: Text("Select Clients"),
-                          hintWidget: Text("Select Clients"),
-                          textField: 'display',
-                          valueField: 'value',
-                          okButtonLabel: 'OK',
-                          cancelButtonLabel: 'CANCEL',
-                          dataSource: clientMultiSelectList,
-                          border: InputBorder.none,
-                          validator: (value) {
-                            return value == null || value.length == 0?'Please select one or more Clients':null;
-                          },
-                          onSaved: (value){
-                            if (value == null) return;
-                            setState(() {
-                              myClients = value;
-                            });
-                          },
+                      child: InkWell(
+                        onTap: (){
+                          showSelectClientDialog();
+                        },
+                        child: Card(
+                          elevation: 10,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: InputDecorator(
+                            decoration: InputDecoration(
+                              filled: true,
+                              errorMaxLines: 4,
+                              fillColor: Theme.of(context).canvasColor,
+                              border: InputBorder.none,
+                            ),
+
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding:EdgeInsets.fromLTRB(0, 2, 0, 0),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text("Select Clients"),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 5, right: 5),
+                                        child: Text(
+                                          ' *',
+                                          style: TextStyle(
+                                            color: Colors.red.shade700,
+                                            fontSize: 17.0,
+                                          ),
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.arrow_drop_down,
+                                        color: Colors.black87,
+                                        size: 25.0,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                selectedClientNames.length > 0
+                                    ? Wrap(
+                                  spacing: 8.0,
+                                  runSpacing: 0.0,
+                                  children: selectedOptions,
+                                )
+                                    : new Container(
+                                  padding: EdgeInsets.only(top: 4),
+                                  child: Text("Select one or more Clients"),
+                                )
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -329,12 +363,18 @@ class _AssumptionsState extends State<Assumptions> {
                         color: Color(0xFF004c4c),
 
                         onPressed: (){
-
                           if(_fbKey.currentState.validate()){
-                            if(marketId==2) {
-                              myClients.add(clientId);
+                            if(selectedMarket=="Local Exclusive") {
+                              selectedClientIds.add(clientId);
                             }
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=>Specifications(marketId,event.text,myClients)));
+                            if(selectedClientIds==null||selectedClientIds.length==0){
+                              Utils.showError(context,"Please Select one or more Client");
+                            }else {
+                              Navigator.push(context, MaterialPageRoute(
+                                  builder: (context) =>
+                                      Specifications(marketId, event.text,
+                                          selectedClientIds)));
+                            }
                           }
                         },
 
@@ -357,5 +397,56 @@ class _AssumptionsState extends State<Assumptions> {
     );
 
   }
-
+  showSelectClientDialog()async{
+    await FilterListDialog.display(
+        context,
+        height: 480,
+        listData: clientNames,
+        headerTextColor: Color(0xFF004c4c),
+        choiceChipLabel: (item){
+          return item;
+        },
+        validateSelectedItem: (list, val) {
+          return list.contains(val);
+        },
+        onItemSearch: (list, text) {
+          if (list.any((element) =>
+              element.toLowerCase().contains(text.toLowerCase()))) {
+            return list
+                .where((element) =>
+                element.toLowerCase().contains(text.toLowerCase()))
+                .toList();
+          }
+          else{
+            return [];
+          }
+        },
+        borderRadius: 20,
+        selectedTextBackgroundColor: Color(0xFF004c4c),
+        // allResetButonColor: Color(0xFF004c4c),
+        applyButonTextBackgroundColor: Color(0xFF004c4c),
+        // headerTextColor: Color(0xFF004c4c),
+        closeIconColor: Color(0xFF004c4c),
+        headlineText: "Select Clients",
+        searchFieldHintText: "Search Clients",
+        onApplyButtonClick: (list) {
+          if (list != null) {
+            setState(() {
+              selectedClientNames.clear();
+              selectedOptions.clear();
+              selectedClientIds.clear();
+              this.selectedClientNames = list;
+              for(int i=0;i<selectedClientNames.length;i++){
+                selectedOptions.add(
+                    Chip(label: Text(selectedClientNames[i],overflow: TextOverflow.ellipsis,))
+                );
+                selectedClientIds.add(clients[clientNames.indexOf(selectedClientNames[i])].stringId);
+                print(selectedClientIds.length);
+                print(selectedClientIds.toString());
+              }
+            });
+          }
+          Navigator.pop(context);
+        });
+  }
 }
