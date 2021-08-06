@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:ars_dialog/ars_dialog.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -7,7 +8,6 @@ import 'package:productdevelopment/Login.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
 import 'package:productdevelopment/Model/Notifications.dart';
@@ -16,7 +16,7 @@ import '../DetailsPage.dart';
 import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
  class Network_Operations{
   static void signIn(BuildContext context,String email,String password) async {
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     var body=jsonEncode({"email":email,"password":password});
     try{
@@ -31,9 +31,9 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
          var claims=Utils.parseJwt(jsonDecode(response.body)['result']);
          //Utils.showSuccess(context, "Login Successful");
          FirebaseMessaging().getToken().then((token){
-           pd.hide();
+           pd.dismiss();
            addFCMToken(context, claims['nameid'], token, jsonDecode(response.body)['result']).then((value){
-
+             Utils.showSuccess(context, "Login Successful");
            });
          });
        }else if(Platform.isIOS){
@@ -41,20 +41,20 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
        }
 
      }else if(response.body!=null){
-       pd.hide();
-       Utils.showError(context, "Invalid Username or Password");
+       pd.dismiss();
+       Utils.showError(context, "Invalid Email or Password");
      }else{
-       pd.hide();
+       pd.dismiss();
        Utils.showError(context, response.statusCode.toString());
      }
     }catch(e) {
-      pd.hide();
+      pd.dismiss();
       print(e.toString());
       Utils.showError(context,e.toString());
     }
   }
   static void register(BuildContext context,String email,String password,String name) async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     var body=jsonEncode({"email":email,"password":password,"firstname":name,"confirmPassword":password});
     try{
@@ -62,11 +62,11 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       if(response.statusCode==200){
         Utils.showSuccess(context, "User Registration successful");
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       Utils.showError(context, e.toString());
     }
   }
@@ -108,12 +108,12 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     return null;
   }
   static Future<void> changeStatusOfRequest(BuildContext context,String token,int requestId,int status) async{
-   // ProgressDialog pd=ProgressDialog(context);
+   // ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     try {
       var response = await http.get(Utils.getBaseUrl() + "Request/ChangeStatusOfRequest/$requestId?StatusId=$status", headers: {"Authorization": "Bearer " + token});
       if (response.statusCode == 200) {
        // Navigator.pop(context,"Refresh");
-         Utils.showSuccess(context, "Status Changed");
+         //Utils.showSuccess(context, "Status Changed");
       }
     }catch(e){
       print(e);
@@ -121,7 +121,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
   }
   static void saveRequest(BuildContext context,String token,Request request) async {
-    ProgressDialog pd=new ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try {
       final body = jsonEncode({
@@ -153,21 +153,21 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
        debugPrint(body);
        var response =await http.post(Utils.getBaseUrl()+"Request/RequestSave",body: body,headers:{"Content-Type": "application/json", "Authorization": "Bearer " + token});
        if(response.statusCode==200){
-         pd.hide();
-         Utils.showSuccess(context, "Request Saved Successfully");
+         pd.dismiss();
          Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+         Utils.showSuccess(context, "Request Created Successfully");
        }else{
-         pd.hide();
+         pd.dismiss();
          print(response.body.toString());
          Utils.showError(context, response.statusCode.toString());
        }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       Utils.showError(context, e.toString());
     }
   }
   static Future<void> addDesignersAndObservationToRequest(BuildContext context,int requestId,List<dynamic> designers,String designerObservations,String token,String modelName,String modelCode,String remarks) async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       final body = jsonEncode({
@@ -181,21 +181,21 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       print(body);
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestDesignerSave",body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
-       pd.hide();
-       Utils.showSuccess(context, response.body.toString());
+       pd.dismiss();
        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+       Utils.showSuccess(context, response.body.toString());
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       Utils.showError(context, e.toString());
     }
 
   }
   static Future<void> addRequestSchedule(BuildContext context,String token,int requestId,DateTime startDate,DateTime endDate,bool IsUpdateMode,String remarks) async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       final body=jsonEncode({
@@ -209,129 +209,129 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestSetSchedule",body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
 
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         Utils.showSuccess(context, response.body.toString());
         Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
         // changeStatusWithRemarks(context, token, requestId, statusId,remarks).then((value){
         //
         // });
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
         print(response.body.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       Utils.showError(context, e.toString());
       print(e.toString());
     }
   }
   static void getRequestById(BuildContext context,String token,int requestId) async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestById/$requestId",headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         Request request;
         request=Request.fromMap(jsonDecode(response.body));
         Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, "No Request Found against this Id");
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e.toString());
     }
 
   }
   static Future<String> getRequestForGM(BuildContext context,String token,int PageSize,int PageNumber)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
          return response.body;
       }else {
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,"No Requests Found");
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<String> getRequestForGMSearchable(BuildContext context,String token,int PageSize,int PageNumber,String searchQuery)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         return response.body;
       }else {
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,"No Requests Found");
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<String> getRequestByStatusGM(BuildContext context,String token,int statusId,int pageNumber,int pageSize) async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         print(response.body);
          return response.body;
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,"No Requests Found");
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<String> getRequestByStatusGMSearchable(BuildContext context,String token,int statusId,int pageNumber,int pageSize,String query) async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         return response.body;
       }else{
         Utils.showError(context,"No Requests Found");
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<void> trialClient(BuildContext context,String token,List<dynamic> clientIds,int requestId,String remarks,DateTime ClientVisitDate,DateTime actualStartDate,DateTime actualEndDate,String newModelName,String newModelCode)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       final body=jsonEncode({
@@ -347,62 +347,62 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       print(body);
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestClientSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
-        Utils.showSuccess(context, "Request Saved Successfully");
+        pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+        Utils.showSuccess(context, "Model Approved");
       }else{
-        pd.hide();
+        pd.dismiss();
         if(response.body!=null){
           print(response.body);
         }
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
   }
   static Future<String> getTrialRequests(BuildContext context,String token,int requestId,int pageNumber,int pageSize)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         return response.body;
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<String> getTrialRequestsSearchable(BuildContext context,String token,int requestId,int pageNumber,pageSize,String query)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         return response.body;
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
@@ -426,28 +426,29 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     return null;
   }
   static Future<Map<String,dynamic>> getRequestCount(BuildContext context,String token)async{
-    ProgressDialog pd=ProgressDialog(context);
-    pd.show();
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
+    pd.show(useSafeArea: false);
+
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestsCountForDashboard",headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         print(response.body.toString());
         return jsonDecode(response.body);
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
    return null;
   }
   static Future<void> addRequestImages(BuildContext context,String token,int colorId,String colorImage)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       final body=jsonEncode({
@@ -456,81 +457,81 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       },toEncodable: Utils.myEncode);
       var response=await http.post(Utils.getBaseUrl()+"Request/RequestColorSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         Utils.showSuccess(context, "Image Added Successfully");
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       Utils.showError(context, e.toString());
     }
   }
   static Future<Map<String,dynamic>> getRequestCountIndividualUser(BuildContext context,String token)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestsCountForIndividual",headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         return jsonDecode(response.body);
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<String> getRequestByStatusIndividualUser(BuildContext context,String token,int statusId,int pageNumber,int pageSize) async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId?PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         return response.body;
       }else{
-       pd.hide();
+       pd.dismiss();
        Utils.showError(context,"No Requests Found");
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<String> getRequestByStatusIndividualUserSearchable(BuildContext context,String token,int statusId,String query,int pageNumber,int pageSize) async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId&SearchString=$query&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         return response.body;
       }else {
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<void> changeStatusWithRemarks(BuildContext context,String token,int requestId,int status,String remarks)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       final body=jsonEncode({
@@ -540,22 +541,23 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       },toEncodable: Utils.myEncode);
       var response=await http.post(Utils.getBaseUrl()+"Request/SaveRequestRemark",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
-        Utils.showSuccess(context, "Status Changed");
+        pd.dismiss();
+
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+        Utils.showSuccess(context, "Request Status Changed");
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
   }
   static Future<void> changeStatusClientWithRemarks(BuildContext context,String token,int requestId,int status,String remarks,DateTime ActualClientVisitDate,List<dynamic> MultipleReasons)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       final body=jsonEncode({
@@ -567,102 +569,103 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       },toEncodable: Utils.myEncode);
       var response=await http.post(Utils.getBaseUrl()+"Request/SaveRequestRemark",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
-        Utils.showSuccess(context, "Status Changed");
+        pd.dismiss();
+
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+        Utils.showSuccess(context, "Request Status Changed");
       }else if(response.body!=null&&response.body.isNotEmpty){
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,response.body);
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
   }
   static Future<String> getClientRequestsByStatus(BuildContext context,String token,int statusId,int pageNumber,int pageSize)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         return response.body;
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<String> getClientRequestsByStatusSearchable(BuildContext context,String token,int statusId,int pageNumber,int pageSize,String searchQuery)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         return response.body;
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<List<TrialRequests>> getClientRequests(BuildContext context,String token)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         List<TrialRequests> requests=[];
         for(int i=0;i<jsonDecode(response.body).length;i++){
           requests.add(TrialRequests.fromJson(jsonDecode(response.body)[i]));
         }
         return requests;
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static void undoStatus(BuildContext context,String token,int remarkId) async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       print(Utils.getBaseUrl()+"Request/ClientVisibility/$remarkId");
       var response=await http.get(Utils.getBaseUrl()+"Request/ClientVisibility/$remarkId",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
-        Utils.showSuccess(context,"Status Reverted");
+        pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+        Utils.showSuccess(context,"Request Status Reverted");
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
@@ -722,7 +725,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     // Or do other work.
   }
   static Future<void> deleteFCMToken(BuildContext context,String userId,String fcmToken,String token) async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       final body=jsonEncode({
@@ -731,91 +734,91 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       },toEncodable: Utils.myEncode);
       var response=await http.post(Utils.getBaseUrl()+"Account/DeleteUserTokenForFCM",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Login()), (route) => false);
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       Utils.showError(context, e.toString());
     }
 
   }
   static Future<List<Notifications>> getUserNotifications(BuildContext context,String token)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response =await http.get(Utils.getBaseUrl()+"Account/GetAllNotificationsOfUser",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         List<Notifications> notifications=[];
         for(int i=0;i<jsonDecode(response.body).length;i++){
           notifications.add(Notifications.fromJson(jsonDecode(response.body)[i]));
         }
         return notifications;
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,"No Notifications Found");
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e.toString());
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<void> readNotification(BuildContext context,String token,int notificationId,int requestId) async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Account/ReadNotification/$notificationId",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         //getRequestById(context, token, requestId);
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
   }
   static Future<Request> getRequestByIdNotifications(BuildContext context,String token,int requestId) async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestById/$requestId",headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         Request request;
         request=Request.fromMap(jsonDecode(response.body));
        // Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
         return request;
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, "No Request Found against this Id");
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e.toString());
     }
 
   }
   static Future<List<ClientVisitSchedule>> getClientVisitSchedule(BuildContext context,String token,String date,String endDate)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response =await http.get(Utils.getBaseUrl()+"Request/GetRequestClientsSchedule?Date=$date&&endDate=$endDate",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         print(response.body);
         List<ClientVisitSchedule> clientVisitSchedule=[];
         for(int i=0;i<jsonDecode(response.body)['result'].length;i++){
@@ -823,15 +826,15 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         }
         return clientVisitSchedule;
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e.toString());
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
@@ -855,7 +858,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     return null;
   }
   static void addClientsToTrial(BuildContext context,String token,List<dynamic> multipleModels,List<dynamic> multipleClients,DateTime expectedClientVisitDate) async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       final body=jsonEncode({
@@ -866,26 +869,26 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       print(body);
       var response=await http.post(Utils.getBaseUrl()+"Request/ClientsSaveAfterModelApproval",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       Utils.showError(context, e.toString());
       print(e);
     }
   }
   static Future<List<Dropdown>> getEmployeesDropDown(BuildContext context,String token)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Account/GetUsersExceptClientDropdown",headers:{"Authorization":"Bearer "+token});
       var data= jsonDecode(response.body);
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         List<Dropdown> list=List();
         list.clear();
         for(int i=0;i<data.length;i++){
@@ -894,20 +897,20 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         print(data.toString());
         return list;
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,"No Employees Found");
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<void> assignUserToRejectedModel(BuildContext context,String token,int clientId,String userId)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       final body=jsonEncode({
@@ -917,135 +920,135 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       print(body);
       var response=await http.post(Utils.getBaseUrl()+"Request/UsersForClientsRejectSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         Utils.showSuccess(context,"User Alloted");
         //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context,response.body.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       Utils.showError(context, e.toString());
       print(e);
     }
   }
   static Future<String> getAssignedRejectedModels(BuildContext context,String token,int PageSize,int PageNumber)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
 
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         print(response.body);
         return response.body;
       }else {
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<String> getAssignedRejectedModelsSearchable(BuildContext context,String token,int PageSize,int PageNumber,String searchQuery)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
 
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         return response.body;
       }else {
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }
     return null;
   }
   static Future<void> changeStatusOfAssignedModel(BuildContext context,String token,int clientId,int statusId)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
-        Utils.showSuccess(context,"Status Changed");
+        pd.dismiss();
+        Utils.showSuccess(context,"Request Status Changed");
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.body.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
   }
   static Future<void> changeStatusOfAssignedModelWithJustification(BuildContext context,String token,int clientId,int statusId,int isJustified)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId&just=$isJustified",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
-        pd.hide();
-        Utils.showSuccess(context,"Status Changed");
+        pd.dismiss();
+        Utils.showSuccess(context,"Request Status Changed");
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.body.toString());
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
   }
   static Future<String> getTrialRequestsWithJustification(BuildContext context,String token,int isJustified,int PageSize,int PageNumber)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       print(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber");
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         return response.body;
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
         return null;
       }
     }catch(e){
-      pd.hide();
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.hide();
+      pd.dismiss();
     }
     return null;
   }
   static Future<String> getTrialRequestsWithJustificationSearchable(BuildContext context,String token,int isJustified,int PageSize,int PageNumber,String searchQuery)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
+        pd.dismiss();
         return response.body;
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
         return null;
       }
@@ -1056,16 +1059,16 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     return null;
   }
   static Future<void> changeClientExpectedVisitDate(BuildContext context,String token,int id,DateTime newDate)async{
-    ProgressDialog pd=ProgressDialog(context);
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
       var response=await http.get(Utils.getBaseUrl()+"Request/ChangeClientExpectedVisitDate?Id="+id.toString()+"&ClientVisitDate="+newDate.toString(),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
-        pd.hide();
-        Utils.showSuccess(context,"Expected Client Visit Date Changed");
+        pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+        Utils.showSuccess(context,"Expected Client Visit Date Changed");
       }else{
-        pd.hide();
+        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
         return null;
       }

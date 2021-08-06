@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:date_range_picker/date_range_picker.dart' as DateRagePicker;
 import 'package:productdevelopment/AddClientsForTrial.dart';
 import 'package:productdevelopment/DetailsPage.dart';
 import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
@@ -14,6 +13,7 @@ class DailyClientSchedule extends StatefulWidget {
 
 class _DailyClientScheduleState extends State<DailyClientSchedule> {
   bool isVisible=false;
+  List<DateTime> picked=[];
   DateTime initialStart=DateTime.now(),initialEnd=DateTime.now().add(Duration(days: 0));
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   List<ClientVisitSchedule> clientVisitSchedules=[];
@@ -44,13 +44,21 @@ class _DailyClientScheduleState extends State<DailyClientSchedule> {
         actions: [
           IconButton(
             onPressed: ()async{
-              final List<DateTime> picked = await DateRagePicker.showDatePicker(
+              if(picked!=null){
+                picked.clear();
+              }
+              var datePicked= await showDateRangePicker(
                   context: context,
-                  initialFirstDate:  initialStart,
-                  initialLastDate: initialEnd,
                   firstDate: DateTime.now().subtract(Duration(days: 365)),
-                  lastDate:  DateTime.now().add(Duration(days: 365)),
+                  lastDate: DateTime.now().add(Duration(days: 365)),
+                  initialDateRange: DateTimeRange(start: initialStart, end: initialEnd),
               );
+              if(datePicked!=null&&datePicked.start!=null){
+                picked.add(datePicked.start);
+              }
+              if(datePicked!=null&&datePicked.end!=null){
+                picked.add(datePicked.end);
+              }
               if(picked!=null&&picked.length==2){
                 setState(() {
                   this.initialStart=picked[0];
@@ -88,7 +96,7 @@ class _DailyClientScheduleState extends State<DailyClientSchedule> {
                       if(clientVisitSchedules!=null&&clientVisitSchedules.length>0){
                         isVisible=true;
                       }else{
-                        Utils.showError(context,"No Schedules Found for Specified Date");
+                        Utils.showError(context,"No Schedules Found");
                       }
                     });
                   });
@@ -130,7 +138,7 @@ class _DailyClientScheduleState extends State<DailyClientSchedule> {
                       if(clientVisitSchedules!=null&&clientVisitSchedules.length>0){
                         isVisible=true;
                       }else{
-                        Utils.showError(context,"No Schedules Found for Today");
+                        Utils.showError(context,"No Schedules Found");
                       }
                     });
                   });
@@ -160,7 +168,7 @@ class _DailyClientScheduleState extends State<DailyClientSchedule> {
                           subtitle: Text(clientVisitSchedules[index].actualClientVisitDate!=null?DateFormat("yyyy-MM-dd").format(DateTime.parse(clientVisitSchedules[index].actualClientVisitDate)):''),
                         ),
                         Center(
-                          child: FlatButton(
+                          child: TextButton(
                             child: Text("View Details",style: TextStyle(color: Color(0xFF004c4c)),),
                             onPressed: (){
                               SharedPreferences.getInstance().then((prefs){

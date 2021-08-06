@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:flushbar/flushbar.dart';
+import 'package:ars_dialog/ars_dialog.dart';
+import 'package:cherry_toast/cherry_toast.dart';
+import 'package:cherry_toast/resources/arrays.dart';
 import 'package:http/http.dart' as http;
 import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +15,6 @@ import 'package:productdevelopment/AddClientsForTrial.dart';
 import 'package:productdevelopment/DailyClientSchedule.dart';
 import 'package:productdevelopment/Login.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -35,22 +36,30 @@ class Utils{
     return regExp.hasMatch(value);
   }
   static String getBaseUrl(){
-    //return "http://192.236.147.77:8086/api/";
-    return "http://productapi.arabian-ceramics.com/api/";
+    return "http://192.236.147.77:8086/api/";
+    //return "http://productapi.arabian-ceramics.com/api/";
   }
  static void showError(BuildContext context,String message) {
-    Flushbar(
-      message: message,
-      duration: Duration(seconds: 5),
-      backgroundColor: Colors.red,
-    ).show(context);
+   CherryToast.error(
+     toastPosition: POSITION.BOTTOM,
+     toastDuration: Duration(seconds: 5),
+     autoDismiss: true,
+      displayCloseButton: false,
+      animationType: ANIMATION_TYPE.FROM_LEFT,
+       titleStyle: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),
+       title: message, borderRadius: 25)
+       .show(context);
   }
   static void showSuccess(BuildContext context,String message) {
-    Flushbar(
-      message: message,
-      duration: Duration(seconds: 5),
-      backgroundColor: Colors.green,
-    ).show(context);
+    CherryToast.success(
+        toastPosition: POSITION.BOTTOM,
+        toastDuration: Duration(seconds: 5),
+        autoDismiss: true,
+        displayCloseButton: false,
+        animationType: ANIMATION_TYPE.FROM_LEFT,
+        titleStyle: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),
+        title: message, borderRadius: 25)
+        .show(context);
   }
   static dynamic myEncode(dynamic item) {
     if(item is DateTime) {
@@ -98,7 +107,7 @@ class Utils{
     return int.parse(hexColor, radix: 16);
   }
   static Future<File> urlToFile(BuildContext context,String imageUrl) async {
-   ProgressDialog pd=ProgressDialog(context);
+   ProgressDialog pd=ProgressDialog(context,message: Text("Please Wait..."),dismissable: true);
    pd.show();
    try{
   var rng = new Random();
@@ -111,15 +120,15 @@ class Utils{
 
   http.Response response = await http.get(imageUrl);
   if(response.statusCode==200){
-    pd.hide();
+    pd.dismiss();
     await file.writeAsBytes(response.bodyBytes);
   }else{
-    pd.hide();
+    pd.dismiss();
     Utils.showError(context, response.statusCode.toString());
   }
   return file;
 }catch(e){
-  pd.hide();
+  pd.dismiss();
   print(e.toString());
 }
    return null;
@@ -145,11 +154,15 @@ class Utils{
         });
       }
       } catch (e) {
-      Flushbar(
-        message: e,
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 5),
-      ).show(context);
+      CherryToast.error(
+          toastPosition: POSITION.BOTTOM,
+          toastDuration: Duration(seconds: 5),
+          autoDismiss: true,
+          displayCloseButton: false,
+          animationType: ANIMATION_TYPE.FROM_LEFT,
+          description: e,
+          title:"Exception", borderRadius: 25)
+          .show(context);
     }
     return barcode;
   }
