@@ -4,9 +4,9 @@ import 'dart:typed_data';
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:multiselect_formfield/multiselect_formfield.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Model/Request.dart';
+import 'package:productdevelopment/Model/RequestColors.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,7 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 
 class Suitability extends StatefulWidget{
-
+  Request request;
   var market,event,size,surface,thickness,classification,color,technologyId,structureId, edge,range,material,myClient;
   List<dynamic> designTopologies=[],sizesList=[],colorsList=[],colorDropDown=[];
   List<String> colorNames=[];
@@ -33,6 +33,7 @@ class Suitability extends StatefulWidget{
     this.designTopologies,
       this.myClient,
       this.colorDropDown,
+       {this.request}
       );
   @override
   State<StatefulWidget> createState() {
@@ -41,7 +42,8 @@ class Suitability extends StatefulWidget{
 }
 
 class _Suitability_State extends State<Suitability> {
-  List _myActivities,myClient;
+  List myClient;
+  String selected_color;
   var base64EncodedImage,colorID;
   final formKey = new GlobalKey<FormState>();
   final fbKey = new GlobalKey<FormBuilderState>();
@@ -57,6 +59,21 @@ class _Suitability_State extends State<Suitability> {
  @override
   void initState() {
    technical_consideration=TextEditingController();
+   if(widget.request!=null){
+     if(widget.request.technicalConcentration!=null){
+       technical_consideration.text=widget.request.technicalConcentration;
+     }
+     if(widget.request.multipleColorNames!=null&&widget.request.multipleColorNames.length>0){
+       setState(() {
+         for(RequestColors mc in widget.request.multipleColorNames){
+           if(mc.colorImage!=null){
+             selected_color=mc.colorName;
+             return;
+           }
+         }
+       });
+     }
+   }
    for(int i=0;i<colorDropDown.length;i++){
      setState(() {
        colorIds.add(colorDropDown[i]['value']);
@@ -82,8 +99,19 @@ class _Suitability_State extends State<Suitability> {
                }
            );
          }
-         if(suitibilityName.length>0){
-           suitibilityDropDownVisible=true;
+         if(suitibilityName.length>0) {
+           suitibilityDropDownVisible = true;
+           if (widget.request != null) {
+             if (widget.request.multipleSuitabilityNames != null && widget.request.multipleSuitabilityNames.length > 0) {
+                for(var s in widget.request.multipleSuitabilityNames){
+                  selectedSuitibilityNames.add(s);
+                  selectedSuitibilityOptions.add(
+                      Chip(label: Text(s,overflow: TextOverflow.ellipsis,))
+                  );
+                  selectedSuitibilityIds.add(suitibility[suitibilityName.indexOf(s)].id.toString());
+                }
+             }
+           }
          }
        });
      });
@@ -112,7 +140,6 @@ class _Suitability_State extends State<Suitability> {
   File _image;
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
         appBar: AppBar(
           title: Text("Suitability"),
@@ -209,10 +236,10 @@ class _Suitability_State extends State<Suitability> {
                            borderRadius: BorderRadius.circular(15),
                          ),
                          child: FormBuilderTextField(
-                           attribute: "Technical Consideration",
+                           name: "Technical Consideration",
                            controller: technical_consideration,
                            maxLines: 8,
-                           validators: [FormBuilderValidators.required()],
+                           validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                            decoration: InputDecoration(
                                contentPadding: EdgeInsets.all(16),
                                border: InputBorder.none,
@@ -256,66 +283,133 @@ class _Suitability_State extends State<Suitability> {
                         ],
                       ),
                     ),
-                    Padding(
+                    Visibility(
+                      visible: selected_color==null,
+                      child: Padding(
 
-                      padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
+                        padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
 
-                      child: Card(
+                        child: Card(
 
-                        elevation: 10,
+                          elevation: 10,
 
-                        shape: RoundedRectangleBorder(
+                          shape: RoundedRectangleBorder(
 
-                          borderRadius: BorderRadius.circular(15),
-
-                        ),
-
-                        child: FormBuilderDropdown(
-
-                          attribute: "Color",
-
-                          validators: [FormBuilderValidators.required()],
-
-                          hint: Text("Select Color for Image"),
-
-                          items:colorName!=null?colorName.map((horse)=>DropdownMenuItem(
-
-                            child: Text(horse),
-
-                            value: horse,
-
-                          )).toList():[""].map((name) => DropdownMenuItem(
-
-                              value: name, child: Text("$name")))
-
-                              .toList(),
-
-                          style: Theme.of(context).textTheme.bodyText1,
-
-                          decoration: InputDecoration(
-
-                            border: InputBorder.none,
-
-                            contentPadding: EdgeInsets.all(16),
+                            borderRadius: BorderRadius.circular(15),
 
                           ),
 
-                          onChanged: (value){
+                          child: FormBuilderDropdown(
 
-                            setState(() {
-                              for(int i=0;i<colorDropDown.length;i++){
-                                 if(colorDropDown[i]['display']==value){
-                                   this.colorID =colorDropDown[i]['value'];
-                                 }
-                              }
-                            });
+                            name: "Color",
 
-                          },
+                            validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
+
+                            hint: Text("Select Color for Image"),
+
+                            items:colorName!=null?colorName.map((horse)=>DropdownMenuItem(
+
+                              child: Text(horse),
+
+                              value: horse,
+
+                            )).toList():[""].map((name) => DropdownMenuItem(
+
+                                value: name, child: Text("$name")))
+
+                                .toList(),
+
+                            style: Theme.of(context).textTheme.bodyText1,
+
+                            decoration: InputDecoration(
+
+                              border: InputBorder.none,
+
+                              contentPadding: EdgeInsets.all(16),
+
+                            ),
+
+                            onChanged: (value){
+
+                              setState(() {
+                                for(int i=0;i<colorDropDown.length;i++){
+                                   if(colorDropDown[i]['display']==value){
+                                     this.colorID =colorDropDown[i]['value'];
+                                   }
+                                }
+                              });
+
+                            },
+
+                          ),
 
                         ),
 
                       ),
+                    ),
+                    Visibility(
+                      visible: selected_color!=null,
+                      child: Padding(
 
+                        padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
+
+                        child: Card(
+
+                          elevation: 10,
+
+                          shape: RoundedRectangleBorder(
+
+                            borderRadius: BorderRadius.circular(15),
+
+                          ),
+
+                          child: FormBuilderDropdown(
+
+                            name: "Color",
+
+                            validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
+                            initialValue: selected_color,
+                            hint: Text("Select Color for Image"),
+
+                            items:colorName!=null?colorName.map((horse)=>DropdownMenuItem(
+
+                              child: Text(horse),
+
+                              value: horse,
+
+                            )).toList():[""].map((name) => DropdownMenuItem(
+
+                                value: name, child: Text("$name")))
+
+                                .toList(),
+
+                            style: Theme.of(context).textTheme.bodyText1,
+
+                            decoration: InputDecoration(
+
+                              border: InputBorder.none,
+
+                              contentPadding: EdgeInsets.all(16),
+
+                            ),
+
+                            onChanged: (value){
+
+                              setState(() {
+                                for(int i=0;i<colorDropDown.length;i++){
+                                  if(colorDropDown[i]['display']==value){
+                                    this.colorID =colorDropDown[i]['value'];
+                                  }
+                                }
+                              });
+
+                            },
+
+                          ),
+
+                        ),
+
+                      ),
                     ),
                     Builder(
                       builder: (BuildContext context){
@@ -326,14 +420,15 @@ class _Suitability_State extends State<Suitability> {
                               color: Color(0xFF004c4c),
                               child: Text("Proceed",style: TextStyle(color: Colors.white),),
                               onPressed: (){
-                                if(fbKey.currentState.validate()&&base64EncodedImage!=null&&selectedSuitibilityIds!=null&&selectedSuitibilityIds.length>0){
+                                if(fbKey.currentState.validate()&&selectedSuitibilityIds!=null&&selectedSuitibilityIds.length>0){
 //                                setState(() {
 //                                  _myActivitiesResult = _myActivities.toString();
 //                                });
+                                if(widget.request!=null){
                                   SharedPreferences.getInstance().then((prefs){
                                     var claims=Utils.parseJwt(prefs.getString("token"));
-                                    Network_Operations.saveRequest(context,prefs.getString("token") ,Request(
-                                      requestId: 0,
+                                    Network_Operations.updateRequest(context,prefs.getString("token") ,Request(
+                                      requestId: widget.request.requestId,
                                       marketId: market,
                                       multipleClients: myClient,
                                       event: event,
@@ -355,7 +450,35 @@ class _Suitability_State extends State<Suitability> {
                                       multipleSuitability: selectedSuitibilityIds,
                                     ));
                                   });
-
+                                }else{
+                                  if(base64EncodedImage!=null){
+                                    SharedPreferences.getInstance().then((prefs){
+                                      var claims=Utils.parseJwt(prefs.getString("token"));
+                                      Network_Operations.saveRequest(context,prefs.getString("token") ,Request(
+                                        requestId: 0,
+                                        marketId: market,
+                                        multipleClients: myClient,
+                                        event: event,
+                                        userId: claims['nameid'],
+                                        technicalConcentration: technical_consideration.text,
+                                        statusId: 1,
+                                        thickness: double.parse(thickness),
+                                        surfaceId: surface,
+                                        classificationId: classification,
+                                        rangeId: range,
+                                        technologyId: technologyId,
+                                        structureId: structureId,
+                                        edgeId: edge,
+                                        image: base64EncodedImage,
+                                        multipleColors: colorsList,
+                                        multipleSizes: sizesList,
+                                        ImageSelectedForColor:colorID,
+                                        multipleDesignTopoligies: designTopologies,
+                                        multipleSuitability: selectedSuitibilityIds,
+                                      ));
+                                    });
+                                  }
+                                }
                                 }else{
                                   Utils.showError(context,"Please Provide All Required Information");
                                 }
@@ -379,6 +502,7 @@ class _Suitability_State extends State<Suitability> {
         context,
         height: 480,
         listData: suitibilityName,
+        selectedListData: selectedSuitibilityNames,
         headerTextColor: Color(0xFF004c4c),
         choiceChipLabel: (item){
           return item;

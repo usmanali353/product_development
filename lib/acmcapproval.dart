@@ -117,10 +117,10 @@ class _acmcApprovalState extends State<acmcApproval> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: FormBuilderTextField(
-                          attribute: "Designer Observations",
+                          name: "Designer Observations",
                           maxLines: 5,
                           controller: designerObservations,
-                          validators: [FormBuilderValidators.required()],
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                           decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(16),
                               border: InputBorder.none,
@@ -140,9 +140,9 @@ class _acmcApprovalState extends State<acmcApproval> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: FormBuilderTextField(
-                          attribute: "Model Name",
+                          name: "Model Name",
                           controller: modelName,
-                          validators: [FormBuilderValidators.required()],
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                           decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(16),
                               border: InputBorder.none,
@@ -162,9 +162,9 @@ class _acmcApprovalState extends State<acmcApproval> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: FormBuilderTextField(
-                          attribute: "Model Code",
+                          name: "Model Code",
                           controller: modelCode,
-                          validators: [FormBuilderValidators.required()],
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                           decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(16),
                               border: InputBorder.none,
@@ -182,9 +182,9 @@ class _acmcApprovalState extends State<acmcApproval> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: FormBuilderTextField(
-                        attribute: "Remarks",
+                        name: "Remarks",
                         controller: remarks,
-                        validators: [FormBuilderValidators.required()],
+                        validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                         maxLines: 5,
                         decoration: InputDecoration(
                             hintText: "Remarks",

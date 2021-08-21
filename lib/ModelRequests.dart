@@ -14,6 +14,7 @@ import 'package:productdevelopment/RequestColorsList.dart';
 import 'package:productdevelopment/RequestImagesGallery.dart';
 import 'package:productdevelopment/SchedulePage.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
+import 'package:productdevelopment/request_Model_form/Assumptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailsPage.dart';
 import 'RequestsForTrial.dart';
@@ -416,6 +417,8 @@ class _ModelReState extends State<ModelRequests>{
                                         PopupMenuItem<String>(
                                             child: const Text('Change Status'), value: 'changeStatus'),
                                         PopupMenuItem<String>(
+                                            child: const Text('Update Request'), value: 'updateRequest'),
+                                        PopupMenuItem<String>(
                                             child: const Text('Add Images'), value: 'addImage'),
                                         PopupMenuItem<String>(
                                             child: const Text('See Details'), value: 'Details'),
@@ -431,6 +434,12 @@ class _ModelReState extends State<ModelRequests>{
                                         });
                                       }else if(selectedItem=="addImage"){
                                         Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(products[index])));
+                                      }else if(selectedItem=='updateRequest'){
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"), products[index].requestId).then((req){
+                                            Navigator.push(context,MaterialPageRoute(builder:(context)=>Assumptions(request: req,)));
+                                          });
+                                        });
                                       }
                                     });
                                   }else if(isClient){

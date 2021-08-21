@@ -3,14 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
+import 'package:productdevelopment/Model/Request.dart';
+import 'package:productdevelopment/Model/RequestColors.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:productdevelopment/request_Model_form/designTopology.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class Specifications extends StatefulWidget {
   var market,event,other,myClients;
+  Request request;
 
-  Specifications(this.market, this.event,this.myClients);
+  Specifications(this.market, this.event,this.myClients,{this.request});
 
   @override
   _SpecificationsState createState() => _SpecificationsState(market,event,myClients);
@@ -29,14 +32,19 @@ class _SpecificationsState extends State<Specifications> {
   String selected_product_name, selected_surface, selected_size,selected_classification;
   int product_name_id, surface_id, size_id,classification_id;
   _SpecificationsState(this.market, this.event,this.myClients);
-  List _myActivities,selectedSizes;
-  String _myActivitiesResult;
+  List selectedSizes;
   final formKey = new GlobalKey<FormState>();
   final formKey2 = new GlobalKey<FormState>();
   final fbKey = new GlobalKey<FormBuilderState>();
 @override
   void initState() {
    thickness=TextEditingController();
+   if(widget.request!=null){
+     if(widget.request.thickness!=null){
+       thickness.text=widget.request.thickness.toString();
+     }
+   }
+   //Method for getting Classification
    SharedPreferences.getInstance().then((prefs){
      Network_Operations.getDropDowns(context, prefs.getString("token"), "Classifications").then((classificationDropDown){
        setState(() {
@@ -46,6 +54,12 @@ class _SpecificationsState extends State<Specifications> {
          }
          if(classificationName.length>0){
            classificationDropDownVisible=true;
+           if(widget.request!=null){
+             if(widget.request.classificationName!=null&&widget.request.classificationId!=null) {
+               selected_classification = widget.request.classificationName;
+               classification_id=widget.request.classificationId;
+             }
+           }
          }
        });
           //Method for Surfaces
@@ -57,6 +71,11 @@ class _SpecificationsState extends State<Specifications> {
            }
            if(surfaceName.length>0){
              surfaceDropDownVisible=true;
+             if(widget.request!=null){
+               if(widget.request.surfaceName!=null&&widget.request.surfaceId!=null)
+               selected_surface=widget.request.surfaceName;
+               surface_id=widget.request.surfaceId;
+             }
            }
          });
 
@@ -70,6 +89,17 @@ class _SpecificationsState extends State<Specifications> {
            }
            if(sizeName.length>0){
              sizeDropDownVisible=true;
+             if(widget.request!=null){
+               if(widget.request.multipleSizeNames!=null&&widget.request.multipleSizeNames.length>0){
+                 for(var s in widget.request.multipleSizeNames){
+                   selectedSizeNames.add(s);
+                   selectedSizeIds.add(size[sizeName.indexOf(s)].id.toString());
+                   selectedSizeOptions.add(
+                       Chip(label: Text(s,overflow: TextOverflow.ellipsis,))
+                   );
+                 }
+               }
+             }
            }
          });
 
@@ -89,6 +119,17 @@ class _SpecificationsState extends State<Specifications> {
            }
            if(colorName.length>0){
              colorDropDownVisible=true;
+             if(widget.request!=null){
+               if(widget.request.multipleColorNames!=null&&widget.request.multipleColorNames.length>0){
+                 for(RequestColors colors in widget.request.multipleColorNames){
+                   selectedColorNames.add(colors.colorName);
+                   selectedColorIds.add(color[colorName.indexOf(colors.colorName)].id.toString());
+                   selectedColorOptions.add(
+                       Chip(label: Text(colors.colorName,overflow: TextOverflow.ellipsis,))
+                   );
+                 }
+               }
+             }
            }
          });
 
@@ -122,7 +163,7 @@ class _SpecificationsState extends State<Specifications> {
                   //ProductName Dropdown
                   //Product Classification Dropdown
                   Visibility(
-                    visible: classificationDropDownVisible,
+                    visible: classificationDropDownVisible&&selected_classification==null,
                     child: Padding(
                       padding: const EdgeInsets.only(top:16,left: 16,right:16,bottom: 16),
                       child: Card(
@@ -131,9 +172,45 @@ class _SpecificationsState extends State<Specifications> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: FormBuilderDropdown(
-                          attribute: "Classification",
-                          validators: [FormBuilderValidators.required()],
+                          name: "Classification",
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                           hint: Text("Select Classification"),
+                          items:classificationName!=null?classificationName.map((horse)=>DropdownMenuItem(
+                            child: Text(horse),
+                            value: horse,
+                          )).toList():[""].map((name) => DropdownMenuItem(
+                              value: name, child: Text("$name")))
+                              .toList(),
+                          style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.all(16),
+                          ),
+                          onChanged: (value){
+                            setState(() {
+                              surfaceVisible=true;
+                              this.selected_classification=value;
+                              this.classification_id=classifications[classificationName.indexOf(value)].id;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: classificationDropDownVisible&&selected_classification!=null,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top:16,left: 16,right:16,bottom: 16),
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: FormBuilderDropdown(
+                          name: "Classification",
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
+                          hint: Text("Select Classification"),
+                          initialValue: selected_classification,
                           items:classificationName!=null?classificationName.map((horse)=>DropdownMenuItem(
                             child: Text(horse),
                             value: horse,
@@ -158,7 +235,7 @@ class _SpecificationsState extends State<Specifications> {
                   ),
                   //Product Surface Dropdown
                   Visibility(
-                    visible: surfaceDropDownVisible,
+                    visible: surfaceDropDownVisible&&selected_surface==null,
                     child: Padding(
                       padding: const EdgeInsets.only(left: 16,right: 16),
                       child: Card(
@@ -167,8 +244,8 @@ class _SpecificationsState extends State<Specifications> {
                             borderRadius: BorderRadius.circular(15)
                         ),
                         child: FormBuilderDropdown(
-                          attribute: "Surface",
-                          validators: [FormBuilderValidators.required()],
+                          name: "Surface",
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                           hint: Text('Select Surface'),
                           items:surfaceName!=null?surfaceName.map((horse)=>DropdownMenuItem(
                             child: Text(horse),
@@ -187,6 +264,41 @@ class _SpecificationsState extends State<Specifications> {
                                 this.surface_id=surface[surfaceName.indexOf(value)].id;
                                  });
                               }
+                        ),
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: surfaceDropDownVisible&&selected_surface!=null,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16,right: 16),
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)
+                        ),
+                        child: FormBuilderDropdown(
+                            name: "Surface",
+                            validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
+                            hint: Text('Select Surface'),
+                            initialValue: selected_surface,
+                            items:surfaceName!=null?surfaceName.map((horse)=>DropdownMenuItem(
+                              child: Text(horse),
+                              value: horse,
+                            )).toList():[""].map((name) => DropdownMenuItem(
+                                value: name, child: Text("$name")))
+                                .toList(),
+                            style: Theme.of(context).textTheme.bodyText1,
+                            decoration: InputDecoration(
+                                contentPadding: EdgeInsets.all(16),
+                                border: InputBorder.none
+                            ),
+                            onChanged: (value){
+                              setState(() {
+                                this.selected_surface=value;
+                                this.surface_id=surface[surfaceName.indexOf(value)].id;
+                              });
+                            }
                         ),
                       ),
                     ),
@@ -268,9 +380,9 @@ class _SpecificationsState extends State<Specifications> {
                       ),
                       child: FormBuilderTextField(
                         controller: thickness,
-                        attribute: "Thickness",
+                        name: "Thickness",
                         keyboardType: TextInputType.numberWithOptions(decimal: true),
-                        validators: [FormBuilderValidators.required()],
+                        validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                         decoration: InputDecoration(hintText: "Thickness (cm)",
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.all(16),
@@ -360,18 +472,34 @@ class _SpecificationsState extends State<Specifications> {
                             }else if(selectedColorIds==null||selectedColorIds.length==0){
                               Utils.showError(context,"Please Select Colors");
                             }else {
-                              Navigator.push(context, MaterialPageRoute(
-                                  builder: (context) =>
-                                      designTopology(
-                                          market,
-                                          event,
-                                          selectedSizeIds,
-                                          surface_id,
-                                          thickness.text,
-                                          classification_id,
-                                          selectedColorIds,
-                                          myClients,
-                                          colors)));
+                              if(widget.request==null){
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) =>
+                                        designTopology(
+                                            market,
+                                            event,
+                                            selectedSizeIds,
+                                            surface_id,
+                                            thickness.text,
+                                            classification_id,
+                                            selectedColorIds,
+                                            myClients,
+                                            colors)));
+                              }else
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) =>
+                                        designTopology(
+                                            market,
+                                            event,
+                                            selectedSizeIds,
+                                            surface_id,
+                                            thickness.text,
+                                            classification_id,
+                                            selectedColorIds,
+                                            myClients,
+                                            colors,
+                                            request: widget.request,
+                                        )));
                             }
                           }
                         },
@@ -391,6 +519,7 @@ class _SpecificationsState extends State<Specifications> {
         context,
         height: 480,
         listData: sizeName,
+        selectedListData: selectedSizeNames,
         headerTextColor: Color(0xFF004c4c),
         choiceChipLabel: (item){
           return item;
@@ -442,6 +571,7 @@ class _SpecificationsState extends State<Specifications> {
         context,
         height: 480,
         listData: colorName,
+        selectedListData: selectedColorNames,
         headerTextColor: Color(0xFF004c4c),
         choiceChipLabel: (item){
           return item;

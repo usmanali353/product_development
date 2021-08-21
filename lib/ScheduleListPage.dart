@@ -202,11 +202,11 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: FormBuilderDateTimePicker(
-                    attribute: "Client Visit Date",
+                    name: "Client Visit Date",
                     initialValue: DateTime.parse(request['clientVisitDate']),
                     style: Theme.of(context).textTheme.bodyText1,
                     inputType: InputType.date,
-                    validators: [FormBuilderValidators.required()],
+                    validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                     format: DateFormat("MM-dd-yyyy"),
                     decoration: InputDecoration(
                         hintText: "Select Client Visit Date",

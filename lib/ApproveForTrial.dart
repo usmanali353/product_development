@@ -79,10 +79,10 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                          borderRadius: BorderRadius.circular(15),
                        ),
                        child: FormBuilderDateTimePicker(
-                         attribute: "Actual Start Date",
+                         name: "Actual Start Date",
                          style: Theme.of(context).textTheme.bodyText1,
                          inputType: InputType.date,
-                         validators: [FormBuilderValidators.required()],
+                         validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                          format: DateFormat("MM-dd-yyyy"),
                          decoration: InputDecoration(hintText: "Sample Actual Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                          onChanged: (value){
@@ -101,10 +101,10 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                          borderRadius: BorderRadius.circular(15),
                        ),
                        child: FormBuilderDateTimePicker(
-                         attribute: "Sample Production Actual End Date",
+                         name: "Sample Production Actual End Date",
                          style: Theme.of(context).textTheme.bodyText1,
                          inputType: InputType.date,
-                         validators: [FormBuilderValidators.required()],
+                         validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                          format: DateFormat("MM-dd-yyyy"),
                          decoration: InputDecoration(hintText: "Sample Actual End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                          onChanged: (value){
@@ -125,9 +125,9 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                            borderRadius: BorderRadius.circular(15),
                          ),
                          child: FormBuilderTextField(
-                           attribute: "Model Name",
+                           name: "Model Name",
                            controller: modelName,
-                           validators: [FormBuilderValidators.required()],
+                           validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                            decoration: InputDecoration(
                                contentPadding: EdgeInsets.all(16),
                                border: InputBorder.none,
@@ -147,9 +147,9 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                            borderRadius: BorderRadius.circular(15),
                          ),
                          child: FormBuilderTextField(
-                           attribute: "Model Code",
+                           name: "Model Code",
                            controller: modelCode,
-                           validators: [FormBuilderValidators.required()],
+                           validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                            decoration: InputDecoration(
                                contentPadding: EdgeInsets.all(16),
                                border: InputBorder.none,
@@ -200,10 +200,10 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                          borderRadius: BorderRadius.circular(15),
                        ),
                        child: FormBuilderDateTimePicker(
-                         attribute: "Client Visit Date",
+                         name: "Client Visit Date",
                          style: Theme.of(context).textTheme.bodyText1,
                          inputType: InputType.date,
-                         validators: [FormBuilderValidators.required()],
+                         validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                          format: DateFormat("MM-dd-yyyy"),
                          decoration: InputDecoration(hintText: "Client Visit Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                          onChanged: (value){
@@ -222,9 +222,9 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                          borderRadius: BorderRadius.circular(15),
                        ),
                        child: FormBuilderTextField(
-                         attribute: "Remarks",
+                         name: "Remarks",
                          controller: remarks,
-                         validators: [FormBuilderValidators.required()],
+                         validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                          maxLines: 5,
                          decoration: InputDecoration(
                              hintText: "Remarks",

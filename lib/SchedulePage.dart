@@ -56,11 +56,11 @@ class _SchedulePageState extends State<SchedulePage> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: FormBuilderDateTimePicker(
-                        attribute: "Target Start Date",
+                        name: "Target Start Date",
                         initialValue: request.statusId==4?DateTime.parse(request.targetStartDate.toString()):null,
                         style: Theme.of(context).textTheme.bodyText1,
                         inputType: InputType.date,
-                        validators: [FormBuilderValidators.required()],
+                        validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                         format: DateFormat("MM-dd-yyyy"),
                         decoration: InputDecoration(hintText: "Sample Target Start Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                         onChanged: (value){
@@ -84,11 +84,11 @@ class _SchedulePageState extends State<SchedulePage> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: FormBuilderDateTimePicker(
-                        attribute: "Target End Date",
+                        name: "Target End Date",
                         initialValue: request.statusId==4?DateTime.parse(request.targetEndDate.toString()):null,
                         style: Theme.of(context).textTheme.bodyText1,
                         inputType: InputType.date,
-                        validators: [FormBuilderValidators.required()],
+                        validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                         format: DateFormat("MM-dd-yyyy"),
                         decoration: InputDecoration(hintText: "Sample Target End Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                         onChanged: (value){
@@ -110,9 +110,9 @@ class _SchedulePageState extends State<SchedulePage> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: FormBuilderTextField(
-                        attribute: "Remarks",
+                        name: "Remarks",
                         controller: remarks,
-                        validators: [FormBuilderValidators.required()],
+                        validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                         maxLines: 5,
                         decoration: InputDecoration(
                             hintText: "Remarks",

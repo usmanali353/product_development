@@ -1,15 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:another_flushbar/flushbar.dart';
 import 'package:ars_dialog/ars_dialog.dart';
-import 'package:cherry_toast/cherry_toast.dart';
-import 'package:cherry_toast/resources/arrays.dart';
 import 'package:http/http.dart' as http;
-import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 import 'package:image_picker/image_picker.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:productdevelopment/AddClientsForTrial.dart';
 import 'package:productdevelopment/DailyClientSchedule.dart';
@@ -24,7 +23,7 @@ class Utils{
     return image;
   }
   static Future<bool> check_connectivity () async{
-    bool result = await DataConnectionChecker().hasConnection;
+    bool result = await InternetConnectionChecker().hasConnection;
     return result;
   }
   static bool validatePassword(String value){
@@ -36,30 +35,22 @@ class Utils{
     return regExp.hasMatch(value);
   }
   static String getBaseUrl(){
-    return "http://192.236.147.77:8086/api/";
-    //return "http://productapi.arabian-ceramics.com/api/";
+   // return "http://192.236.147.77:8086/api/";
+    return "http://productapi.arabian-ceramics.com/api/";
   }
  static void showError(BuildContext context,String message) {
-   CherryToast.error(
-     toastPosition: POSITION.BOTTOM,
-     toastDuration: Duration(seconds: 5),
-     autoDismiss: true,
-      displayCloseButton: false,
-      animationType: ANIMATION_TYPE.FROM_LEFT,
-       titleStyle: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),
-       title: message, borderRadius: 25)
-       .show(context);
+   Flushbar(
+     message: message,
+     duration: Duration(seconds: 5),
+     backgroundColor: Colors.red,
+   ).show(context);
   }
   static void showSuccess(BuildContext context,String message) {
-    CherryToast.success(
-        toastPosition: POSITION.BOTTOM,
-        toastDuration: Duration(seconds: 5),
-        autoDismiss: true,
-        displayCloseButton: false,
-        animationType: ANIMATION_TYPE.FROM_LEFT,
-        titleStyle: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),
-        title: message, borderRadius: 25)
-        .show(context);
+    Flushbar(
+      message: message,
+      duration: Duration(seconds: 5),
+      backgroundColor: Colors.green,
+    ).show(context);
   }
   static dynamic myEncode(dynamic item) {
     if(item is DateTime) {
@@ -118,7 +109,7 @@ class Utils{
 
   File file = new File('$tempPath'+ (rng.nextInt(10000)).toString() +'.png');
 
-  http.Response response = await http.get(imageUrl);
+  http.Response response = await http.get(Uri.parse(imageUrl));
   if(response.statusCode==200){
     pd.dismiss();
     await file.writeAsBytes(response.bodyBytes);
@@ -140,6 +131,7 @@ class Utils{
 //        context,
 //        MaterialPageRoute(builder: (context) => QRCodeScanner())
 //      );
+
       String result = await FlutterBarcodeScanner.scanBarcode(
           "#ff6666",
           "Cancel",
@@ -147,22 +139,17 @@ class Utils{
           ScanMode.DEFAULT);
       barcode = result;
       if (barcode != "" && barcode.length > 0) {
-        SharedPreferences.getInstance().then((prefs) {
+        SharedPreferences.getInstance().then((prefs) async{
           print(barcode.split("?")[1].replaceAll("RequestId=", ""));
-          Network_Operations.getRequestById(context, prefs.getString("token"),
-              int.parse(barcode.split("?")[1].replaceAll("RequestId=", "")));
+          Network_Operations.getRequestById(context, prefs.getString("token"),int.parse(barcode.split("?")[1].replaceAll("RequestId=", "")));
         });
       }
       } catch (e) {
-      CherryToast.error(
-          toastPosition: POSITION.BOTTOM,
-          toastDuration: Duration(seconds: 5),
-          autoDismiss: true,
-          displayCloseButton: false,
-          animationType: ANIMATION_TYPE.FROM_LEFT,
-          description: e,
-          title:"Exception", borderRadius: 25)
-          .show(context);
+      Flushbar(
+        message: e,
+        duration: Duration(seconds: 5),
+        backgroundColor: Colors.red,
+      ).show(context);
     }
     return barcode;
   }

@@ -20,7 +20,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     pd.show();
     var body=jsonEncode({"email":email,"password":password});
     try{
-    var response=await http.post(Utils.getBaseUrl()+"Account/Login",body:body,headers: {"Content-type":"application/json"});
+    var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Account/Login"),body:body,headers: {"Content-type":"application/json"});
     print(response.statusCode);
      if(response.statusCode==200){
        SharedPreferences.getInstance().then((prefs){
@@ -30,7 +30,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
        if(Platform.isAndroid){
          var claims=Utils.parseJwt(jsonDecode(response.body)['result']);
          //Utils.showSuccess(context, "Login Successful");
-         FirebaseMessaging().getToken().then((token){
+         FirebaseMessaging.instance.getToken().then((token){
            pd.dismiss();
            addFCMToken(context, claims['nameid'], token, jsonDecode(response.body)['result']).then((value){
              Utils.showSuccess(context, "Login Successful");
@@ -51,6 +51,8 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       pd.dismiss();
       print(e.toString());
       Utils.showError(context,e.toString());
+    }finally{
+      pd.dismiss();
     }
   }
   static void register(BuildContext context,String email,String password,String name) async{
@@ -58,7 +60,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     pd.show();
     var body=jsonEncode({"email":email,"password":password,"firstname":name,"confirmPassword":password});
     try{
-      var response=await http.post(Utils.getBaseUrl()+"account/Register",body:body,headers: {"Content-type":"application/json"});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"account/Register"),body:body,headers: {"Content-type":"application/json"});
       if(response.statusCode==200){
         Utils.showSuccess(context, "User Registration successful");
       }else{
@@ -72,7 +74,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   }
   static Future<List<Dropdown>> getDropDowns(BuildContext context,String token,String endpoint)async{
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Configuration/"+endpoint+"Dropdown",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Configuration/"+endpoint+"Dropdown"),headers:{"Authorization":"Bearer "+token});
       var data= jsonDecode(response.body);
       if(response.statusCode==200){
         List<Dropdown> list=List();
@@ -93,7 +95,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   }
   static Future<List<Request>> getRequest(BuildContext context,String token)async{
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequests",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequests"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         List<Request> requests=[];
         for(int i=0;i<jsonDecode(response.body)['response'].length;i++){
@@ -110,7 +112,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   static Future<void> changeStatusOfRequest(BuildContext context,String token,int requestId,int status) async{
    // ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     try {
-      var response = await http.get(Utils.getBaseUrl() + "Request/ChangeStatusOfRequest/$requestId?StatusId=$status", headers: {"Authorization": "Bearer " + token});
+      var response = await http.get(Uri.parse(Utils.getBaseUrl() + "Request/ChangeStatusOfRequest/$requestId?StatusId=$status"), headers: {"Authorization": "Bearer " + token});
       if (response.statusCode == 200) {
        // Navigator.pop(context,"Refresh");
          //Utils.showSuccess(context, "Status Changed");
@@ -151,7 +153,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "image":request.image,
       }, toEncodable: Utils.myEncode);
        debugPrint(body);
-       var response =await http.post(Utils.getBaseUrl()+"Request/RequestSave",body: body,headers:{"Content-Type": "application/json", "Authorization": "Bearer " + token});
+       var response =await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestSave"),body: body,headers:{"Content-Type": "application/json", "Authorization": "Bearer " + token});
        if(response.statusCode==200){
          pd.dismiss();
          Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
@@ -164,6 +166,56 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }catch(e){
       pd.dismiss();
       Utils.showError(context, e.toString());
+    }finally{
+      pd.dismiss();
+    }
+  }
+  static void updateRequest(BuildContext context,String token,Request request) async {
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
+    pd.show();
+    try {
+      final body = jsonEncode({
+        "requestId": request.requestId,
+        "date": DateTime.now(),
+        "marketId": request.marketId,
+        "event": request.event,
+        "userId": request.userId,
+        "technicalConcentration": request.technicalConcentration,
+        "statusId": request.statusId,
+        "classificationId": request.classificationId,
+        "rangeId": request.rangeId,
+        "technologyId": request.technologyId,
+        "structureId": request.structureId,
+        "edgeId": request.edgeId,
+        "multipleColors": request.multipleColors,
+        "multipleSizes": request.multipleSizes,
+        "multipleDesignTopoligies": request.multipleDesignTopoligies,
+        "multipleSuitability": request.multipleSuitability,
+        "thickness": request.thickness,
+        "surfaceId": request.surfaceId,
+        "multipleDesigners": request.multipleDesigners,
+        "designerObservation": request.designerObservation,
+        "customerObservation": request.customerObservation,
+        "multipleClients":request.multipleClients,
+        "ImageSelectedForColor":request.ImageSelectedForColor,
+        "image":request.image,
+      }, toEncodable: Utils.myEncode);
+      debugPrint(body);
+      var response =await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestSave?IsUpateMode=true"),body: body,headers:{"Content-Type": "application/json", "Authorization": "Bearer " + token});
+      if(response.statusCode==200){
+        pd.dismiss();
+        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+        Utils.showSuccess(context, "Request Created Successfully");
+      }else{
+        pd.dismiss();
+        print(response.body.toString());
+        Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      pd.dismiss();
+      Utils.showError(context, e.toString());
+    }finally{
+      pd.dismiss();
     }
   }
   static Future<void> addDesignersAndObservationToRequest(BuildContext context,int requestId,List<dynamic> designers,String designerObservations,String token,String modelName,String modelCode,String remarks) async{
@@ -179,7 +231,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "Remarks":remarks
       },toEncodable: Utils.myEncode);
       print(body);
-      var response=await http.post(Utils.getBaseUrl()+"Request/RequestDesignerSave",body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestDesignerSave"),body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
        pd.dismiss();
        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
@@ -206,12 +258,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "Remarks":remarks
       },toEncodable: Utils.myEncode);
       print(body);
-      var response=await http.post(Utils.getBaseUrl()+"Request/RequestSetSchedule",body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestSetSchedule"),body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
 
       if(response.statusCode==200){
         pd.dismiss();
-        Utils.showSuccess(context, response.body.toString());
+
         Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
+        Utils.showSuccess(context, response.body.toString());
         // changeStatusWithRemarks(context, token, requestId, statusId,remarks).then((value){
         //
         // });
@@ -230,7 +283,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestById/$requestId",headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestById/$requestId"),headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         Request request;
@@ -250,7 +303,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
          return response.body;
@@ -271,7 +324,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -292,7 +345,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         print(response.body);
@@ -314,7 +367,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -345,7 +398,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "Remarks":remarks
       },toEncodable: Utils.myEncode);
       print(body);
-      var response=await http.post(Utils.getBaseUrl()+"Request/RequestClientSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer "+token});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientSave"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
@@ -368,7 +421,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId&PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -389,7 +442,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -408,7 +461,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   }
   static Future<List<Dropdown>> getDesignerDropDowns(BuildContext context,String token,String endpoint)async{
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Configuration/Get"+endpoint+"Dropdown",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Configuration/Get"+endpoint+"Dropdown"),headers:{"Authorization":"Bearer "+token});
       var data= jsonDecode(response.body);
       if(response.statusCode==200){
         List<Dropdown> list=List();
@@ -428,9 +481,8 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   static Future<Map<String,dynamic>> getRequestCount(BuildContext context,String token)async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show(useSafeArea: false);
-
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestsCountForDashboard",headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestsCountForDashboard"),headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
         print(response.body.toString());
@@ -455,7 +507,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "id":colorId,
         "colorImage":colorImage
       },toEncodable: Utils.myEncode);
-      var response=await http.post(Utils.getBaseUrl()+"Request/RequestColorSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestColorSave"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
         Utils.showSuccess(context, "Image Added Successfully");
@@ -466,13 +518,15 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }catch(e){
       pd.dismiss();
       Utils.showError(context, e.toString());
+    }finally{
+      pd.dismiss();
     }
   }
   static Future<Map<String,dynamic>> getRequestCountIndividualUser(BuildContext context,String token)async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestsCountForIndividual",headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestsCountForIndividual"),headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
         return jsonDecode(response.body);
@@ -492,7 +546,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId?PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId?PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -513,7 +567,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId&SearchString=$query&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId&SearchString=$query&PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -539,7 +593,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "RequestId":requestId,
         "Remarks":remarks,
       },toEncodable: Utils.myEncode);
-      var response=await http.post(Utils.getBaseUrl()+"Request/SaveRequestRemark",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/SaveRequestRemark"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
 
@@ -567,7 +621,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "ActualClientVisitDate":ActualClientVisitDate,
         "MultipleReasons": MultipleReasons
       },toEncodable: Utils.myEncode);
-      var response=await http.post(Utils.getBaseUrl()+"Request/SaveRequestRemark",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/SaveRequestRemark"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
 
@@ -591,7 +645,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -612,7 +666,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -633,7 +687,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/RequestClientsGetAll",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientsGetAll"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         List<TrialRequests> requests=[];
@@ -659,7 +713,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     pd.show();
     try{
       print(Utils.getBaseUrl()+"Request/ClientVisibility/$remarkId");
-      var response=await http.get(Utils.getBaseUrl()+"Request/ClientVisibility/$remarkId",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/ClientVisibility/$remarkId"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
@@ -669,14 +723,17 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.dismiss();
     }
     return null;
   }
   static Future<List<Dropdown>> getClientsForTrial(BuildContext context,String token,int requestId)async{
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestClientsDropdown/$requestId",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestClientsDropdown/$requestId"),headers:{"Authorization":"Bearer "+token});
       var data= jsonDecode(response.body);
       if(response.statusCode==200){
         List<Dropdown> list=List();
@@ -699,7 +756,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
           "Token":fcmToken,
           "UserId":userId
         },toEncodable: Utils.myEncode);
-        var response=await http.post(Utils.getBaseUrl()+"Account/UserTokenForFCMSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+        var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Account/UserTokenForFCMSave"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
         if(response.statusCode==200){
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
         }else{
@@ -732,7 +789,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "Token":fcmToken,
         "UserId":userId
       },toEncodable: Utils.myEncode);
-      var response=await http.post(Utils.getBaseUrl()+"Account/DeleteUserTokenForFCM",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Account/DeleteUserTokenForFCM"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Login()), (route) => false);
@@ -743,6 +800,8 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }catch(e){
       pd.dismiss();
       Utils.showError(context, e.toString());
+    }finally{
+      pd.dismiss();
     }
 
   }
@@ -750,7 +809,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response =await http.get(Utils.getBaseUrl()+"Account/GetAllNotificationsOfUser",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response =await http.get(Uri.parse(Utils.getBaseUrl()+"Account/GetAllNotificationsOfUser"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
         List<Notifications> notifications=[];
@@ -775,7 +834,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Account/ReadNotification/$notificationId",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Account/ReadNotification/$notificationId"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
         //getRequestById(context, token, requestId);
@@ -795,7 +854,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetRequestById/$requestId",headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestById/$requestId"),headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         Request request;
@@ -809,6 +868,8 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }catch(e){
       pd.dismiss();
       print(e.toString());
+    }finally{
+      pd.dismiss();
     }
 
   }
@@ -816,7 +877,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response =await http.get(Utils.getBaseUrl()+"Request/GetRequestClientsSchedule?Date=$date&&endDate=$endDate",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response =await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestClientsSchedule?Date=$date&&endDate=$endDate"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
         print(response.body);
@@ -840,7 +901,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   }
   static Future<List<Dropdown>> getModelsDropDowns(BuildContext context,String token,String endpoint)async{
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/"+endpoint+"Dropdown/5",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/"+endpoint+"Dropdown/5"),headers:{"Authorization":"Bearer "+token});
       var data= jsonDecode(response.body);
       if(response.statusCode==200){
         List<Dropdown> list=List();
@@ -867,7 +928,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "ExpectedClientVisitDate":expectedClientVisitDate
       },toEncodable: Utils.myEncode);
       print(body);
-      var response=await http.post(Utils.getBaseUrl()+"Request/ClientsSaveAfterModelApproval",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/ClientsSaveAfterModelApproval"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
@@ -879,13 +940,15 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       pd.dismiss();
       Utils.showError(context, e.toString());
       print(e);
+    }finally{
+      pd.dismiss();
     }
   }
   static Future<List<Dropdown>> getEmployeesDropDown(BuildContext context,String token)async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Account/GetUsersExceptClientDropdown",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Account/GetUsersExceptClientDropdown"),headers:{"Authorization":"Bearer "+token});
       var data= jsonDecode(response.body);
       if(response.statusCode==200){
         pd.dismiss();
@@ -918,7 +981,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "RequestClientId":clientId,
       },toEncodable: Utils.myEncode);
       print(body);
-      var response=await http.post(Utils.getBaseUrl()+"Request/UsersForClientsRejectSave",body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/UsersForClientsRejectSave"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
         Utils.showSuccess(context,"User Alloted");
@@ -931,13 +994,15 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       pd.dismiss();
       Utils.showError(context, e.toString());
       print(e);
+    }finally{
+      pd.dismiss();
     }
   }
   static Future<String> getAssignedRejectedModels(BuildContext context,String token,int PageSize,int PageNumber)async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber"),headers:{"Authorization":"Bearer "+token});
 
       if(response.statusCode==200){
         pd.dismiss();
@@ -960,7 +1025,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token});
 
       if(response.statusCode==200){
         pd.dismiss();
@@ -973,6 +1038,8 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.dismiss();
     }
     return null;
   }
@@ -980,7 +1047,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
         Utils.showSuccess(context,"Request Status Changed");
@@ -1000,7 +1067,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId&just=$isJustified",headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId&just=$isJustified"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
         Utils.showSuccess(context,"Request Status Changed");
@@ -1021,7 +1088,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     pd.show();
     try{
       print(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber");
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -1043,7 +1110,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery",headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -1053,8 +1120,11 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         return null;
       }
     }catch(e){
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.dismiss();
     }
     return null;
   }
@@ -1062,7 +1132,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Utils.getBaseUrl()+"Request/ChangeClientExpectedVisitDate?Id="+id.toString()+"&ClientVisitDate="+newDate.toString(),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/ChangeClientExpectedVisitDate?Id="+id.toString()+"&ClientVisitDate="+newDate.toString()),headers:{"Authorization":"Bearer "+token});
       if(response.statusCode==200){
         pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
@@ -1073,8 +1143,11 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         return null;
       }
     }catch(e){
+      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
+    }finally{
+      pd.dismiss();
     }
     return null;
   }

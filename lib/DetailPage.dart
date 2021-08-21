@@ -375,19 +375,18 @@ class _DetailPageState extends State<DetailPage>{
                                                 var image = await boundary.toImage();
                                                 ByteData byteData = await image.toByteData(format: ImageByteFormat.png);
                                                 Uint8List pngBytes = byteData.buffer.asUint8List();
-                                                final PdfImage img = await pdfImageFromImageProvider(pdf: doc.document, image: MemoryImage(pngBytes));
-                                                final PdfImage imgLogo = await pdfImageFromImageProvider(pdf: doc.document, image: AssetImage("Assets/img/AC.png"));
+                                                final PdfImage img = PdfImage.file(doc.document, bytes: pngBytes);
+                                                final  imgLogo = await imageFromAssetBundle("Assets/img/AC.png");
                                                 doc.addPage(pw.Page(
                                                     build: (pw.Context context) {
                                                       return pw.Column(
                                                         children: [
-
                                                           pw.Center(
                                                               child: pw.Image(imgLogo,width: 150,height:150)
                                                           ),
                                                           pw.Padding(padding: pw.EdgeInsets.all(8.0)),
                                                           pw.Center(
-                                                              child: pw.Image(img,width: 100,height:100)
+                                                              child: pw.Image(pw.ImageProxy(img),width: 100,height: 100)
                                                           ),
                                                           pw.Padding(padding: pw.EdgeInsets.all(8.0)),
                                                           pw.Center(

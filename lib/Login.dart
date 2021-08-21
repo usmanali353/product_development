@@ -1,6 +1,10 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'DetailsPage.dart';
+import 'Network_Operations/DynamicLinkService.dart';
 import 'Utils/Utils.dart';
 
 class Login extends StatefulWidget {
@@ -14,9 +18,24 @@ class _LoginState extends State<Login> {
   bool isVisible=true;
   @override
   void initState() {
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      if(message.data!=null){
+        print("Message Data "+message.data["RequestId"]);
+        if(message.data["RequestId"]!=null){
+          SharedPreferences.getInstance().then((prefs){
+            Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"),int.parse(message.data["RequestId"])).then((req){
+              Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
+            });
+          });
+        }
+      }
+    });
+    DynamicLinkService.handleDynamicLinks(context);
+
     username=TextEditingController();
     password=TextEditingController();
     Utils.setupQuickActions(context);
+
     super.initState();
   }
 

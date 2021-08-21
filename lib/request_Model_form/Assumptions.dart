@@ -2,18 +2,17 @@ import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
+import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Specifications.dart';
 
 class Assumptions extends StatefulWidget {
- bool isUpdate;
- Assumptions({isUpdate});
+  Request request;
+ Assumptions({this.request});
   @override
-
   _AssumptionsState createState() => _AssumptionsState();
-
 }
 
 
@@ -40,7 +39,7 @@ class _AssumptionsState extends State<Assumptions> {
 
   List<dynamic> selectedClientNames=[];
 
-  String selectedMarket,selectedClient="Client 1";
+  String selectedMarket,selectedClient;
 
   String clientId;
 
@@ -49,37 +48,60 @@ class _AssumptionsState extends State<Assumptions> {
   void initState() {
 
     event=TextEditingController();
-
+    if(widget.request!=null&&widget.request.event!=null){
+      event.text=widget.request.event;
+    }
     SharedPreferences.getInstance().then((prefs){
 
-     Network_Operations.getDropDowns(context, prefs.getString("token"), "Markets").then((marketDropDown){
+      Network_Operations.getDropDowns(context, prefs.getString("token"), "Markets").then((marketDropDown){
 
-       setState(() {
+        setState(() {
 
-         this.markets=marketDropDown;
+          this.markets=marketDropDown;
 
-         for(var market in markets){
+          for(var market in markets){
 
-           marketNames.add(market.name);
-         }
+            marketNames.add(market.name);
+          }
+          if(widget.request!=null){
+            selectedMarket=widget.request.marketName;
+            marketId=widget.request.marketId;
+          }
 
-         if(marketNames.length>0){
-           marketDropdownVisible=true;
-         }
-         Network_Operations.getDropDowns(context,prefs.getString("token"),"Clients").then((clientDropDown){
-           setState(() {
-             if(clients!=null){
-               this.clients=clientDropDown;
-               for(var c in clients){
-                 clientNames.add(c.name);
-               }
-             }
-           });
-         });
-       });
-     });
+          if(marketNames.length>0){
+            marketDropdownVisible=true;
+          }
+          Network_Operations.getDropDowns(context,prefs.getString("token"),"Clients").then((clientDropDown){
+            setState(() {
+              if(clients!=null){
+                this.clients=clientDropDown;
+                for(var c in clients){
+                  clientNames.add(c.name);
+                }
+                if(widget.request!=null) {
+                  if (widget.request.multipleClientNames != null && widget.request.multipleClientNames.length > 0) {
+                    if (widget.request.statusName == "Local Exclusive") {
+                      selectedClient = widget.request.multipleClientNames[0];
+                      clientId = clients[clientNames.indexOf(selectedClient)].stringId;
+                    } else {
+                      for (var c in widget.request.multipleClientNames) {
+                        selectedClientNames.add(c);
+                        selectedOptions.add(
+                            Chip(label: Text(
+                              c, overflow: TextOverflow.ellipsis,))
+                        );
+                        selectedClientIds.add(
+                            clients[clientNames.indexOf(c)].stringId);
+                      }
+                    }
+                  }
+                }
+              }
+            });
+          });
+        });
+      });
     });
-
     super.initState();
 
   }
@@ -119,10 +141,9 @@ class _AssumptionsState extends State<Assumptions> {
                 children: <Widget>[
 
                   //Market Dropdown
-
                   Visibility(
 
-                    visible: marketDropdownVisible,
+                    visible: marketDropdownVisible&&selectedMarket!=null,
 
                     child: Padding(
 
@@ -140,9 +161,11 @@ class _AssumptionsState extends State<Assumptions> {
 
                         child: FormBuilderDropdown(
 
-                          attribute: "Market",
+                          name: "Market",
 
-                          validators: [FormBuilderValidators.required()],
+                          initialValue: selectedMarket,
+
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
 
                           hint: Text("Select Market"),
 
@@ -187,9 +210,74 @@ class _AssumptionsState extends State<Assumptions> {
                     ),
 
                   ),
+                  Visibility(
 
+                    visible: marketDropdownVisible&&selectedMarket==null,
+
+                    child: Padding(
+
+                      padding: const EdgeInsets.only(top: 16,left: 16,right:16),
+
+                      child: Card(
+
+                        elevation: 10,
+
+                        shape: RoundedRectangleBorder(
+
+                          borderRadius: BorderRadius.circular(15),
+
+                        ),
+
+                        child: FormBuilderDropdown(
+
+                          name: "Market",
+
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
+
+                          hint: Text("Select Market"),
+
+                          items:marketNames!=null?marketNames.map((horse)=>DropdownMenuItem(
+
+                            child: Text(horse),
+
+                            value: horse,
+
+                          )).toList():[""].map((name) => DropdownMenuItem(
+
+                              value: name, child: Text("$name")))
+
+                              .toList(),
+
+                          style: Theme.of(context).textTheme.bodyText1,
+
+                          decoration: InputDecoration(
+
+                            border: InputBorder.none,
+
+                            contentPadding: EdgeInsets.all(16),
+
+                          ),
+
+                          onChanged: (value){
+
+                            setState(() {
+
+                              this.selectedMarket=value;
+
+                              this.marketId=markets[marketNames.indexOf(value)].id;
+
+                            });
+
+                          },
+
+                        ),
+
+                      ),
+
+                    ),
+
+                  ),
                   // Event TextBox
-
                   Padding(
 
                     padding: EdgeInsets.only(top: 16,left: 16,right: 16,bottom: 16),
@@ -208,9 +296,9 @@ class _AssumptionsState extends State<Assumptions> {
 
                         controller: event,
 
-                        attribute: "Event",
+                        name: "Event",
 
-                        validators: [FormBuilderValidators.required()],
+                        validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
 
                         decoration: InputDecoration(hintText: "Event",
 
@@ -225,9 +313,9 @@ class _AssumptionsState extends State<Assumptions> {
                     ),
 
                   ),
-                    // Client Dropdown
+                  // Client Dropdown
                   Visibility(
-                    visible:selectedMarket!=null&&selectedMarket=="Local Exclusive",
+                    visible:selectedMarket!=null&&selectedMarket=="Local Exclusive"&&selectedClient==null,
                     child: Padding(
 
                       padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
@@ -244,9 +332,9 @@ class _AssumptionsState extends State<Assumptions> {
 
                         child: FormBuilderDropdown(
 
-                          attribute: "Client",
+                          name: "Client",
 
-                          validators: [FormBuilderValidators.required()],
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
 
                           hint: Text("Select Client"),
 
@@ -286,6 +374,69 @@ class _AssumptionsState extends State<Assumptions> {
 
                     ),
                   ),
+                  Visibility(
+                    visible:selectedMarket!=null&&selectedMarket=="Local Exclusive"&&selectedClient!=null,
+                    child: Padding(
+
+                      padding: const EdgeInsets.only(left: 16,right:16,bottom: 16),
+
+                      child: Card(
+
+                        elevation: 10,
+
+                        shape: RoundedRectangleBorder(
+
+                          borderRadius: BorderRadius.circular(15),
+
+                        ),
+
+                        child: FormBuilderDropdown(
+
+                          name: "Client",
+
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
+
+                          hint: Text("Select Client"),
+
+                          initialValue: selectedClient,
+
+                          items:clientNames!=null?clientNames.map((horse)=>DropdownMenuItem(
+
+                            child: Text(horse),
+
+                            value: horse,
+
+                          )).toList():[""].map((name) => DropdownMenuItem(
+
+                              value: name, child: Text("$name")))
+
+                              .toList(),
+
+                          style: Theme.of(context).textTheme.bodyText1,
+
+                          decoration: InputDecoration(
+
+                            border: InputBorder.none,
+
+                            contentPadding: EdgeInsets.all(16),
+
+                          ),
+
+                          onChanged: (value){
+
+                            setState(() {
+                              this.clientId =clients[clientNames.indexOf(value)].stringId;
+                            });
+
+                          },
+
+                        ),
+
+                      ),
+
+                    ),
+                  ),
+                  //Client Multiselect
                   Visibility(
                     visible:selectedMarket!=null&&selectedMarket!="Local Exclusive",
                     child: Padding(
@@ -352,6 +503,7 @@ class _AssumptionsState extends State<Assumptions> {
                       ),
                     ),
                   ),
+                  //Proceed Button
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Center(
@@ -370,10 +522,17 @@ class _AssumptionsState extends State<Assumptions> {
                             if(selectedClientIds==null||selectedClientIds.length==0){
                               Utils.showError(context,"Please Select one or more Client");
                             }else {
-                              Navigator.push(context, MaterialPageRoute(
-                                  builder: (context) =>
-                                      Specifications(marketId, event.text,
-                                          selectedClientIds)));
+                              if(widget.request==null) {
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) =>
+                                        Specifications(marketId, event.text,
+                                            selectedClientIds)));
+                              }else{
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) =>
+                                        Specifications(marketId, event.text,
+                                            selectedClientIds,request: widget.request,)));
+                              }
                             }
                           }
                         },
@@ -402,6 +561,7 @@ class _AssumptionsState extends State<Assumptions> {
         context,
         height: 480,
         listData: clientNames,
+        selectedListData: selectedClientNames,
         headerTextColor: Color(0xFF004c4c),
         choiceChipLabel: (item){
           return item;

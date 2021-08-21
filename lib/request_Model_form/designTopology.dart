@@ -3,29 +3,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:multiselect_formfield/multiselect_formfield.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
+import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Suitability.dart';
 class designTopology extends StatefulWidget {
+  Request request;
   var market,event,other,size,surfaceId,thickness,classification,color,myClients;
   List<dynamic> sizesList=[],colorsList=[],colorsDropDown=[],colorNames=[];
-  designTopology(this.market, this.event, this.sizesList,
-      this.surfaceId, this.thickness, this.classification, this.colorsList,this.myClients,this.colorsDropDown);
+  designTopology(
+      this.market,
+      this.event,
+      this.sizesList,
+      this.surfaceId,
+      this.thickness,
+      this.classification,
+      this.colorsList,
+      this.myClients,
+      this.colorsDropDown,
+      {this.request}
+      );
 
   @override
-  _designTopologyState createState() => _designTopologyState(market,event,sizesList,surfaceId,thickness,classification,colorsList,myClients,colorsDropDown);
+  _designTopologyState createState() => _designTopologyState(market,event,sizesList,surfaceId,thickness,classification,colorsList,myClients,colorsDropDown,request: this.request);
 }
 
 class _designTopologyState extends State<designTopology> {
-  List _myMaterials,myClients;
+  List myClients;
+  Request request;
   bool designTopologyDropDownVisible=false;
   final formKey = new GlobalKey<FormState>();
   bool rangeDropdownVisible=false,technologyDropdownVisible=false,edgeDropdownVisible=false,structureDropdownVisible=false;
  List<Dropdown> designTopology=[], range=[], material=[],structure=[], edge=[],technology=[];
  List<String> designTopologyName=[], rangeName=[], materialName=[],structureName=[], edgeName=[],technologyName=[],colorNames=[],selectedDesigntopologyIds=[];
- List<dynamic> designTopologies=[],sizesList=[],colorsList=[],colorsDropDown=[],electedDesigntopologyName=[];
+ List<dynamic> designTopologies=[],sizesList=[],colorsList=[],colorsDropDown=[],selectedDesigntopologyName=[];
  List<Widget> selectedDesignTopologyoptions=[];
  var market,event,other,size,surfaceId,name,thickness,classification,color;
 String selected_technology, selected_structure, selected_edge,selected_range, selected_material;
@@ -41,6 +54,7 @@ int range_id, material_id,technology_id, structure_id, edge_id;
       this.colorsList,
       this.myClients,
      this.colorsDropDown,
+     {this.request}
      );
 
   @override
@@ -60,6 +74,17 @@ int range_id, material_id,technology_id, structure_id, edge_id;
           }
           if(designTopologyName.length>0){
             designTopologyDropDownVisible=true;
+            if(request!=null){
+              if(request.multipleDesignTopoligyNames!=null&&request.multipleDesignTopoligyNames.length>0){
+                for(var dt in request.multipleDesignTopoligyNames){
+                  selectedDesigntopologyName.add(dt);
+                  selectedDesignTopologyoptions.add(
+                      Chip(label: Text(dt,overflow: TextOverflow.ellipsis,))
+                  );
+                  selectedDesigntopologyIds.add(designTopology[designTopologyName.indexOf(dt)].id.toString());
+                }
+              }
+            }
           }
           Network_Operations.getDropDowns(context, prefs.getString("token"), "Ranges").then((rangeDropDown){
             setState(() {
@@ -69,6 +94,12 @@ int range_id, material_id,technology_id, structure_id, edge_id;
               }
               if(rangeName.length>0){
                 rangeDropdownVisible=true;
+                if(request!=null){
+                  if(request.rangeName!=null&&request.rangeId!=null){
+                    selected_range=request.rangeName;
+                    range_id=request.rangeId;
+                  }
+                }
               }
             });
 
@@ -81,6 +112,12 @@ int range_id, material_id,technology_id, structure_id, edge_id;
               }
               if(technologyName.length>0){
                 technologyDropdownVisible=true;
+                if(request!=null){
+                  if(request.technologyName!=null&&request.technologyId!=null){
+                    selected_technology=request.technologyName;
+                    technology_id=request.technologyId;
+                  }
+                }
               }
             });
 
@@ -93,6 +130,12 @@ int range_id, material_id,technology_id, structure_id, edge_id;
               }
               if(structureName.length>0){
                 structureDropdownVisible=true;
+                if(request!=null){
+                  if(request.structureName!=null&&request.structureId!=null){
+                    selected_structure=request.structureName;
+                    structure_id=request.structureId;
+                  }
+                }
               }
             });
 
@@ -105,6 +148,12 @@ int range_id, material_id,technology_id, structure_id, edge_id;
               }
               if(edgeName.length>0){
                 edgeDropdownVisible=true;
+                if(request!=null){
+                  if(request.edgeName!=null&&request.edgeId!=null){
+                    selected_edge=request.edgeName;
+                    edge_id=request.edgeId;
+                  }
+                }
               }
             });
 
@@ -136,6 +185,7 @@ int range_id, material_id,technology_id, structure_id, edge_id;
               key: fbkey,
               child: Column(
                 children: <Widget>[
+                  //Product Design Topologies
                   Visibility(
                     visible: designTopologyDropDownVisible,
                     child: InkWell(
@@ -185,7 +235,7 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                                     ],
                                   ),
                                 ),
-                                electedDesigntopologyName.length > 0
+                                selectedDesigntopologyName.length > 0
                                     ? Wrap(
                                   spacing: 8.0,
                                   runSpacing: 0.0,
@@ -202,11 +252,9 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                       ),
                     ),
                   ),
-                  //Product Materials
-
                   //Product Range
                   Visibility(
-                    visible: rangeDropdownVisible,
+                    visible: rangeDropdownVisible&&selected_range==null,
                     child: Padding(
                       padding: const EdgeInsets.only(top: 16,left: 16,right:16),
                       child: Card(
@@ -215,8 +263,8 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: FormBuilderDropdown(
-                          attribute: "Range",
-                          validators: [FormBuilderValidators.required()],
+                          name: "Range",
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                           hint: Text("Select Range"),
                           items:rangeName!=null?rangeName.map((horse)=>DropdownMenuItem(
                             child: Text(horse),
@@ -239,19 +287,54 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                       ),
                     ),
                   ),
-                  //Product Technology
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16,left: 16,right:16),
-                    child: Visibility(
-                       visible: technologyDropdownVisible,
+                  Visibility(
+                    visible: rangeDropdownVisible&&selected_range!=null,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16,left: 16,right:16),
                       child: Card(
                         elevation: 10,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: FormBuilderDropdown(
-                          attribute: "Technology",
-                          validators: [FormBuilderValidators.required()],
+                          name: "Range",
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
+                          hint: Text("Select Range"),
+                          initialValue: selected_range,
+                          items:rangeName!=null?rangeName.map((horse)=>DropdownMenuItem(
+                            child: Text(horse),
+                            value: horse,
+                          )).toList():[""].map((name) => DropdownMenuItem(
+                              value: name, child: Text("$name")))
+                              .toList(),
+                          style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.all(16),
+                          ),
+                          onChanged: (value){
+                            setState(() {
+                              this.selected_range=value;
+                              this.range_id=range[rangeName.indexOf(value)].id;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  //Product Technology
+                  Visibility(
+                     visible: technologyDropdownVisible&&selected_technology==null,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top:16,left: 18,right:16),
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: FormBuilderDropdown(
+                          name: "Technology",
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                           hint: Text("Select Technology"),
                           items:technologyName!=null?technologyName.map((horse)=>DropdownMenuItem(
                             child: Text(horse),
@@ -274,19 +357,54 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                       ),
                     ),
                   ),
-                  //Product Structure
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16,right: 16,left: 16),
-                    child: Visibility(
-                       visible: structureDropdownVisible,
+                  Visibility(
+                    visible: technologyDropdownVisible&&selected_technology!=null,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16,left: 16,right: 16),
                       child: Card(
                         elevation: 10,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: FormBuilderDropdown(
-                          attribute: "Structure",
-                          validators: [FormBuilderValidators.required()],
+                          name: "Technology",
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
+                          hint: Text("Select Technology"),
+                          initialValue: selected_technology,
+                          items:technologyName!=null?technologyName.map((horse)=>DropdownMenuItem(
+                            child: Text(horse),
+                            value: horse,
+                          )).toList():[""].map((name) => DropdownMenuItem(
+                              value: name, child: Text("$name")))
+                              .toList(),
+                          style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            border:InputBorder.none,
+                            contentPadding: EdgeInsets.all(16),
+                          ),
+                          onChanged: (value){
+                            setState(() {
+                              this.selected_technology=value;
+                              this.technology_id=technology[technologyName.indexOf(value)].id;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  //Product Structure
+                  Visibility(
+                     visible: structureDropdownVisible&&selected_structure==null,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16,left: 16,right: 16),
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: FormBuilderDropdown(
+                          name: "Structure",
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                           hint: Text("Select Structure"),
                           items:structureName!=null?structureName.map((horse)=>DropdownMenuItem(
                             child: Text(horse),
@@ -309,19 +427,54 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                       ),
                     ),
                   ),
-                  //Edge
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16,left: 16,right:16),
-                    child: Visibility(
-                       visible: edgeDropdownVisible,
+                  Visibility(
+                    visible: structureDropdownVisible&&selected_structure!=null,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16,left: 16,right: 16),
                       child: Card(
                         elevation: 10,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: FormBuilderDropdown(
-                          attribute: "Edge",
-                          validators: [FormBuilderValidators.required()],
+                          name: "Structure",
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
+                          hint: Text("Select Structure"),
+                          initialValue: selected_structure,
+                          items:structureName!=null?structureName.map((horse)=>DropdownMenuItem(
+                            child: Text(horse),
+                            value: horse,
+                          )).toList():[""].map((name) => DropdownMenuItem(
+                              value: name, child: Text("$name")))
+                              .toList(),
+                          style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.all(16)
+                          ),
+                          onChanged: (value){
+                            setState(() {
+                              this.selected_structure=value;
+                              this.structure_id=structure[structureName.indexOf(value)].id;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  //Edge
+                  Visibility(
+                     visible: edgeDropdownVisible&&selected_edge==null,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top:16,right: 16,left: 16),
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: FormBuilderDropdown(
+                          name: "Edge",
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                           hint: Text("Select Edge"),
                           items:edgeName!=null?edgeName.map((horse)=>DropdownMenuItem(
                             child: Text(horse),
@@ -344,7 +497,42 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                       ),
                     ),
                   ),
-
+                  Visibility(
+                    visible: edgeDropdownVisible&&selected_edge!=null,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 16,left: 16,right: 16),
+                      child: Card(
+                        elevation: 10,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: FormBuilderDropdown(
+                          name: "Edge",
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
+                          hint: Text("Select Edge"),
+                          initialValue: selected_edge,
+                          items:edgeName!=null?edgeName.map((horse)=>DropdownMenuItem(
+                            child: Text(horse),
+                            value: horse,
+                          )).toList():[""].map((name) => DropdownMenuItem(
+                              value: name, child: Text("$name")))
+                              .toList(),
+                          style: Theme.of(context).textTheme.bodyText1,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.all(16),
+                          ),
+                          onChanged: (value){
+                            setState(() {
+                              this.selected_edge=value;
+                              this.edge_id=edge[edgeName.indexOf(value)].id;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  //Proceed Button
                   Center(
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -356,24 +544,45 @@ int range_id, material_id,technology_id, structure_id, edge_id;
                             if(selectedDesigntopologyIds==null||selectedDesigntopologyIds.length==0){
                               Utils.showError(context,"Please Select one or more Design Topologies");
                             }else {
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) =>
-                                      Suitability(
-                                        market,
-                                        event,
-                                        sizesList,
-                                        surfaceId,
-                                        thickness,
-                                        classification,
-                                        colorsList,
-                                        technology_id,
-                                        structure_id,
-                                        edge_id,
-                                        range_id,
-                                        selectedDesigntopologyIds,
-                                        myClients,
-                                        colorsDropDown,
-                                      )));
+                              if(widget.request==null) {
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) =>
+                                        Suitability(
+                                          market,
+                                          event,
+                                          sizesList,
+                                          surfaceId,
+                                          thickness,
+                                          classification,
+                                          colorsList,
+                                          technology_id,
+                                          structure_id,
+                                          edge_id,
+                                          range_id,
+                                          selectedDesigntopologyIds,
+                                          myClients,
+                                          colorsDropDown,
+                                        )));
+                              }else
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) =>
+                                        Suitability(
+                                          market,
+                                          event,
+                                          sizesList,
+                                          surfaceId,
+                                          thickness,
+                                          classification,
+                                          colorsList,
+                                          technology_id,
+                                          structure_id,
+                                          edge_id,
+                                          range_id,
+                                          selectedDesigntopologyIds,
+                                          myClients,
+                                          colorsDropDown,
+                                          request: request,
+                                        )));
                             }
                           }
                         },
@@ -393,6 +602,7 @@ int range_id, material_id,technology_id, structure_id, edge_id;
         context,
         height: 480,
         listData: designTopologyName,
+        selectedListData: selectedDesigntopologyName,
         headerTextColor: Color(0xFF004c4c),
         choiceChipLabel: (item){
           return item;
@@ -423,15 +633,15 @@ int range_id, material_id,technology_id, structure_id, edge_id;
         onApplyButtonClick: (list) {
           if (list != null) {
             setState(() {
-              electedDesigntopologyName.clear();
+              selectedDesigntopologyName.clear();
               selectedDesignTopologyoptions.clear();
               selectedDesigntopologyIds.clear();
-              this.electedDesigntopologyName = list;
-              for(int i=0;i<electedDesigntopologyName.length;i++){
+              this.selectedDesigntopologyName = list;
+              for(int i=0;i<selectedDesigntopologyName.length;i++){
                 selectedDesignTopologyoptions.add(
-                    Chip(label: Text(electedDesigntopologyName[i],overflow: TextOverflow.ellipsis,))
+                    Chip(label: Text(selectedDesigntopologyName[i],overflow: TextOverflow.ellipsis,))
                 );
-                selectedDesigntopologyIds.add(designTopology[designTopologyName.indexOf(electedDesigntopologyName[i])].id.toString());
+                selectedDesigntopologyIds.add(designTopology[designTopologyName.indexOf(selectedDesigntopologyName[i])].id.toString());
                 print(selectedDesigntopologyIds.toString());
               }
             });

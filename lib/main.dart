@@ -1,15 +1,19 @@
 import 'dart:io';
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:productdevelopment/Login.dart';
 import 'package:productdevelopment/Dashboard.dart';
+import 'package:productdevelopment/Network_Operations/DynamicLinkService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'Network_Operations/MyHttpOverrides.dart';
-import 'OldDashboard.dart';
+import 'Network_Operations/Network_Operations.dart';
 import 'Utils/Utils.dart';
-import 'package:productdevelopment/RejectedModelsActions.dart';
-void main() {
+
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   //HttpOverrides.global = new MyHttpOverrides();
   runApp(MyApp());
 }
@@ -33,7 +37,7 @@ class _MyAppState extends State<MyApp> {
   @override
 
   void initState(){
-
+    super.initState();
     myColor = MaterialColor(0xFF004c4c, color);
 
     SharedPreferences.getInstance().then((prefs){
@@ -47,15 +51,25 @@ class _MyAppState extends State<MyApp> {
           setState(() {
             isLogin=true;
           });
-
+        }else{
+          if(Platform.isAndroid){
+            SharedPreferences.getInstance().then((prefs){
+              FirebaseMessaging.instance.getToken().then((fcmToken){
+                Network_Operations.deleteFCMToken(context, claims["nameid"],fcmToken, prefs.getString("token")).then((value){
+                  prefs.remove("token");
+                });
+              });
+            });
+          }else{
+            SharedPreferences.getInstance().then((prefs){
+              prefs.remove("token");
+            });
+          }
         }
 
       }
 
     });
-
-    super.initState();
-
   }
 
   Map<int, Color> color =

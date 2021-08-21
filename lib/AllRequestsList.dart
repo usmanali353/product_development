@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/RequestColorsList.dart';
+import 'package:productdevelopment/request_Model_form/Assumptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ApproveForTrial.dart';
 import 'DetailsPage.dart';
@@ -368,6 +369,8 @@ class _AllRequestListState extends State<AllRequestList> {
                                         PopupMenuItem<String>(
                                             child: const Text('Change Status'), value: 'changeStatus'),
                                         PopupMenuItem<String>(
+                                            child: const Text('Update Request'), value: 'updateRequest'),
+                                        PopupMenuItem<String>(
                                             child: const Text('Add Images'), value: 'addImage'),
                                         PopupMenuItem<String>(
                                             child: const Text('See Details'), value: 'Details'),
@@ -383,6 +386,12 @@ class _AllRequestListState extends State<AllRequestList> {
                                         });
                                       }else if(selectedItem=="addImage"){
                                         Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(allRequests[index])));
+                                      }else if(selectedItem=='updateRequest'){
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"), allRequests[index].requestId).then((req){
+                                            Navigator.push(context,MaterialPageRoute(builder:(context)=>Assumptions(request: req,)));
+                                          });
+                                        });
                                       }
                                     });
                                   }else if(isClient){
@@ -767,7 +776,7 @@ class _AllRequestListState extends State<AllRequestList> {
       onPressed: () {
         Navigator.pop(context);
         SharedPreferences.getInstance().then((prefs){
-          Network_Operations.getRequestById(context, prefs.getString("token"),request.id);
+          Network_Operations.getRequestById(context, prefs.getString("token"),request.requestId);
         });
       },
     );
@@ -841,7 +850,8 @@ class _AllRequestListState extends State<AllRequestList> {
       onPressed: () {
         Navigator.pop(context);
         SharedPreferences.getInstance().then((prefs){
-          Network_Operations.getRequestById(context, prefs.getString("token"),request.id);
+          print("Request Id "+request.requestId.toString());
+          Network_Operations.getRequestById(context, prefs.getString("token"),request.requestId);
         });
       },
     );

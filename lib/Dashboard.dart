@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:badges/badges.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:productdevelopment/DailyClientSchedule.dart';
 import 'package:productdevelopment/Notifications/NotificationListPage.dart';
@@ -11,7 +12,9 @@ import 'package:productdevelopment/RejectedModelsActions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'AllRequestsList.dart';
 import 'CustomerRejectionPageWithJustification.dart';
+import 'DetailsPage.dart';
 import 'ModelRequests.dart';
+import 'Network_Operations/DynamicLinkService.dart';
 import 'Network_Operations/Network_Operations.dart';
 import 'ProductionManagerRequests.dart';
 import 'Utils/Utils.dart';
@@ -28,71 +31,127 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
   FirebaseMessaging messaging;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
-
-  
   @override
   void onResume() {
-    Utils.check_connectivity().then((isConnected){
-      if(isConnected){
         WidgetsBinding.instance
             .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-      }else{
-        Utils.showError(context,"Network Not Available");
-      }
-    });
-
     super.onResume();
+  }
+  Future<void> _messageHandler(RemoteMessage message) async {
+    if(message.data!=null){
+      print("Message Data "+message.data["RequestId"]);
+      if(message.data["RequestId"]!=null){
+        SharedPreferences.getInstance().then((prefs){
+          Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"),int.parse(message.data["RequestId"])).then((req){
+            Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
+          });
+        });
+      }
+    }
   }
   @override
   void initState() {
-    Utils.check_connectivity().then((isConnected){
-      if(isConnected){
-        if(Platform.isAndroid){
-          messaging=FirebaseMessaging();
-          messaging.getToken().then((value) =>debugPrint(value));
-          messaging.configure(
-              onMessage:(Map<String, dynamic> message)async{
-                WidgetsBinding.instance
-                    .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                showOverlayNotification((context) {
-                  return Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    child: SafeArea(
-                      child: ListTile(
-                        leading:Icon(Icons.notifications,color: Theme.of(context).primaryColor,size: 40,),
-                        title: Text(message['notification']['title']),
-                        subtitle: Text(message['notification']['body']),
-                        onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
-                        },
-                        trailing: IconButton(
-                            icon: Icon(Icons.close),
-                            onPressed: () {
-                              OverlaySupportEntry.of(context).dismiss();
-                            }),
-                      ),
-                    ),
-                  );
-                }, duration: Duration(milliseconds: 5000));
-              },
-              onBackgroundMessage: Platform.isIOS ? null : Network_Operations.myBackgroundMessageHandler,
-              onResume: (Map<String, dynamic> message) async{
-                print(message.toString());
-              },
-              onLaunch: (Map<String, dynamic> message)async{
-                print(message.toString());
-              }
-          );
+    super.initState();
+    FirebaseMessaging.onBackgroundMessage(_messageHandler);
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      if(message.data!=null){
+        print("Message Data "+message.data["RequestId"]);
+        if(message.data["RequestId"]!=null){
+          SharedPreferences.getInstance().then((prefs){
+            Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"),int.parse(message.data["RequestId"])).then((req){
+              Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
+            });
+          });
         }
-
-        WidgetsBinding.instance
-            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-      }else{
-        Utils.showError(context,"Network Not Available");
       }
     });
+    DynamicLinkService.handleDynamicLinks(context);
+    if(Platform.isAndroid){
+      messaging=FirebaseMessaging.instance;
+      messaging.getToken().then((value) =>debugPrint(value));
+      //for OnLaunch
+      messaging..getInitialMessage().then((RemoteMessage message) {
+        if(message.data!=null){
+          print("Message Data "+message.data["RequestId"]);
+          if(message.data["RequestId"]!=null){
+            SharedPreferences.getInstance().then((prefs){
+              Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"),int.parse(message.data["RequestId"])).then((req){
+                Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
+              });
+            });
+          }
+        }
+      });
+      //for onMessage
+      FirebaseMessaging.onMessage.listen((RemoteMessage message)async{
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+        showOverlayNotification((context){
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            child: SafeArea(
+              child: ListTile(
+                leading:Icon(Icons.notifications,color: Theme.of(context).primaryColor,size: 40,),
+                title: Text(message.notification.title),
+                subtitle: Text(message.notification.body),
+                onTap: (){
+                  push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
+                },
+                trailing: IconButton(
+                    icon: Icon(Icons.close),
+                    onPressed: () {
+                      OverlaySupportEntry.of(context).dismiss();
+                    }),
+              ),
+            ),
+          );
+        }, duration: Duration(milliseconds: 5000));
+      });
 
-    super.initState();
+      // messaging.configure(
+      //     onMessage:(Map<String, dynamic> message)async{
+      //       WidgetsBinding.instance
+      //           .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+      //       showOverlayNotification((context) {
+      //         return Card(
+      //           margin: const EdgeInsets.symmetric(horizontal: 4),
+      //           child: SafeArea(
+      //             child: ListTile(
+      //               leading:Icon(Icons.notifications,color: Theme.of(context).primaryColor,size: 40,),
+      //               title: Text(message['notification']['title']),
+      //               subtitle: Text(message['notification']['body']),
+      //               onTap: (){
+      //                 push(context, MaterialPageRoute(builder: (context)=>NotificationListPage()));
+      //               },
+      //               trailing: IconButton(
+      //                   icon: Icon(Icons.close),
+      //                   onPressed: () {
+      //                     OverlaySupportEntry.of(context).dismiss();
+      //                   }),
+      //             ),
+      //           ),
+      //         );
+      //       }, duration: Duration(milliseconds: 5000));
+      //     },
+      //     onBackgroundMessage: Platform.isIOS ? null : Network_Operations.myBackgroundMessageHandler,
+      //     onResume: (Map<String, dynamic> message) async{
+      //       print(message.toString());
+      //     },
+      //     onLaunch: (Map<String, dynamic> message)async{
+      //       print(message.toString());
+      //     }
+      // );
+    }
+
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+    // Utils.check_connectivity().then((isConnected){
+    //   if(isConnected){
+    //
+    //   }else{
+    //     Utils.showError(context,"Network Not Available");
+    //   }
+    // });
   }
 
 
@@ -209,7 +268,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
           return Utils.check_connectivity().then((isConnected){
             if(isConnected){
               SharedPreferences.getInstance().then((prefs){
-                setState(() {
+                setState(() async{
                   claims=Utils.parseJwt(prefs.getString("token"));
                   if(!claims['role'].contains("Client")) {
                     Network_Operations.getRequestCount(context, prefs.getString("token")).then((requestCountMap){
@@ -217,6 +276,13 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         this.requestCount=requestCountMap['statuses'];
                         this.currentUserRoles=requestCountMap['currentLoggedInUserStatuses'];
                         this.notificationCount=requestCountMap['notificationsCount'];
+                        FlutterAppBadger.isAppBadgeSupported().then((isSupported){
+                          if(isSupported){
+                            if(notificationCount!=null&&notificationCount['Unread Notifications Count']!=null){
+                              FlutterAppBadger.updateBadgeCount(notificationCount['Unread Notifications Count']);
+                            }
+                          }
+                        });
                       });
                     });
                   }else{
@@ -224,6 +290,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                       setState(() {
                         this.requestCount=requestCountMap['statuses'];
                         this.currentUserRoles=requestCountMap['currentLoggedInUserStatuses'];
+
                       });
                     });
                   }

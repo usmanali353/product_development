@@ -78,9 +78,9 @@ class _ObservationsState extends State<Observations> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: FormBuilderTextField(
-                        attribute: "Remarks",
+                        name: "Remarks",
                         controller: remarks,
-                        validators: [FormBuilderValidators.required()],
+                        validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                         maxLines: 8,
                         decoration: InputDecoration(
                           hintText: "Remarks",
@@ -100,10 +100,10 @@ class _ObservationsState extends State<Observations> {
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: FormBuilderDateTimePicker(
-                          attribute: "Visit Date",
+                          name: "Visit Date",
                           style: Theme.of(context).textTheme.bodyText1,
                           inputType: InputType.date,
-                          validators: [FormBuilderValidators.required()],
+                          validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                           format: DateFormat("MM-dd-yyyy"),
                           decoration: InputDecoration(hintText: "Visit Date",contentPadding: EdgeInsets.all(16),border: InputBorder.none),
                           onChanged: (value){
@@ -126,9 +126,9 @@ class _ObservationsState extends State<Observations> {
                   //       ),
                   //       child: FormBuilderDropdown(
                   //
-                  //         attribute: "Rejection Reason",
+                  //         name: "Rejection Reason",
                   //
-                  //         validators: [FormBuilderValidators.required()],
+                  //         validator: FormBuilderValidators.required(context,errorText: "This Field is Required"),
                   //
                   //         hint: Text("Select Rejection Reason"),
                   //
@@ -288,10 +288,13 @@ class _ObservationsState extends State<Observations> {
                 element.toLowerCase().contains(text.toLowerCase()))
                 .toList();
           }
+          else{
+            return [];
+          }
         },
         borderRadius: 20,
 
-        selectedTextBackgroundColor: Colors.teal,
+        selectedTextBackgroundColor: Color(0xFF004c4c),
         //allResetButonColor: Color(0xFF004c4c),
         applyButonTextBackgroundColor: Color(0xFF004c4c),
         //headerTextColor: Color(0xFF004c4c),
