@@ -145,6 +145,7 @@ class Utils{
         });
       }
       } catch (e) {
+
       Flushbar(
         message: e,
         duration: Duration(seconds: 5),
