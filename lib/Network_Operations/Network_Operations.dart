@@ -20,7 +20,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     pd.show();
     var body=jsonEncode({"email":email,"password":password});
     try{
-    var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Account/Login"),body:body,headers: {"Content-type":"application/json"});
+    var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Account/Login"),body:body,headers: {"Content-type":"application/json"}).timeout(
+    Duration(minutes: 1),
+    onTimeout: () {
+    // Time has run out, do what you wanted to do.
+    return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+    },
+    );
     print(response.statusCode);
      if(response.statusCode==200){
        SharedPreferences.getInstance().then((prefs){
@@ -74,7 +80,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   }
   static Future<List<Dropdown>> getDropDowns(BuildContext context,String token,String endpoint)async{
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Configuration/"+endpoint+"Dropdown"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Configuration/"+endpoint+"Dropdown"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       var data= jsonDecode(response.body);
       if(response.statusCode==200){
         List<Dropdown> list=List();
@@ -95,7 +107,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   }
   static Future<List<Request>> getRequest(BuildContext context,String token)async{
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequests"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequests"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );;
       if(response.statusCode==200){
         List<Request> requests=[];
         for(int i=0;i<jsonDecode(response.body)['response'].length;i++){
@@ -205,7 +223,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       if(response.statusCode==200){
         pd.dismiss();
         Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
-        Utils.showSuccess(context, "Request Created Successfully");
+        Utils.showSuccess(context, "Request Updated Successfully");
       }else{
         pd.dismiss();
         print(response.body.toString());
@@ -478,11 +496,18 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
     return null;
   }
-  static Future<Map<String,dynamic>> getRequestCount(BuildContext context,String token)async{
+  static Future<Map<String,dynamic>> getRequestCount(BuildContext context,String token,{String startDate,String endDate})async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show(useSafeArea: false);
+    String url;
+    if(startDate!=null&&endDate!=null){
+      url=Utils.getBaseUrl()+"Request/GetRequestsCountForDashboard?StartDate=$startDate&EndDate=$endDate";
+      print(url);
+    }else{
+      url=Utils.getBaseUrl()+"Request/GetRequestsCountForDashboard";
+    }
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestsCountForDashboard"),headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.get(Uri.parse(url),headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
       if(response.statusCode==200){
         pd.dismiss();
         print(response.body.toString());
@@ -1150,5 +1175,35 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       pd.dismiss();
     }
     return null;
+  }
+  static Future<dynamic> checkUpdate()async{
+    try{
+      var response= await http.get(Uri.parse("https://drive.google.com/uc?export=download&id=1z-tOeG4egZl6iFWj8BNmDN6CuyGDAfqz"));
+      if(response.statusCode==200){
+        return jsonDecode(response.body);
+      }
+    }catch(e){
+      print(e.toString());
+    }
+    return null;
+  }
+  static Future<void> deleteRequestById(BuildContext context,String token,int requestId)async{
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
+    pd.show();
+    try{
+      var response=await http.delete(Uri.parse(Utils.getBaseUrl()+"Request/DeleteRequestById/$requestId"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      if(response.statusCode==200){
+        pd.dismiss();
+      }else{
+        pd.dismiss();
+        Utils.showError(context, response.body.toString());
+      }
+    }catch(e){
+      pd.dismiss();
+      print(e);
+      Utils.showError(context, e.toString());
+    }finally{
+      pd.dismiss();
+    }
   }
 }

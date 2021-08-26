@@ -118,7 +118,9 @@ dependencies:
 
   internet_connection_checker: ^0.0.1+2
 
+  package_info_plus: ^1.0.5
 
+  r_upgrade: ^0.3.5
 
 dev_dependencies:
 

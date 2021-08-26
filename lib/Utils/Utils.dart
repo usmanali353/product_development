@@ -35,8 +35,9 @@ class Utils{
     return regExp.hasMatch(value);
   }
   static String getBaseUrl(){
-   // return "http://192.236.147.77:8086/api/";
-    return "http://productapi.arabian-ceramics.com/api/";
+    //return "http://173.212.235.106:8900/api/";
+    //return "http://productapi.arabian-ceramics.com/api/";
+    return "http://192.168.10.13:45456/api/";
   }
  static void showError(BuildContext context,String message) {
    Flushbar(

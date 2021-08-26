@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/AddClientsForTrial.dart';
 import 'package:productdevelopment/ApproveForTrial.dart';
+import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/DetailsPage.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
@@ -419,6 +420,8 @@ class _ModelReState extends State<ModelRequests>{
                                         PopupMenuItem<String>(
                                             child: const Text('Update Request'), value: 'updateRequest'),
                                         PopupMenuItem<String>(
+                                            child: const Text('Delete Request'), value: 'deleteRequest'),
+                                        PopupMenuItem<String>(
                                             child: const Text('Add Images'), value: 'addImage'),
                                         PopupMenuItem<String>(
                                             child: const Text('See Details'), value: 'Details'),
@@ -438,6 +441,13 @@ class _ModelReState extends State<ModelRequests>{
                                         SharedPreferences.getInstance().then((prefs){
                                           Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"), products[index].requestId).then((req){
                                             Navigator.push(context,MaterialPageRoute(builder:(context)=>Assumptions(request: req,)));
+                                          });
+                                        });
+                                      }else if(selectedItem=="deleteRequest"){
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.deleteRequestById(context, prefs.getString("token"), products[index].requestId).then((req){
+                                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder:(context)=>Dashboard()), (route) => false);
+                                            Utils.showSuccess(context,"Request Deleted Successfully");
                                           });
                                         });
                                       }

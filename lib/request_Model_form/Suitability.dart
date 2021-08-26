@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -68,6 +69,7 @@ class _Suitability_State extends State<Suitability> {
          for(RequestColors mc in widget.request.multipleColorNames){
            if(mc.colorImage!=null){
              selected_color=mc.colorName;
+             colorID=mc.colorId;
              return;
            }
          }
@@ -85,7 +87,13 @@ class _Suitability_State extends State<Suitability> {
        colorName.add(colorDropDown[colorIds.indexOf(colorsList[i])]['display']);
      });
    }
-   print(colorName);
+   print("Color names List from suitibility "+colorName.toString());
+   if(!colorName.contains(selected_color)){
+     setState(() {
+       selected_color=null;
+       colorID=null;
+     });
+   }
    SharedPreferences.getInstance().then((prefs){
      Network_Operations.getDropDowns(context, prefs.getString("token"), "GetSuitability").then((suitibilityDropDown){
        setState(() {
@@ -257,7 +265,8 @@ class _Suitability_State extends State<Suitability> {
                             margin: EdgeInsets.all(16),
                             height: 100,
                             width: 80,
-                            child: _image == null ? Text('No image selected.') : Image.file(_image),
+                            child: _image == null&&widget.request==null ? Text('No image selected.') :_image==null&&widget.request!=null?CachedNetworkImage(imageUrl:widget.request.image!=null?widget.request.image:"http://anokha.world/images/not-found.png",placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
+                              errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),):Image.file(_image),
                           ),
                           MaterialButton(
                             color: Color(0xFF004c4c),

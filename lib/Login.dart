@@ -1,6 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailsPage.dart';
@@ -18,6 +17,8 @@ class _LoginState extends State<Login> {
   bool isVisible=true;
   @override
   void initState() {
+    super.initState();
+    DynamicLinkService.handleDynamicLinks(context);
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       if(message.data!=null){
         print("Message Data "+message.data["RequestId"]);
@@ -30,13 +31,9 @@ class _LoginState extends State<Login> {
         }
       }
     });
-    DynamicLinkService.handleDynamicLinks(context);
-
     username=TextEditingController();
     password=TextEditingController();
     Utils.setupQuickActions(context);
-
-    super.initState();
   }
 
   @override

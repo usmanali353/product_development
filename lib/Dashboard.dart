@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'package:badges/badges.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
+import 'package:intl/intl.dart';
 import 'package:need_resume/need_resume.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:productdevelopment/DailyClientSchedule.dart';
 import 'package:productdevelopment/Notifications/NotificationListPage.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -9,12 +12,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:productdevelopment/RejectedModelsActions.dart';
+import 'package:r_upgrade/r_upgrade.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'AllRequestsList.dart';
 import 'CustomerRejectionPageWithJustification.dart';
 import 'DetailsPage.dart';
 import 'ModelRequests.dart';
-import 'Network_Operations/DynamicLinkService.dart';
 import 'Network_Operations/Network_Operations.dart';
 import 'ProductionManagerRequests.dart';
 import 'Utils/Utils.dart';
@@ -23,11 +26,27 @@ class Dashboard extends StatefulWidget {
   @override
   _CRMDashboardState createState() => _CRMDashboardState();
 }
-
+Future<void> _messageHandler(RemoteMessage message) async {
+  if(message!=null){
+    if(message.data!=null){
+      print("Message Data "+message.data["RequestId"]);
+      if(message!=null&&message.data!=null&&message.data["RequestId"]!=null){
+        // SharedPreferences.getInstance().then((prefs){
+        //   Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"),int.parse(message.data["RequestId"])).then((req){
+        //     Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
+        //   });
+        // });
+      }
+    }
+  }
+}
 class _CRMDashboardState extends ResumableState<Dashboard> {
   var claims;
   var requestCount,notificationCount;
   var currentUserRoles;
+  List<DateTime> picked=[];
+  DateTime initialStart=DateTime.now(),initialEnd=DateTime.now().add(Duration(days: 0));
+  PendingDynamicLinkData data;
   FirebaseMessaging messaging;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
@@ -37,24 +56,43 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
             .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
     super.onResume();
   }
-  Future<void> _messageHandler(RemoteMessage message) async {
-    if(message.data!=null){
-      print("Message Data "+message.data["RequestId"]);
-      if(message.data["RequestId"]!=null){
-        SharedPreferences.getInstance().then((prefs){
-          Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"),int.parse(message.data["RequestId"])).then((req){
-            Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
-          });
-        });
-      }
-    }
-  }
+
   @override
   void initState() {
     super.initState();
     FirebaseMessaging.onBackgroundMessage(_messageHandler);
+    FirebaseDynamicLinks.instance.getInitialLink().then((deeplink){
+      setState(() {
+        this.data=deeplink;
+        if(data!=null&&data.link!=null){
+          print(data.link);
+          SharedPreferences.getInstance().then((prefs){
+            Network_Operations.getRequestByIdNotifications(context,prefs.getString("token"),int.parse(data.link.toString().split("?")[1].replaceAll("RequestId=", ""))).then((req){
+              Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
+            });
+          });
+        }
+      });
+    });
+    FirebaseDynamicLinks.instance.onLink(
+        onSuccess: (PendingDynamicLinkData dynamicLink) async {
+          // 3a. handle link that has been retrieved
+          setState(() {
+            this.data=dynamicLink;
+            print(data.link);
+            if(data!=null&&data.link!=null){
+              SharedPreferences.getInstance().then((prefs){
+                Network_Operations.getRequestByIdNotifications(context,prefs.getString("token"),int.parse(data.link.toString().split("?")[1].replaceAll("RequestId=", ""))).then((req){
+                  Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
+                });
+              });
+            }
+          });
+        }, onError: (OnLinkErrorException e) async {
+      print('Link Failed: ${e.message}');
+    });
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      if(message.data!=null){
+      if(message!=null&&message.data!=null){
         print("Message Data "+message.data["RequestId"]);
         if(message.data["RequestId"]!=null){
           SharedPreferences.getInstance().then((prefs){
@@ -65,13 +103,12 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
         }
       }
     });
-    DynamicLinkService.handleDynamicLinks(context);
     if(Platform.isAndroid){
       messaging=FirebaseMessaging.instance;
       messaging.getToken().then((value) =>debugPrint(value));
       //for OnLaunch
-      messaging..getInitialMessage().then((RemoteMessage message) {
-        if(message.data!=null){
+      messaging.getInitialMessage().then((RemoteMessage message) {
+        if(data!=null&&data.link!=null){
           print("Message Data "+message.data["RequestId"]);
           if(message.data["RequestId"]!=null){
             SharedPreferences.getInstance().then((prefs){
@@ -249,6 +286,41 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
         centerTitle: true,
         actions: [
           IconButton(
+            onPressed: ()async{
+              if(picked!=null){
+                picked.clear();
+              }
+              var datePicked= await showDateRangePicker(
+                context: context,
+                firstDate: DateTime.now().subtract(Duration(days: 365)),
+                lastDate: DateTime.now().add(Duration(days: 365)),
+                initialDateRange: DateTimeRange(start: initialStart, end: initialEnd),
+              );
+              if(datePicked!=null&&datePicked.start!=null){
+                picked.add(datePicked.start);
+              }
+              if(datePicked!=null&&datePicked.end!=null){
+                picked.add(datePicked.end);
+              }
+              if(picked!=null&&picked.length==2){
+                setState(() {
+                  this.initialStart=picked[0];
+                  this.initialEnd=picked[1];
+                });
+
+              }else if(picked!=null&&picked.length==1){
+                setState(() {
+                  this.initialStart=picked[0];
+                  this.initialEnd=picked[0].add(Duration(days: 0));
+                });
+
+              }
+
+              print(picked);
+            },
+            icon: Icon(Icons.filter_list),
+          ),
+          IconButton(
             icon:Badge(
                 toAnimate: true,
                 showBadge:notificationCount!=null&&notificationCount['Unread Notifications Count']!=null&&notificationCount['Unread Notifications Count']!=0,
@@ -268,34 +340,79 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
           return Utils.check_connectivity().then((isConnected){
             if(isConnected){
               SharedPreferences.getInstance().then((prefs){
-                setState(() async{
-                  claims=Utils.parseJwt(prefs.getString("token"));
-                  if(!claims['role'].contains("Client")) {
-                    Network_Operations.getRequestCount(context, prefs.getString("token")).then((requestCountMap){
-                      setState(() {
-                        this.requestCount=requestCountMap['statuses'];
-                        this.currentUserRoles=requestCountMap['currentLoggedInUserStatuses'];
-                        this.notificationCount=requestCountMap['notificationsCount'];
-                        FlutterAppBadger.isAppBadgeSupported().then((isSupported){
-                          if(isSupported){
-                            if(notificationCount!=null&&notificationCount['Unread Notifications Count']!=null){
-                              FlutterAppBadger.updateBadgeCount(notificationCount['Unread Notifications Count']);
+                claims=Utils.parseJwt(prefs.getString("token"));
+                if(!claims['role'].contains("Client")) {
+                  if(this.data==null){
+                    if(picked.length>0){
+                      Network_Operations.getRequestCount(context, prefs.getString("token"),startDate:DateFormat("yyyy-MM-dd").format(picked[0]),endDate:DateFormat("yyyy-MM-dd").format(picked[1])).then((requestCountMap){
+                        setState(() {
+                          this.requestCount=requestCountMap['statuses'];
+                          this.currentUserRoles=requestCountMap['currentLoggedInUserStatuses'];
+                          this.notificationCount=requestCountMap['notificationsCount'];
+                          FlutterAppBadger.isAppBadgeSupported().then((isSupported){
+                            if(isSupported){
+                              if(notificationCount!=null&&notificationCount['Unread Notifications Count']!=null){
+                                FlutterAppBadger.updateBadgeCount(notificationCount['Unread Notifications Count']);
+                              }
                             }
-                          }
+
+                          });
+                          PackageInfo.fromPlatform().then((pkg){
+                            print("App Version "+pkg.version);
+                            print("App Package Name "+pkg.packageName);
+                            print("App Name "+pkg.appName);
+                            Network_Operations.checkUpdate().then((response){
+                              if(response!=null){
+                                if(response["version"]!=pkg.version){
+                                  showAlertDialog(context, response);
+                                }
+                              }
+                            });
+                          });
                         });
                       });
-                    });
-                  }else{
+                    }else{
+                      Network_Operations.getRequestCount(context, prefs.getString("token")).then((requestCountMap){
+                        setState(() {
+                          this.requestCount=requestCountMap['statuses'];
+                          this.currentUserRoles=requestCountMap['currentLoggedInUserStatuses'];
+                          this.notificationCount=requestCountMap['notificationsCount'];
+                          FlutterAppBadger.isAppBadgeSupported().then((isSupported){
+                            if(isSupported){
+                              if(notificationCount!=null&&notificationCount['Unread Notifications Count']!=null){
+                                FlutterAppBadger.updateBadgeCount(notificationCount['Unread Notifications Count']);
+                              }
+                            }
+
+                          });
+                          PackageInfo.fromPlatform().then((pkg){
+                            print("App Version "+pkg.version);
+                            print("App Package Name "+pkg.packageName);
+                            print("App Name "+pkg.appName);
+                            Network_Operations.checkUpdate().then((response){
+                              if(response!=null){
+                                if(response["version"]!=pkg.version){
+                                  showAlertDialog(context, response);
+                                }
+                              }
+                            });
+                          });
+                        });
+                      });
+                    }
+
+                  }
+
+                }else{
+                  if(this.data==null){
                     Network_Operations.getRequestCountIndividualUser(context,prefs.getString("token")).then((requestCountMap){
                       setState(() {
                         this.requestCount=requestCountMap['statuses'];
                         this.currentUserRoles=requestCountMap['currentLoggedInUserStatuses'];
-
                       });
                     });
                   }
-                });
-
+                }
               });
             }else{
               Utils.showError(context, "Network Not Available");
@@ -1211,6 +1328,47 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
           ),
         ),
       ),
+    );
+  }
+  showAlertDialog(BuildContext context,dynamic response) {
+
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Cancel"),
+      onPressed:  () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = TextButton(
+      child: Text("Install"),
+      onPressed:  () async{
+          await RUpgrade.upgrade(
+            'https://onedrive.live.com/download?cid=A82CB96BFF0FB925&resid=A82CB96BFF0FB925%211072&authkey=AEelcxW-Fldhvg4',
+            isAutoRequestInstall: true,
+            useDownloadManager: false
+        );
+          Navigator.pop(context);
+        //https://onedrive.live.com/download?cid=A82CB96BFF0FB925&resid=A82CB96BFF0FB925%211072&authkey=AEelcxW-Fldhvg4
+
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("ACMC Products"),
+      content: Text("New Version of ACMC Products is Available Would you Like to Install it. It will be Downloaded in the Background"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
   @override
