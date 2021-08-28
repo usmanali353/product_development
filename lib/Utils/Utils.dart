@@ -18,8 +18,8 @@ import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Utils{
-  static Future<PickedFile> getImage() async {
-    var image = await ImagePicker().getImage(source: ImageSource.gallery);
+  static Future<XFile> getImage() async {
+    var image = await ImagePicker().pickImage(source: ImageSource.gallery);
     return image;
   }
   static Future<bool> check_connectivity () async{
@@ -36,8 +36,8 @@ class Utils{
   }
   static String getBaseUrl(){
     //return "http://173.212.235.106:8900/api/";
-    //return "http://productapi.arabian-ceramics.com/api/";
-    return "http://192.168.10.13:45456/api/";
+    return "http://productapi.arabian-ceramics.com/api/";
+    //return "http://192.168.137.240:45455/api/";
   }
  static void showError(BuildContext context,String message) {
    Flushbar(

@@ -44,6 +44,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
   var claims;
   var requestCount,notificationCount;
   var currentUserRoles;
+  bool isDateBarVisible=false;
   List<DateTime> picked=[];
   DateTime initialStart=DateTime.now(),initialEnd=DateTime.now().add(Duration(days: 0));
   PendingDynamicLinkData data;
@@ -283,7 +284,19 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
       ),
       appBar: AppBar(
         title: Text('Dashboard',),
-        centerTitle: true,
+        bottom:isDateBarVisible? PreferredSize(
+          preferredSize: Size.fromHeight(40),
+          child: Container(
+            alignment: Alignment.topCenter,
+
+            child:Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Text(DateFormat("yyyy-MM-dd").format(initialStart)+" - "+DateFormat("yyyy-MM-dd").format(initialEnd),style: TextStyle(color: Colors.white),),
+              ),
+            ),
+          ),
+        ):null,
         actions: [
           IconButton(
             onPressed: ()async{
@@ -292,6 +305,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
               }
               var datePicked= await showDateRangePicker(
                 context: context,
+                cancelText: "Clear Filter",
                 firstDate: DateTime.now().subtract(Duration(days: 365)),
                 lastDate: DateTime.now().add(Duration(days: 365)),
                 initialDateRange: DateTimeRange(start: initialStart, end: initialEnd),
@@ -306,19 +320,28 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                 setState(() {
                   this.initialStart=picked[0];
                   this.initialEnd=picked[1];
+                  isDateBarVisible=true;
                 });
 
               }else if(picked!=null&&picked.length==1){
                 setState(() {
                   this.initialStart=picked[0];
                   this.initialEnd=picked[0].add(Duration(days: 0));
+                  isDateBarVisible=true;
                 });
-
               }
-
+              if(picked==null||picked.length==0){
+                setState(() {
+                  isDateBarVisible=false;
+                  initialStart=DateTime.now();
+                  initialEnd=DateTime.now().add(Duration(days: 0));
+                });
+              }
+              WidgetsBinding.instance
+                  .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
               print(picked);
             },
-            icon: Icon(Icons.filter_list),
+            icon: Icon(Icons.filter_alt),
           ),
           IconButton(
             icon:Badge(
@@ -465,7 +488,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                       children: [
                         InkWell(
                           onTap: (){
-                            push(context, MaterialPageRoute(builder: (context)=>AllRequestList(currentUserRoles)));
+                            push(context, MaterialPageRoute(builder: (context)=>AllRequestList(currentUserRoles,startDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[0]):null,endDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[1]):null,)));
                           },
                           child: Card(
                             elevation: 8,
@@ -522,7 +545,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                         ),
                         InkWell(
                           onTap:(){
-                            push(context, MaterialPageRoute(builder: (context)=>ModelRequests(1,currentUserRoles,name: "New Requests",)));
+                            push(context, MaterialPageRoute(builder: (context)=>ModelRequests(1,currentUserRoles,name: "New Requests",startDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[0]):null,endDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[1]):null)));
                           },
                           child: Card(
                             elevation: 8,
@@ -590,7 +613,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                     children: [
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(3,currentUserRoles,name: "ACMC Rejected",)));
+                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(3,currentUserRoles,name: "ACMC Rejected",startDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[0]):null,endDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[1]):null)));
                         },
                         child: Card(
                           elevation: 8,
@@ -647,7 +670,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                       ),
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(2,currentUserRoles,name: "ACMC Approved",)));
+                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(2,currentUserRoles,name: "ACMC Approved",startDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[0]):null,endDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[1]):null)));
                         },
                         child: Card(
                           elevation: 8,
@@ -765,7 +788,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                     children: [
                       InkWell(
                         onTap:(){
-                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(4,currentUserRoles,name: "Samples Scheduled",)));
+                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(4,currentUserRoles,name: "Samples Scheduled",startDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[0]):null,endDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[1]):null)));
                         },
                         child: Card(
                           elevation: 8,
@@ -822,7 +845,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                       ),
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(6,currentUserRoles,name:"Rejected Models")));
+                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(6,currentUserRoles,name:"Rejected Models",startDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[0]):null,endDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[1]):null)));
                         },
                         child: Card(
                           elevation: 8,
@@ -894,7 +917,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                     children: [
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(5,currentUserRoles,name: "Approved Models",)));
+                          push(context, MaterialPageRoute(builder: (context)=>ModelRequests(5,currentUserRoles,name: "Approved Models",startDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[0]):null,endDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[1]):null)));
                         },
                         child: Card(
                           elevation: 8,
@@ -1343,7 +1366,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
       child: Text("Install"),
       onPressed:  () async{
           await RUpgrade.upgrade(
-            'https://onedrive.live.com/download?cid=A82CB96BFF0FB925&resid=A82CB96BFF0FB925%211072&authkey=AEelcxW-Fldhvg4',
+            response["url"],
             isAutoRequestInstall: true,
             useDownloadManager: false
         );

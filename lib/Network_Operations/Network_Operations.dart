@@ -113,7 +113,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
           // Time has run out, do what you wanted to do.
           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
         },
-      );;
+      );
       if(response.statusCode==200){
         List<Request> requests=[];
         for(int i=0;i<jsonDecode(response.body)['response'].length;i++){
@@ -130,7 +130,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   static Future<void> changeStatusOfRequest(BuildContext context,String token,int requestId,int status) async{
    // ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     try {
-      var response = await http.get(Uri.parse(Utils.getBaseUrl() + "Request/ChangeStatusOfRequest/$requestId?StatusId=$status"), headers: {"Authorization": "Bearer " + token});
+      var response = await http.get(Uri.parse(Utils.getBaseUrl() + "Request/ChangeStatusOfRequest/$requestId?StatusId=$status"), headers: {"Authorization": "Bearer " + token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if (response.statusCode == 200) {
        // Navigator.pop(context,"Refresh");
          //Utils.showSuccess(context, "Status Changed");
@@ -171,7 +177,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "image":request.image,
       }, toEncodable: Utils.myEncode);
        debugPrint(body);
-       var response =await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestSave"),body: body,headers:{"Content-Type": "application/json", "Authorization": "Bearer " + token});
+       var response =await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestSave"),body: body,headers:{"Content-Type": "application/json", "Authorization": "Bearer " + token}).timeout(
+         Duration(minutes: 1),
+         onTimeout: () {
+           // Time has run out, do what you wanted to do.
+           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+         },
+       );
        if(response.statusCode==200){
          pd.dismiss();
          Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
@@ -219,7 +231,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "image":request.image,
       }, toEncodable: Utils.myEncode);
       debugPrint(body);
-      var response =await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestSave?IsUpateMode=true"),body: body,headers:{"Content-Type": "application/json", "Authorization": "Bearer " + token});
+      var response =await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestSave?IsUpateMode=true"),body: body,headers:{"Content-Type": "application/json", "Authorization": "Bearer " + token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
@@ -249,7 +267,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "Remarks":remarks
       },toEncodable: Utils.myEncode);
       print(body);
-      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestDesignerSave"),body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestDesignerSave"),body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
        pd.dismiss();
        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
@@ -276,7 +300,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "Remarks":remarks
       },toEncodable: Utils.myEncode);
       print(body);
-      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestSetSchedule"),body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestSetSchedule"),body: body,headers: {"Content-type":"application/json","Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
 
       if(response.statusCode==200){
         pd.dismiss();
@@ -301,7 +331,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestById/$requestId"),headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestById/$requestId"),headers: {"Content-type":"application/json","Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         Request request;
@@ -317,11 +353,23 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
 
   }
-  static Future<String> getRequestForGM(BuildContext context,String token,int PageSize,int PageNumber)async{
+  static Future<String> getRequestForGM(BuildContext context,String token,int PageSize,int PageNumber,{String startDate,String endDate})async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber"),headers:{"Authorization":"Bearer "+token});
+      String url;
+      if(startDate!=null&&endDate!=null){
+        url=Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber&StartDate=$startDate&EndDate=$endDate";
+      }else{
+        url=Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber";
+      }
+      var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
          return response.body;
@@ -338,11 +386,23 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
     return null;
   }
-  static Future<String> getRequestForGMSearchable(BuildContext context,String token,int PageSize,int PageNumber,String searchQuery)async{
+  static Future<String> getRequestForGMSearchable(BuildContext context,String token,int PageSize,int PageNumber,String searchQuery,{String startDate,String endDate})async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token});
+      String url;
+      if(startDate!=null&&endDate!=null){
+        url=Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber&StartDate=$startDate&EndDate=$endDate&SearchString=$searchQuery";
+      }else{
+        url=Utils.getBaseUrl()+"Request/GetAllRequestsForGM?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery";
+      }
+      var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -359,11 +419,23 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
     return null;
   }
-  static Future<String> getRequestByStatusGM(BuildContext context,String token,int statusId,int pageNumber,int pageSize) async{
+  static Future<String> getRequestByStatusGM(BuildContext context,String token,int statusId,int pageNumber,int pageSize,{String startDate,String endDate}) async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token});
+      String url;
+      if(startDate!=null&&endDate!=null){
+        url=Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&StartDate=$startDate&EndDate=$endDate";
+      }else{
+        url=Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize";
+      }
+      var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         print(response.body);
@@ -381,11 +453,23 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
     return null;
   }
-  static Future<String> getRequestByStatusGMSearchable(BuildContext context,String token,int statusId,int pageNumber,int pageSize,String query) async{
+  static Future<String> getRequestByStatusGMSearchable(BuildContext context,String token,int statusId,int pageNumber,int pageSize,String query,{String startDate,String endDate}) async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query"),headers:{"Authorization":"Bearer "+token});
+      String url;
+      if(startDate!=null&&endDate!=null){
+        url=Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&StartDate=$startDate&EndDate=$endDate&SearchString=$query";
+      }else{
+        url=Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query";
+      }
+      var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -416,7 +500,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "Remarks":remarks
       },toEncodable: Utils.myEncode);
       print(body);
-      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientSave"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer "+token});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientSave"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
@@ -439,7 +529,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId&PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId&PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -460,7 +556,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -479,7 +581,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   }
   static Future<List<Dropdown>> getDesignerDropDowns(BuildContext context,String token,String endpoint)async{
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Configuration/Get"+endpoint+"Dropdown"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Configuration/Get"+endpoint+"Dropdown"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       var data= jsonDecode(response.body);
       if(response.statusCode==200){
         List<Dropdown> list=List();
@@ -507,7 +615,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       url=Utils.getBaseUrl()+"Request/GetRequestsCountForDashboard";
     }
     try{
-      var response=await http.get(Uri.parse(url),headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.get(Uri.parse(url),headers:{"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         print(response.body.toString());
@@ -532,7 +646,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "id":colorId,
         "colorImage":colorImage
       },toEncodable: Utils.myEncode);
-      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestColorSave"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestColorSave"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         Utils.showSuccess(context, "Image Added Successfully");
@@ -551,7 +671,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestsCountForIndividual"),headers:{"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestsCountForIndividual"),headers:{"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         return jsonDecode(response.body);
@@ -567,11 +693,23 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
     return null;
   }
-  static Future<String> getRequestByStatusIndividualUser(BuildContext context,String token,int statusId,int pageNumber,int pageSize) async{
+  static Future<String> getRequestByStatusIndividualUser(BuildContext context,String token,int statusId,int pageNumber,int pageSize,{String startDate,String endDate}) async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId?PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token});
+      String url;
+      if(startDate!=null&&endDate!=null){
+        url=Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId?PageNumber=$pageNumber&PageSize=$pageSize&StartDate=$startDate&EndDate=$endDate";
+      }else{
+        url=Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId?PageNumber=$pageNumber&PageSize=$pageSize";
+      }
+      var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -588,11 +726,23 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
     return null;
   }
-  static Future<String> getRequestByStatusIndividualUserSearchable(BuildContext context,String token,int statusId,String query,int pageNumber,int pageSize) async{
+  static Future<String> getRequestByStatusIndividualUserSearchable(BuildContext context,String token,int statusId,String query,int pageNumber,int pageSize,{String startDate,String endDate}) async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId&SearchString=$query&PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token});
+      String url;
+      if(startDate!=null&&endDate!=null){
+        url=Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId?PageNumber=$pageNumber&PageSize=$pageSize&StartDate=$startDate&EndDate=$endDate&SearchString=$query";
+      }else{
+        url=Utils.getBaseUrl()+"Request/GetAllRequests?StatusId=$statusId?PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$query";
+      }
+      var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -618,7 +768,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "RequestId":requestId,
         "Remarks":remarks,
       },toEncodable: Utils.myEncode);
-      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/SaveRequestRemark"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/SaveRequestRemark"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
 
@@ -646,7 +802,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "ActualClientVisitDate":ActualClientVisitDate,
         "MultipleReasons": MultipleReasons
       },toEncodable: Utils.myEncode);
-      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/SaveRequestRemark"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/SaveRequestRemark"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
 
@@ -670,7 +832,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -691,7 +859,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -712,7 +886,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientsGetAll"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientsGetAll"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         List<TrialRequests> requests=[];
@@ -738,7 +918,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     pd.show();
     try{
       print(Utils.getBaseUrl()+"Request/ClientVisibility/$remarkId");
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/ClientVisibility/$remarkId"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/ClientVisibility/$remarkId"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
@@ -758,7 +944,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   }
   static Future<List<Dropdown>> getClientsForTrial(BuildContext context,String token,int requestId)async{
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestClientsDropdown/$requestId"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestClientsDropdown/$requestId"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       var data= jsonDecode(response.body);
       if(response.statusCode==200){
         List<Dropdown> list=List();
@@ -781,7 +973,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
           "Token":fcmToken,
           "UserId":userId
         },toEncodable: Utils.myEncode);
-        var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Account/UserTokenForFCMSave"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+        var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Account/UserTokenForFCMSave"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+          Duration(minutes: 1),
+          onTimeout: () {
+            // Time has run out, do what you wanted to do.
+            return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+          },
+        );
         if(response.statusCode==200){
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
         }else{
@@ -814,7 +1012,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "Token":fcmToken,
         "UserId":userId
       },toEncodable: Utils.myEncode);
-      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Account/DeleteUserTokenForFCM"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Account/DeleteUserTokenForFCM"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Login()), (route) => false);
@@ -834,7 +1038,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response =await http.get(Uri.parse(Utils.getBaseUrl()+"Account/GetAllNotificationsOfUser"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response =await http.get(Uri.parse(Utils.getBaseUrl()+"Account/GetAllNotificationsOfUser"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         List<Notifications> notifications=[];
@@ -859,7 +1069,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Account/ReadNotification/$notificationId"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Account/ReadNotification/$notificationId"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         //getRequestById(context, token, requestId);
@@ -879,7 +1095,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestById/$requestId"),headers: {"Content-type":"application/json","Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestById/$requestId"),headers: {"Content-type":"application/json","Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         Request request;
@@ -902,7 +1124,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response =await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestClientsSchedule?Date=$date&&endDate=$endDate"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response =await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetRequestClientsSchedule?Date=$date&&endDate=$endDate"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         print(response.body);
@@ -926,7 +1154,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   }
   static Future<List<Dropdown>> getModelsDropDowns(BuildContext context,String token,String endpoint)async{
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/"+endpoint+"Dropdown/5"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/"+endpoint+"Dropdown/5"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       var data= jsonDecode(response.body);
       if(response.statusCode==200){
         List<Dropdown> list=List();
@@ -953,7 +1187,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "ExpectedClientVisitDate":expectedClientVisitDate
       },toEncodable: Utils.myEncode);
       print(body);
-      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/ClientsSaveAfterModelApproval"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/ClientsSaveAfterModelApproval"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
@@ -973,7 +1213,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Account/GetUsersExceptClientDropdown"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Account/GetUsersExceptClientDropdown"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       var data= jsonDecode(response.body);
       if(response.statusCode==200){
         pd.dismiss();
@@ -1006,7 +1252,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "RequestClientId":clientId,
       },toEncodable: Utils.myEncode);
       print(body);
-      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/UsersForClientsRejectSave"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.post(Uri.parse(Utils.getBaseUrl()+"Request/UsersForClientsRejectSave"),body: body,headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         Utils.showSuccess(context,"User Alloted");
@@ -1027,7 +1279,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
 
       if(response.statusCode==200){
         pd.dismiss();
@@ -1050,7 +1308,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
 
       if(response.statusCode==200){
         pd.dismiss();
@@ -1072,7 +1336,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         Utils.showSuccess(context,"Request Status Changed");
@@ -1092,7 +1362,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId&just=$isJustified"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/ChangeUsersAssignedToClientsRejectionAction/$clientId?ActionId=$statusId&just=$isJustified"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         Utils.showSuccess(context,"Request Status Changed");
@@ -1113,7 +1389,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     pd.show();
     try{
       print(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber");
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -1135,7 +1417,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         return response.body;
@@ -1157,7 +1445,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/ChangeClientExpectedVisitDate?Id="+id.toString()+"&ClientVisitDate="+newDate.toString()),headers:{"Authorization":"Bearer "+token});
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/ChangeClientExpectedVisitDate?Id="+id.toString()+"&ClientVisitDate="+newDate.toString()),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
@@ -1178,8 +1472,15 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
   }
   static Future<dynamic> checkUpdate()async{
     try{
-      var response= await http.get(Uri.parse("https://drive.google.com/uc?export=download&id=1z-tOeG4egZl6iFWj8BNmDN6CuyGDAfqz"));
+      var response= await http.get(Uri.parse("https://drive.google.com/uc?export=download&id=1z-tOeG4egZl6iFWj8BNmDN6CuyGDAfqz")).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
+        print(response.body);
         return jsonDecode(response.body);
       }
     }catch(e){
@@ -1191,7 +1492,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.delete(Uri.parse(Utils.getBaseUrl()+"Request/DeleteRequestById/$requestId"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"});
+      var response=await http.delete(Uri.parse(Utils.getBaseUrl()+"Request/DeleteRequestById/$requestId"),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
       if(response.statusCode==200){
         pd.dismiss();
       }else{

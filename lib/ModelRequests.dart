@@ -27,7 +27,8 @@ class ModelRequests extends StatefulWidget {
   int statusId;
   var currentUserRoles;
   String name;
-  ModelRequests(this.statusId,this.currentUserRoles,{this.name});
+  String startDate,endDate;
+  ModelRequests(this.statusId,this.currentUserRoles,{this.name,this.startDate,this.endDate});
 
 
   @override
@@ -185,7 +186,14 @@ class _ModelReState extends State<ModelRequests>{
               if(isConnected){
                 if(!_isSearching){
                   if(!isClient){
-                    Network_Operations.getRequestByStatusGM(context, token, statusId,pageNum,10).then((response){
+                    Network_Operations.getRequestByStatusGM(context,
+                        token,
+                        statusId,
+                        pageNum,
+                        10,
+                      startDate: widget.startDate,
+                        endDate: widget.endDate
+                    ).then((response){
                       setState(() {
                         requests.clear();
                         req=jsonDecode(response);
@@ -217,7 +225,7 @@ class _ModelReState extends State<ModelRequests>{
                     });
                   }
                   else {
-                    Network_Operations.getRequestByStatusIndividualUser(context, token, statusId,pageNum,10).then((response){
+                    Network_Operations.getRequestByStatusIndividualUser(context, token, statusId,pageNum,10,startDate: widget.startDate,endDate: widget.endDate).then((response){
                       setState(() {
                         requests.clear();
                         for(int i=0;i<jsonDecode(response).length;i++){
@@ -249,7 +257,7 @@ class _ModelReState extends State<ModelRequests>{
                   }
                 }else{
                   if(!isClient){
-                    Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,pageNum,10,searchQuery).then((response){
+                    Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,pageNum,10,searchQuery,startDate: widget.startDate,endDate: widget.endDate).then((response){
                       setState(() {
                         requests.clear();
                         req=jsonDecode(response);
@@ -281,7 +289,7 @@ class _ModelReState extends State<ModelRequests>{
                     });
                   }
                   else {
-                    Network_Operations.getRequestByStatusIndividualUserSearchable(context,token,statusId,searchQuery,searchPageNum,10).then((response){
+                    Network_Operations.getRequestByStatusIndividualUserSearchable(context,token,statusId,searchQuery,searchPageNum,10,startDate: widget.startDate,endDate: widget.endDate).then((response){
                       setState(() {
                         requests.clear();
                         for(int i=0;i<jsonDecode(response).length;i++){
@@ -847,7 +855,7 @@ class _ModelReState extends State<ModelRequests>{
       onSubmitted:(query){
         if(query.isNotEmpty){
           if(!isClient){
-            Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,searchPageNum,10,query).then((response){
+            Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,searchPageNum,10,query,startDate: widget.startDate,endDate: widget.endDate).then((response){
               setState(() {
                 requests.clear();
                 req=jsonDecode(response);
@@ -877,7 +885,7 @@ class _ModelReState extends State<ModelRequests>{
               });
             });
           }else {
-            Network_Operations.getRequestByStatusIndividualUserSearchable(context, token, statusId,query,searchPageNum,10).then((response){
+            Network_Operations.getRequestByStatusIndividualUserSearchable(context, token, statusId,query,searchPageNum,10,startDate: widget.startDate,endDate: widget.endDate).then((response){
               setState(() {
                 requests.clear();
                 for(int i=0;i<jsonDecode(response).length;i++){
@@ -939,7 +947,7 @@ class _ModelReState extends State<ModelRequests>{
               });
             });
           }else {
-            Network_Operations.getRequestByStatusIndividualUser(context, token, statusId,pageNum,10).then((response){
+            Network_Operations.getRequestByStatusIndividualUser(context, token, statusId,pageNum,10,startDate: widget.startDate,endDate: widget.endDate).then((response){
               setState(() {
                 requests.clear();
                 for(int i=0;i<jsonDecode(response).length;i++){

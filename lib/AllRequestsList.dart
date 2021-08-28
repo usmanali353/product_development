@@ -10,6 +10,7 @@ import 'package:productdevelopment/RequestColorsList.dart';
 import 'package:productdevelopment/request_Model_form/Assumptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ApproveForTrial.dart';
+import 'Dashboard.dart';
 import 'DetailsPage.dart';
 import 'Observations.dart';
 import 'RequestImagesGallery.dart';
@@ -20,8 +21,8 @@ import 'acmcapproval.dart';
 
 class AllRequestList extends StatefulWidget{
   var currentUserRoles;
-
-  AllRequestList(this.currentUserRoles);
+  String startDate,endDate;
+  AllRequestList(this.currentUserRoles,{this.startDate,this.endDate});
 
   @override
   State<StatefulWidget> createState() {
@@ -181,7 +182,13 @@ class _AllRequestListState extends State<AllRequestList> {
                 SharedPreferences.getInstance().then((prefs) {
                   if(!_isSearching){
                     Network_Operations.getRequestForGM(
-                        context, prefs.getString("token"), 10, pageNum).then((response) {
+                        context,
+                        prefs.getString("token"),
+                        10,
+                        pageNum,
+                      startDate: widget.startDate,
+                      endDate: widget.endDate,
+                    ).then((response) {
                       setState(() {
                         requests.clear();
                         req=jsonDecode(response);
@@ -212,7 +219,8 @@ class _AllRequestListState extends State<AllRequestList> {
                       });
                     });
                   }else{
-                    Network_Operations.getRequestForGMSearchable(context, prefs.getString("token"), 10, searchPageNum,searchQuery).then((response) {
+                    Network_Operations.getRequestForGMSearchable(context, prefs.getString("token"), 10, searchPageNum,searchQuery,startDate: widget.startDate,
+                      endDate: widget.endDate,).then((response) {
                       setState(() {
                         requests.clear();
                         req=jsonDecode(response);
@@ -371,6 +379,8 @@ class _AllRequestListState extends State<AllRequestList> {
                                         PopupMenuItem<String>(
                                             child: const Text('Update Request'), value: 'updateRequest'),
                                         PopupMenuItem<String>(
+                                            child: const Text('Delete Request'), value: 'deleteRequest'),
+                                        PopupMenuItem<String>(
                                             child: const Text('Add Images'), value: 'addImage'),
                                         PopupMenuItem<String>(
                                             child: const Text('See Details'), value: 'Details'),
@@ -390,6 +400,13 @@ class _AllRequestListState extends State<AllRequestList> {
                                         SharedPreferences.getInstance().then((prefs){
                                           Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"), allRequests[index].requestId).then((req){
                                             Navigator.push(context,MaterialPageRoute(builder:(context)=>Assumptions(request: req,)));
+                                          });
+                                        });
+                                      }else if(selectedItem=="deleteRequest"){
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.deleteRequestById(context, prefs.getString("token"), allRequests[index].requestId).then((req){
+                                            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder:(context)=>Dashboard()), (route) => false);
+                                            Utils.showSuccess(context,"Request Deleted Successfully");
                                           });
                                         });
                                       }
@@ -662,7 +679,8 @@ class _AllRequestListState extends State<AllRequestList> {
         if(query.isNotEmpty){
           this.searchQuery=query;
           SharedPreferences.getInstance().then((prefs){
-            Network_Operations.getRequestForGMSearchable(context,prefs.getString("token"),10,searchPageNum,query).then((response){
+            Network_Operations.getRequestForGMSearchable(context,prefs.getString("token"),10,searchPageNum,query,startDate: widget.startDate,
+              endDate: widget.endDate,).then((response){
               setState(() {
                 requests.clear();
                 req=jsonDecode(response);

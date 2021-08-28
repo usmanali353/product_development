@@ -90,6 +90,7 @@ class _SpecificationsState extends State<Specifications> {
            if(sizeName.length>0){
              sizeDropDownVisible=true;
              if(widget.request!=null){
+               print("Updatable Sizes "+widget.request.multipleSizeNames.toString());
                if(widget.request.multipleSizeNames!=null&&widget.request.multipleSizeNames.length>0){
                  for(var s in widget.request.multipleSizeNames){
                    selectedSizeNames.add(s);

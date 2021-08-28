@@ -142,7 +142,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                 Padding(
                                   padding: EdgeInsets.only(left: 5, right: 5),
                                 ),
-                                Text(remarksHistory[index].clientName!=null?remarksHistory[index].clientName:remarksHistory[index].remarkedByName),
+                                Text(remarksHistory[index].clientName!=null?remarksHistory[index].clientName:remarksHistory[index].remarkedByName!=null?remarksHistory[index].remarkedByName:""),
                                 Padding(
                                   padding: EdgeInsets.only(left: 20, right: 5),
                                 ),
@@ -152,7 +152,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                     Padding(
                                       padding: EdgeInsets.only(left: 5, right: 5),
                                     ),
-                                    Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(remarksHistory[index].date)).toString()),
+                                    Text(remarksHistory[index].date!=null?DateFormat("yyyy-MM-dd").format(DateTime.parse(remarksHistory[index].date)).toString():""),
                                   ],
                                 ),
                               ],
@@ -173,7 +173,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                 width: MediaQuery.of(context).size.width / 1.5,
                                 //color: Colors.teal,
                                 child: Card(color: Colors.white, elevation: 0,
-                                    child: Text(remarksHistory[index].remarks,maxLines: 3,overflow: TextOverflow.ellipsis,)),
+                                    child: Text(remarksHistory[index].remarks!=null?remarksHistory[index].remarks:"",maxLines: 3,overflow: TextOverflow.ellipsis,)),
                               ),
                             ),
                           ],
