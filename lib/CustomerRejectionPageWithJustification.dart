@@ -14,7 +14,7 @@ class CustomerRejectionPageWithJustification extends StatefulWidget {
   int isJustifiable;
   String title;
   String startDate,endDate;
-  CustomerRejectionPageWithJustification(this.isJustifiable,this.title);
+  CustomerRejectionPageWithJustification(this.isJustifiable,this.title,{this.startDate,this.endDate});
 
   @override
   _CustomerRejectionPageWithJustificationState createState() => _CustomerRejectionPageWithJustificationState();

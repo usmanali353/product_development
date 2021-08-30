@@ -16,7 +16,7 @@ class ProductionManagerRequests extends StatefulWidget {
   var currentUserRole;
   String name;
 
-  ProductionManagerRequests(this.statusId,this.type,this.currentUserRole,{this.name});
+  ProductionManagerRequests(this.statusId,this.type,this.currentUserRole,{this.name,this.startDate,this.endDate});
 
   @override
   _ProductionManagerRequestsState createState() => _ProductionManagerRequestsState(statusId,type,currentUserRole);

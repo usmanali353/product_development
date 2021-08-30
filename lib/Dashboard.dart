@@ -974,7 +974,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                       ),
                       InkWell(
                         onTap:(){
-                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(7,"Dashboard",currentUserRoles,name: "Customer Approved",)));
+                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(7,"Dashboard",currentUserRoles,name: "Customer Approved",startDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[0]):null,endDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[1]):null)));
                         },
                         child: Card(
                           elevation: 8,
@@ -1040,7 +1040,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                     children: [
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(8,"Dashboard",currentUserRoles,name: "Customer Rejected",)));
+                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(8,"Dashboard",currentUserRoles,name: "Customer Rejected",startDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[0]):null,endDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[1]):null)));
                         },
                         child: Card(
                           elevation: 8,
@@ -1097,7 +1097,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                       ),
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>CustomerRejectionPageWithJustification(1,"Rejections Justified")));
+                          push(context, MaterialPageRoute(builder: (context)=>CustomerRejectionPageWithJustification(1,"Rejections Justified",startDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[0]):null,endDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[1]):null)));
                         },
                         child: Card(
                           elevation: 8,
@@ -1164,7 +1164,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
 
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>CustomerRejectionPageWithJustification(0,"Rejections UnJustified")));
+                          push(context, MaterialPageRoute(builder: (context)=>CustomerRejectionPageWithJustification(0,"Rejections UnJustified",startDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[0]):null,endDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[1]):null)));
                         },
                         child: Card(
                           elevation: 8,
@@ -1221,7 +1221,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                       ),
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(10,"Dashboard",currentUserRoles,name: "Production Rejected",)));
+                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(10,"Dashboard",currentUserRoles,name: "Production Rejected",startDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[0]):null,endDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[1]):null)));
                         },
                         child: Card(
                           elevation: 8,
@@ -1287,7 +1287,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                     children: [
                       InkWell(
                         onTap: (){
-                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(9,"Dashboard",currentUserRoles,name: "Production Approved",)));
+                          push(context, MaterialPageRoute(builder: (context)=>ProductionManagerRequests(9,"Dashboard",currentUserRoles,name: "Production Approved",startDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[0]):null,endDate: picked!=null&&picked.length>0?DateFormat("yyyy-MM-dd").format(picked[1]):null)));
                         },
                         child: Card(
                           elevation: 8,
