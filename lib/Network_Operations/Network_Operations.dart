@@ -828,11 +828,17 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       pd.dismiss();
     }
   }
-  static Future<String> getClientRequestsByStatus(BuildContext context,String token,int statusId,int pageNumber,int pageSize)async{
+  static Future<String> getClientRequestsByStatus(BuildContext context,String token,int statusId,int pageNumber,int pageSize,{String startDate,String endDate})async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token}).timeout(
+      String url;
+      if(startDate!=null&&endDate!=null){
+        url=Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&StartDate=$startDate&EndDate=$endDate";
+      }else{
+        url=Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize";
+      }
+      var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
           // Time has run out, do what you wanted to do.
@@ -855,11 +861,17 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
     return null;
   }
-  static Future<String> getClientRequestsByStatusSearchable(BuildContext context,String token,int statusId,int pageNumber,int pageSize,String searchQuery)async{
+  static Future<String> getClientRequestsByStatusSearchable(BuildContext context,String token,int statusId,int pageNumber,int pageSize,String searchQuery,{String startDate,String endDate})async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token}).timeout(
+      String url;
+      if(startDate!=null&&endDate!=null){
+        url=Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&StartDate=$startDate&EndDate=$endDate&SearchString=$searchQuery";
+      }else{
+        url=Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize&SearchString=$searchQuery";
+      }
+      var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
           // Time has run out, do what you wanted to do.
@@ -1384,12 +1396,18 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       pd.dismiss();
     }
   }
-  static Future<String> getTrialRequestsWithJustification(BuildContext context,String token,int isJustified,int PageSize,int PageNumber)async{
+  static Future<String> getTrialRequestsWithJustification(BuildContext context,String token,int isJustified,int PageSize,int PageNumber,{String startDate,String endDate})async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      print(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber");
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber"),headers:{"Authorization":"Bearer "+token}).timeout(
+      String url;
+      if(startDate!=null&&endDate!=null){
+        url=Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber&StartDate=$startDate&EndDate=$endDate";
+      }else{
+        url=Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber";
+      }
+      print(url);
+      var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
           // Time has run out, do what you wanted to do.
@@ -1413,11 +1431,17 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
     return null;
   }
-  static Future<String> getTrialRequestsWithJustificationSearchable(BuildContext context,String token,int isJustified,int PageSize,int PageNumber,String searchQuery)async{
+  static Future<String> getTrialRequestsWithJustificationSearchable(BuildContext context,String token,int isJustified,int PageSize,int PageNumber,String searchQuery,{String startDate,String endDate})async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token}).timeout(
+      String url;
+      if(startDate!=null&&endDate!=null){
+        url=Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber&StartDate=$startDate&EndDate=$endDate&SearchString=$searchQuery";
+      }else{
+        url=Utils.getBaseUrl()+"Request/GetAllTrialRequests?just=$isJustified&PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery";
+      }
+      var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
           // Time has run out, do what you wanted to do.

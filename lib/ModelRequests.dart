@@ -41,6 +41,9 @@ class _ModelReState extends State<ModelRequests>{
   GlobalKey<RefreshIndicatorState> refreshIndicatorKey=GlobalKey();
   var selectedPreference,selectedStatus;
   int statusId;
+  bool isDateBarVisible=false;
+  List<DateTime> picked=[];
+  DateTime initialStart=DateTime.now(),initialEnd=DateTime.now().add(Duration(days: 0));
   var currentUserRoles;
   var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
   int searchPageNum=1,pageNum=1;
@@ -106,6 +109,19 @@ class _ModelReState extends State<ModelRequests>{
           leading: _isSearching ? const BackButton() : null,
           title: _isSearching ? _buildSearchField() : _buildTitle(context),
           actions: _buildActions(),
+           bottom: isDateBarVisible? PreferredSize(
+              preferredSize: Size.fromHeight(40),
+              child: Container(
+                alignment: Alignment.topCenter,
+
+                child:Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Text(DateFormat("yyyy-MM-dd").format(initialStart)+" - "+DateFormat("yyyy-MM-dd").format(initialEnd),style: TextStyle(color: Colors.white),),
+                  ),
+                ),
+              ),
+            ):null
         ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton:
@@ -990,7 +1006,7 @@ class _ModelReState extends State<ModelRequests>{
   List<Widget> _buildActions() {
     if (_isSearching) {
       return <Widget>[
-        new IconButton(
+         IconButton(
           icon: const Icon(Icons.clear),
           onPressed: () {
             if (_searchQuery == null || _searchQuery.text.isEmpty) {
@@ -1003,6 +1019,57 @@ class _ModelReState extends State<ModelRequests>{
       ];
     }
     return <Widget>[
+      IconButton(
+        onPressed: ()async{
+          if(picked!=null){
+            picked.clear();
+          }
+          var datePicked= await showDateRangePicker(
+            context: context,
+            cancelText: "Clear Filter",
+            firstDate: DateTime.now().subtract(Duration(days: 365)),
+            lastDate: DateTime.now().add(Duration(days: 365)),
+            initialDateRange: DateTimeRange(start: initialStart, end: initialEnd),
+          );
+          if(datePicked!=null&&datePicked.start!=null){
+            picked.add(datePicked.start);
+          }
+          if(datePicked!=null&&datePicked.end!=null){
+            picked.add(datePicked.end);
+          }
+          if(picked!=null&&picked.length==2){
+            setState(() {
+              this.initialStart=picked[0];
+              this.initialEnd=picked[1];
+              widget.startDate=DateFormat("yyyy-MM-dd").format(picked[0]);
+              widget.endDate=DateFormat("yyyy-MM-dd").format(picked[1]);
+              isDateBarVisible=true;
+            });
+
+          }else if(picked!=null&&picked.length==1){
+            setState(() {
+              this.initialStart=picked[0];
+              this.initialEnd=picked[0].add(Duration(days: 0));
+              widget.startDate=DateFormat("yyyy-MM-dd").format(initialStart);
+              widget.endDate=DateFormat("yyyy-MM-dd").format(initialEnd);
+              isDateBarVisible=true;
+            });
+          }
+          if(picked==null||picked.length==0){
+            setState(() {
+              isDateBarVisible=false;
+              initialStart=DateTime.now();
+              initialEnd=DateTime.now().add(Duration(days: 0));
+              widget.startDate=null;
+              widget.endDate=null;
+            });
+          }
+          WidgetsBinding.instance
+              .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+          print(picked);
+        },
+        icon: Icon(Icons.filter_alt),
+      ),
        IconButton(
         icon: const Icon(Icons.search),
         onPressed: _startSearch,

@@ -13,6 +13,7 @@ import 'Utils/Utils.dart';
 class CustomerRejectionPageWithJustification extends StatefulWidget {
   int isJustifiable;
   String title;
+  String startDate,endDate;
   CustomerRejectionPageWithJustification(this.isJustifiable,this.title);
 
   @override
@@ -30,6 +31,9 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
   String searchQuery = "Search query";
   bool isColorsVisible=false;
   int pageNum=1,searchPageNum=1;
+  bool isDateBarVisible=false;
+  List<DateTime> picked=[];
+  DateTime initialStart=DateTime.now(),initialEnd=DateTime.now().add(Duration(days: 0));
   List<TrialRequests> requests=[];
   var req;
   var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
@@ -48,6 +52,19 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
          leading: _isSearching ? const BackButton() : null,
          title: _isSearching ? _buildSearchField() : _buildTitle(context),
          actions: _buildActions(),
+           bottom: isDateBarVisible? PreferredSize(
+             preferredSize: Size.fromHeight(40),
+             child: Container(
+               alignment: Alignment.topCenter,
+
+               child:Center(
+                 child: Padding(
+                   padding: const EdgeInsets.only(bottom: 16),
+                   child: Text(DateFormat("yyyy-MM-dd").format(initialStart)+" - "+DateFormat("yyyy-MM-dd").format(initialEnd),style: TextStyle(color: Colors.white),),
+                 ),
+               ),
+             ),
+           ):null
        ),
        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
        floatingActionButton:
@@ -129,7 +146,14 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                  SharedPreferences.getInstance().then((prefs) {
                    if(!_isSearching){
                      Network_Operations.getTrialRequestsWithJustification(
-                         context, prefs.getString("token"),widget.isJustifiable, 10, pageNum).then((response) {
+                         context,
+                         prefs.getString("token"),
+                         widget.isJustifiable,
+                         10,
+                         pageNum,
+                       startDate: widget.startDate,
+                       endDate: widget.endDate
+                     ).then((response) {
                        setState(() {
                          requests.clear();
                          req=jsonDecode(response);
@@ -161,7 +185,16 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                        });
                      });
                    }else{
-                     Network_Operations.getTrialRequestsWithJustificationSearchable(context, prefs.getString("token"),widget.isJustifiable, 10, searchPageNum,searchQuery).then((response) {
+                     Network_Operations.getTrialRequestsWithJustificationSearchable(
+                         context,
+                         prefs.getString("token"),
+                         widget.isJustifiable,
+                         10,
+                         searchPageNum,
+                         searchQuery,
+                         startDate: widget.startDate,
+                         endDate: widget.endDate
+                     ).then((response) {
                        setState(() {
                          requests.clear();
                          req=jsonDecode(response);
@@ -487,7 +520,16 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
         if(query.isNotEmpty){
           this.searchQuery=query;
           SharedPreferences.getInstance().then((prefs){
-            Network_Operations.getTrialRequestsWithJustificationSearchable(context,prefs.getString("token"),widget.isJustifiable,10,searchPageNum,query).then((response){
+            Network_Operations.getTrialRequestsWithJustificationSearchable(
+                context,
+                prefs.getString("token"),
+                widget.isJustifiable,
+                10,
+                searchPageNum,
+                query,
+                startDate: widget.startDate,
+                endDate: widget.endDate
+            ).then((response){
               setState(() {
                 requests.clear();
                 req=jsonDecode(response);
@@ -548,10 +590,62 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
       ];
     }
     return <Widget>[
-      new IconButton(
+      IconButton(
+        onPressed: ()async{
+          if(picked!=null){
+            picked.clear();
+          }
+          var datePicked= await showDateRangePicker(
+            context: context,
+            cancelText: "Clear Filter",
+            firstDate: DateTime.now().subtract(Duration(days: 365)),
+            lastDate: DateTime.now().add(Duration(days: 365)),
+            initialDateRange: DateTimeRange(start: initialStart, end: initialEnd),
+          );
+          if(datePicked!=null&&datePicked.start!=null){
+            picked.add(datePicked.start);
+          }
+          if(datePicked!=null&&datePicked.end!=null){
+            picked.add(datePicked.end);
+          }
+          if(picked!=null&&picked.length==2){
+            setState(() {
+              this.initialStart=picked[0];
+              this.initialEnd=picked[1];
+              widget.startDate=DateFormat("yyyy-MM-dd").format(picked[0]);
+              widget.endDate=DateFormat("yyyy-MM-dd").format(picked[1]);
+              isDateBarVisible=true;
+            });
+
+          }else if(picked!=null&&picked.length==1){
+            setState(() {
+              this.initialStart=picked[0];
+              this.initialEnd=picked[0].add(Duration(days: 0));
+              widget.startDate=DateFormat("yyyy-MM-dd").format(initialStart);
+              widget.endDate=DateFormat("yyyy-MM-dd").format(initialEnd);
+              isDateBarVisible=true;
+            });
+          }
+          if(picked==null||picked.length==0){
+            setState(() {
+              isDateBarVisible=false;
+              initialStart=DateTime.now();
+              initialEnd=DateTime.now().add(Duration(days: 0));
+              widget.startDate=null;
+              widget.endDate=null;
+            });
+          }
+          WidgetsBinding.instance
+              .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+          print(picked);
+        },
+        icon: Icon(Icons.filter_alt),
+      ),
+       IconButton(
         icon: const Icon(Icons.search),
         onPressed: _startSearch,
       ),
+
     ];
   }
   void _stopSearching() {

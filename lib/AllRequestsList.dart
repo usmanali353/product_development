@@ -40,6 +40,9 @@ class _AllRequestListState extends State<AllRequestList> {
   var claims;
   var selectedPreference,selectedStatus;
   String token;
+  bool isDateBarVisible=false;
+  List<DateTime> picked=[];
+  DateTime initialStart=DateTime.now(),initialEnd=DateTime.now().add(Duration(days: 0));
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   String searchQuery = "Search query";
   bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false;
@@ -101,6 +104,19 @@ class _AllRequestListState extends State<AllRequestList> {
         leading: _isSearching ? const BackButton() : null,
         title: _isSearching ? _buildSearchField() : _buildTitle(context),
         actions: _buildActions(),
+          bottom: isDateBarVisible? PreferredSize(
+            preferredSize: Size.fromHeight(40),
+            child: Container(
+              alignment: Alignment.topCenter,
+
+              child:Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(DateFormat("yyyy-MM-dd").format(initialStart)+" - "+DateFormat("yyyy-MM-dd").format(initialEnd),style: TextStyle(color: Colors.white),),
+                ),
+              ),
+            ),
+          ):null
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton:
@@ -741,9 +757,60 @@ class _AllRequestListState extends State<AllRequestList> {
       ];
     }
     return <Widget>[
-      new IconButton(
+      IconButton(
         icon: const Icon(Icons.search),
         onPressed: _startSearch,
+      ),
+      IconButton(
+        onPressed: ()async{
+          if(picked!=null){
+            picked.clear();
+          }
+          var datePicked= await showDateRangePicker(
+            context: context,
+            cancelText: "Clear Filter",
+            firstDate: DateTime.now().subtract(Duration(days: 365)),
+            lastDate: DateTime.now().add(Duration(days: 365)),
+            initialDateRange: DateTimeRange(start: initialStart, end: initialEnd),
+          );
+          if(datePicked!=null&&datePicked.start!=null){
+            picked.add(datePicked.start);
+          }
+          if(datePicked!=null&&datePicked.end!=null){
+            picked.add(datePicked.end);
+          }
+          if(picked!=null&&picked.length==2){
+            setState(() {
+              this.initialStart=picked[0];
+              this.initialEnd=picked[1];
+              widget.startDate=DateFormat("yyyy-MM-dd").format(picked[0]);
+              widget.endDate=DateFormat("yyyy-MM-dd").format(picked[1]);
+              isDateBarVisible=true;
+            });
+
+          }else if(picked!=null&&picked.length==1){
+            setState(() {
+              this.initialStart=picked[0];
+              this.initialEnd=picked[0].add(Duration(days: 0));
+              widget.startDate=DateFormat("yyyy-MM-dd").format(initialStart);
+              widget.endDate=DateFormat("yyyy-MM-dd").format(initialEnd);
+              isDateBarVisible=true;
+            });
+          }
+          if(picked==null||picked.length==0){
+            setState(() {
+              isDateBarVisible=false;
+              initialStart=DateTime.now();
+              initialEnd=DateTime.now().add(Duration(days: 0));
+              widget.startDate=null;
+              widget.endDate=null;
+            });
+          }
+          WidgetsBinding.instance
+              .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+          print(picked);
+        },
+        icon: Icon(Icons.filter_alt),
       ),
     ];
   }

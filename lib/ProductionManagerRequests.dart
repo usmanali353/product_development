@@ -12,9 +12,10 @@ import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class ProductionManagerRequests extends StatefulWidget {
   int statusId;
-  String type;
+  String type,startDate,endDate;
   var currentUserRole;
   String name;
+
   ProductionManagerRequests(this.statusId,this.type,this.currentUserRole,{this.name});
 
   @override
@@ -29,6 +30,9 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
   String type;
   var currentUserRole,req;
   int pageNum=1,searchPageNum=1;
+  bool isDateBarVisible=false;
+  List<DateTime> picked=[];
+  DateTime initialStart=DateTime.now(),initialEnd=DateTime.now().add(Duration(days: 0));
   String searchQuery = "Search query";
   static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _searchQuery;
@@ -52,6 +56,19 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
         leading: _isSearching ? const BackButton() : null,
         title: _isSearching ? _buildSearchField() : _buildTitle(context),
         actions: _buildActions(),
+          bottom: isDateBarVisible? PreferredSize(
+            preferredSize: Size.fromHeight(40),
+            child: Container(
+              alignment: Alignment.topCenter,
+
+              child:Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(DateFormat("yyyy-MM-dd").format(initialStart)+" - "+DateFormat("yyyy-MM-dd").format(initialEnd),style: TextStyle(color: Colors.white),),
+                ),
+              ),
+            ),
+          ):null
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton:
@@ -131,7 +148,15 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
               if(isConnected){
                 if(!_isSearching){
                   SharedPreferences.getInstance().then((prefs){
-                    Network_Operations.getClientRequestsByStatus(context, prefs.getString("token"), statusId,pageNum,10).then((response){
+                    Network_Operations.getClientRequestsByStatus(
+                        context,
+                        prefs.getString("token"),
+                        statusId,
+                        pageNum,
+                        10,
+                        startDate: widget.startDate,
+                        endDate: widget.endDate
+                    ).then((response){
                       setState(() {
                         req=jsonDecode(response);
                         this.requests.clear();
@@ -162,7 +187,15 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                 }
                 else{
                   SharedPreferences.getInstance().then((prefs){
-                    Network_Operations.getClientRequestsByStatusSearchable(context, prefs.getString("token"), statusId,searchPageNum,10,searchQuery).then((response){
+                    Network_Operations.getClientRequestsByStatusSearchable(
+                        context,
+                        prefs.getString("token"),
+                        statusId,
+                        searchPageNum,
+                        10,
+                        searchQuery,
+                        startDate: widget.startDate,
+                        endDate: widget.endDate).then((response){
                       setState(() {
                         req=jsonDecode(response);
                         this.requests.clear();
@@ -668,7 +701,15 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
           });
 
           SharedPreferences.getInstance().then((prefs){
-            Network_Operations.getClientRequestsByStatusSearchable(context, prefs.getString("token"), statusId,searchPageNum,10,searchQuery).then((response){
+            Network_Operations.getClientRequestsByStatusSearchable(
+                context,
+                prefs.getString("token"),
+                statusId,
+                searchPageNum,
+                10,
+                searchQuery,
+                startDate: widget.startDate,
+                endDate: widget.endDate).then((response){
               setState(() {
                 req=jsonDecode(response);
                 requests.clear();
@@ -699,7 +740,14 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
         }
         else{
           SharedPreferences.getInstance().then((prefs){
-            Network_Operations.getClientRequestsByStatus(context, prefs.getString("token"), statusId,pageNum,10).then((response){
+            Network_Operations.getClientRequestsByStatus(context,
+                prefs.getString("token"),
+                statusId,
+                pageNum,
+                10,
+                startDate: widget.startDate,
+                endDate: widget.endDate
+            ).then((response){
               setState(() {
                 req=jsonDecode(response);
                 requests.clear();
@@ -753,7 +801,58 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
       ];
     }
     return <Widget>[
-      new IconButton(
+      IconButton(
+        onPressed: ()async{
+          if(picked!=null){
+            picked.clear();
+          }
+          var datePicked= await showDateRangePicker(
+            context: context,
+            cancelText: "Clear Filter",
+            firstDate: DateTime.now().subtract(Duration(days: 365)),
+            lastDate: DateTime.now().add(Duration(days: 365)),
+            initialDateRange: DateTimeRange(start: initialStart, end: initialEnd),
+          );
+          if(datePicked!=null&&datePicked.start!=null){
+            picked.add(datePicked.start);
+          }
+          if(datePicked!=null&&datePicked.end!=null){
+            picked.add(datePicked.end);
+          }
+          if(picked!=null&&picked.length==2){
+            setState(() {
+              this.initialStart=picked[0];
+              this.initialEnd=picked[1];
+              widget.startDate=DateFormat("yyyy-MM-dd").format(picked[0]);
+              widget.endDate=DateFormat("yyyy-MM-dd").format(picked[1]);
+              isDateBarVisible=true;
+            });
+
+          }else if(picked!=null&&picked.length==1){
+            setState(() {
+              this.initialStart=picked[0];
+              this.initialEnd=picked[0].add(Duration(days: 0));
+              widget.startDate=DateFormat("yyyy-MM-dd").format(initialStart);
+              widget.endDate=DateFormat("yyyy-MM-dd").format(initialEnd);
+              isDateBarVisible=true;
+            });
+          }
+          if(picked==null||picked.length==0){
+            setState(() {
+              isDateBarVisible=false;
+              initialStart=DateTime.now();
+              initialEnd=DateTime.now().add(Duration(days: 0));
+              widget.startDate=null;
+              widget.endDate=null;
+            });
+          }
+          WidgetsBinding.instance
+              .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+          print(picked);
+        },
+        icon: Icon(Icons.filter_alt),
+      ),
+       IconButton(
         icon: const Icon(Icons.search),
         onPressed: _startSearch,
       ),
