@@ -4,6 +4,7 @@ import 'package:ars_dialog/ars_dialog.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:productdevelopment/Login.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Model/Request.dart';
@@ -51,7 +52,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
        Utils.showError(context, "Invalid Email or Password");
      }else{
        pd.dismiss();
-       Utils.showError(context, response.statusCode.toString());
+       Utils.showError(context,"Status Code Login"+response.statusCode.toString());
      }
     }catch(e) {
       pd.dismiss();
@@ -995,7 +996,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         if(response.statusCode==200){
           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
         }else{
-          Utils.showError(context,response.statusCode.toString());
+          Utils.showError(context,"StatusCode Add FcM Token"+response.statusCode.toString());
         }
     }catch(e){
       Utils.showError(context, e.toString());
@@ -1537,4 +1538,35 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       pd.dismiss();
     }
   }
-}
+  static Future<String> sendiamgestoserver(BuildContext context,String token, List<XFile> images,int colorId) async{
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
+    try{
+      var request = http.MultipartRequest("POST", Uri.parse(Utils.getBaseUrl() + "Request/AddColorImages"));
+      request.headers.addAll({"Authorization":"Bearer $token"});
+      request.fields['ColorId'] = colorId.toString();
+      for (XFile img in images) {
+        http.MultipartFile.fromPath("images", img.path).then((file) {
+          request.files.add(file);
+        });
+      }
+
+      pd.show();
+      var response= await request.send();
+      if (response.statusCode == 200){
+        pd.dismiss();
+        Utils.showSuccess(context,"Image(s) Uploaded");
+      } else {
+        pd.dismiss();
+        Utils.showError(context,response.reasonPhrase.toString());
+      }
+
+    }catch(e){
+      pd.dismiss();
+      Utils.showError(context,e.toString());
+    }finally{
+      pd.dismiss();
+    }
+
+  }
+
+ }

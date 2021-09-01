@@ -391,15 +391,55 @@ class _AllRequestListState extends State<AllRequestList> {
                                       position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
                                       items: [
                                         PopupMenuItem<String>(
-                                            child: const Text('Change Status'), value: 'changeStatus'),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.update,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("Change Status")
+                                              ],
+                                            ), value: 'changeStatus'),
                                         PopupMenuItem<String>(
-                                            child: const Text('Update Request'), value: 'updateRequest'),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.edit,color:Color(0xFF004c4c)),
+                                                ),
+                                                Text("Update Request")
+                                              ],
+                                            ), value: 'updateRequest'),
                                         PopupMenuItem<String>(
-                                            child: const Text('Delete Request'), value: 'deleteRequest'),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.delete,color:Color(0xFF004c4c),),
+                                                ),
+                                                Text("Delete Request")
+                                              ],
+                                            ), value: 'deleteRequest'),
                                         PopupMenuItem<String>(
-                                            child: const Text('Add Images'), value: 'addImage'),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.add_photo_alternate,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("Add Images")
+                                              ],
+                                            ), value: 'addImage'),
                                         PopupMenuItem<String>(
-                                            child: const Text('See Details'), value: 'Details'),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("See Details")
+                                              ],
+                                            ), value: 'Details'),
                                       ],
                                       elevation: 8.0,
                                     ).then((selectedItem){
@@ -433,9 +473,25 @@ class _AllRequestListState extends State<AllRequestList> {
                                       position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
                                       items: [
                                         PopupMenuItem<String>(
-                                            child: const Text('Add Images'), value: 'addImage'),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.add_photo_alternate,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("Add Images")
+                                              ],
+                                            ), value: 'addImage'),
                                         PopupMenuItem<String>(
-                                            child: const Text('See Details'), value: 'Details'),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("See Details")
+                                              ],
+                                            ), value: 'Details'),
                                       ],
                                       elevation: 8.0,
                                     ).then((selectedItem){
@@ -458,9 +514,25 @@ class _AllRequestListState extends State<AllRequestList> {
                                       position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
                                       items: [
                                         PopupMenuItem<String>(
-                                            child: const Text('Change Status'), value: 'changeStatus'),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.update,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("Change Status")
+                                              ],
+                                            ), value: 'changeStatus'),
                                         PopupMenuItem<String>(
-                                            child: const Text('See Details'), value: 'Details'),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("See Details")
+                                              ],
+                                            ), value: 'Details'),
                                       ],
                                       elevation: 8.0,
                                     ).then((selectedItem){
@@ -484,11 +556,35 @@ class _AllRequestListState extends State<AllRequestList> {
                                       position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
                                       items: [
                                         PopupMenuItem<String>(
-                                            child: const Text('Change Status'), value: 'changeStatus'),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.update,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("Change Status")
+                                              ],
+                                            ), value: 'changeStatus'),
                                         PopupMenuItem<String>(
-                                            child: const Text('Update Schedule'), value: 'updateschedule'),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.insert_invitation,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("Update Schedule")
+                                              ],
+                                            ), value: 'updateschedule'),
                                         PopupMenuItem<String>(
-                                            child: const Text('See Details'), value: 'Details'),
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("See Deatils")
+                                              ],
+                                            ), value: 'Details'),
                                       ],
                                       elevation: 8.0,
                                     ).then((selectedItem){

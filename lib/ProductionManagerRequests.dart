@@ -359,7 +359,17 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                 position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
                                 items: [
                                   PopupMenuItem<String>(
-                                      child: const Text('See Details'), value: 'Details'),
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(right:8.0),
+                                            child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                          ),
+                                          Text("See Deatils")
+                                        ],
+                                      ),
+                                      value: 'Details'
+                                  ),
                                 ],
                                 elevation: 8.0,
                               ).then((selectedItem){

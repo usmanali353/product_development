@@ -247,7 +247,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                     children: [
                       ListTile(
                         title: Text("Client Visit Schedule"),
-                        leading: Icon(Icons.schedule),
+                        leading: Icon(Icons.event),
                         onTap: (){
                           Navigator.push(context, MaterialPageRoute(builder: (context)=>DailyClientSchedule()));
                         },
