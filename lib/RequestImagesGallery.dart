@@ -1,38 +1,45 @@
 import'package:flutter/material.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:productdevelopment/Model/RequestColorImages.dart';
 import 'package:productdevelopment/RequestColorsList.dart';
 class RequestImageGallery extends StatefulWidget {
+  List<RequestColorImages> images;
+  String colorName;
   var request;
-
-  RequestImageGallery(this.request);
+  RequestImageGallery(this.request,{this.images,this.colorName});
 
   @override
-  _RequestImageGalleryState createState() => _RequestImageGalleryState(request);
+  _RequestImageGalleryState createState() => _RequestImageGalleryState();
 }
 
 class _RequestImageGalleryState extends State<RequestImageGallery> {
   var request;
   int num=0,count=1;
    List<String> imageUrl=[],colorNames=[];
-  _RequestImageGalleryState(this.request);
+  _RequestImageGalleryState();
   @override
   void initState() {
     setState(() {
-      if(request.multipleColorNames!=null&&request.multipleColorNames.length>0){
-        for(int i=0;i<request.multipleColorNames.length;i++){
-          if(request.multipleColorNames[i].colorImage!=null){
-            colorNames.add(request.multipleColorNames[i].colorName);
-            imageUrl.add(request.multipleColorNames[i].colorImage);
-          }
-        }
-      }else if(request.multipleColors!=null&&request.multipleColors.length>0){
-        for(int i=0;i<request.multipleColors.length;i++){
-          if(request.multipleColors[i].colorImage!=null){
-            colorNames.add(request.multipleColors[i].colorName);
-            imageUrl.add(request.multipleColors[i].colorImage);
-          }
+      if(widget.images!=null) {
+        for (var images in widget.images) {
+          imageUrl.add(images.colorImages);
         }
       }
+      // if(request.multipleColorNames!=null&&request.multipleColorNames.length>0){
+      //   for(int i=0;i<request.multipleColorNames.length;i++){
+      //     if(request.multipleColorNames[i].colorImage!=null){
+      //       colorNames.add(request.multipleColorNames[i].colorName);
+      //       imageUrl.add(request.multipleColorNames[i].colorImage);
+      //     }
+      //   }
+      // }else if(request.multipleColors!=null&&request.multipleColors.length>0){
+      //   for(int i=0;i<request.multipleColors.length;i++){
+      //     if(request.multipleColors[i].colorImage!=null){
+      //       colorNames.add(request.multipleColors[i].colorName);
+      //       imageUrl.add(request.multipleColors[i].colorImage);
+      //     }
+      //   }
+      // }
 
     });
     super.initState();
@@ -42,9 +49,13 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-          title: Text(colorNames!=null&&colorNames.length>0?"${colorNames[num]} ("+count.toString()+"/"+imageUrl.length.toString()+")":"Gallery"),
+          title: Text((){
+            if(widget.colorName!=null){
+              return widget.colorName + " "+"("+count.toString()+"/"+imageUrl.length.toString()+")";
+            }
+          }()),
            actions: [
-             InkWell(
+             widget.colorName!=null?InkWell(
                child: Center(child: Padding(
                  padding: const EdgeInsets.only(right:8.0),
                  child: Text("Upload More"),
@@ -52,7 +63,7 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
                onTap: (){
                  Navigator.pushReplacement(context, MaterialPageRoute(builder:(context)=>RequestColorsList(request)));
                },
-             )
+             ):Container()
            ],
       ),
       body: Center(

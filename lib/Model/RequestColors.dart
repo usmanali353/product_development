@@ -1,6 +1,8 @@
 
 
 
+import 'package:productdevelopment/Model/RequestColorImages.dart';
+
 class RequestColors{
   RequestColors({
     this.id,
@@ -12,6 +14,7 @@ class RequestColors{
     this.showOnMain,
     this.isApi,
     this.colorImageFile,
+    this.colorimages
   });
 
   int id;
@@ -23,6 +26,7 @@ class RequestColors{
   dynamic showOnMain;
   dynamic isApi;
   dynamic colorImageFile;
+  List<RequestColorImages> colorimages;
 
   factory RequestColors.fromJson(Map<String, dynamic> json) => RequestColors(
     id: json["id"],
@@ -34,6 +38,7 @@ class RequestColors{
     showOnMain: json["showOnMain"],
     isApi: json["isApi"],
     colorImageFile: json["colorImageFile"],
+      colorimages: json['colorimages']!=null?List<RequestColorImages>.from(json["colorimages"].map((x) => RequestColorImages.fromJson(x))):json["colorimages"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -46,5 +51,6 @@ class RequestColors{
     "showOnMain": showOnMain,
     "isApi": isApi,
     "colorImageFile": colorImageFile,
+    "colorimages":colorimages
   };
 }

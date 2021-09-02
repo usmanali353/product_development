@@ -245,11 +245,6 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                                  onTap: (){
                                    setState(() {
                                      List<String> imageUrl=[];
-                                     for(int i=0;i<requests[index].multipleImages.length;i++){
-                                       if(requests[index].multipleImages[i]!=null){
-                                         imageUrl.add(requests[index].multipleImages[i]);
-                                       }
-                                     }
                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(requests[index])));
                                    });
 
@@ -347,9 +342,25 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                                    position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
                                    items: [
                                      PopupMenuItem<String>(
-                                         child: const Text('See Details'), value: 'Details'),
+                                         child: Row(
+                                           children: [
+                                             Padding(
+                                               padding: EdgeInsets.only(right:8.0),
+                                               child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                             ),
+                                             Text("See Details")
+                                           ],
+                                         ), value: 'Details'),
                                      PopupMenuItem<String>(
-                                         child: const Text('View Rejection Reason'), value: 'rejectionReason'),
+                                         child: Row(
+                                           children: [
+                                             Padding(
+                                               padding: EdgeInsets.only(right:8.0),
+                                               child: Icon(Icons.disabled_by_default,color: Color(0xFF004c4c),),
+                                             ),
+                                             Text("Rejection Reason")
+                                           ],
+                                         ), value: 'rejectionReason'),
                                    ],
                                    elevation: 8.0,
                                  ).then((selectedItem){
@@ -368,7 +379,15 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                                    position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
                                    items: [
                                      PopupMenuItem<String>(
-                                         child: const Text('See Details'), value: 'Details'),
+                                         child: Row(
+                                           children: [
+                                             Padding(
+                                               padding: EdgeInsets.only(right:8.0),
+                                               child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                             ),
+                                             Text("See Details")
+                                           ],
+                                         ), value: 'Details'),
                                    ],
                                    elevation: 8.0,
                                  ).then((selectedItem){

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:productdevelopment/RequestImagesGallery.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class RequestColorsList extends StatefulWidget {
@@ -71,34 +72,49 @@ class _RequestColorsListState extends State<RequestColorsList> {
                   itemBuilder: (context,index){
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Card(
-                        elevation: 10,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ListTile(
-                            title: Text(widget.request.multipleColorNames[index].colorName!=null?widget.request.multipleColorNames[index].colorName:''),
-                            leading: widget.request.multipleColorNames[index].colorImage!=null?Container(width: 50,height: 50,child: CachedNetworkImage(imageUrl:widget.request.multipleColorNames[index].colorImage,placeholder: (context, url) => Container(width:40,height: 40,child: Center(child: CircularProgressIndicator())),errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,))):Container(width:50,height:50,color: Color(Utils.getColorFromHex(widget.request.multipleColorNames[index].colorCode)),),
-                            onTap: (){
-                              Utils.getImage().then((imageFile){
-                                if(imageFile!=null){
-                                  imageFile.readAsBytes().then((image){
-                                    if(image!=null){
-                                      setState(() {
-                                        _image = File(imageFile.path);
-                                        base64EncodedImage=base64Encode(image);
-                                        showAddColorDialog(widget.request.multipleColorNames[index].id,base64EncodedImage,widget.request.multipleColorNames[index].colorName);
+                      child: GestureDetector(
+                        onTapDown: (details)async{
+                            await showMenu(context: context,
+                                position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                items: [
+                                  PopupMenuItem<String>(
+                                      child: const Text('Upload Images'), value: 'uploadImages'),
+                                  PopupMenuItem<String>(
+                                      child: const Text('View Images'), value: 'viewImages'),
+                                ]
+                            ).then((selectedMenuItem){
+                                  if(selectedMenuItem=="uploadImages"){
+                                        Utils.getMultipleImages().then((images){
+                                          SharedPreferences.getInstance().then((prefs){
+                                            Network_Operations.sendiamgestoserver(context,prefs.getString("token"), images,widget.request.multipleColorNames[index].id);
+                                          });
+                                        });
+                                  }else if(selectedMenuItem=="viewImages"){
+                                    SharedPreferences.getInstance().then((prefs){
+                                      Network_Operations.getImagesByColororRequest(context, prefs.getString("token"),requestColorId:widget.request.multipleColorNames[index].id).then((colorImages){
+                                        if(colorImages!=null&&colorImages.length>0) {
+                                          Navigator.push(context, MaterialPageRoute(builder: (context) => RequestImageGallery(widget.request, images: colorImages,colorName:widget.request.multipleColorNames[index].colorName)));
+                                        }else{
+                                          Utils.showError(context,"No Images Yet for this Color");
+                                        }
                                       });
-                                    }
-                                  });
-                                }else{
+                                    });
 
-                                }
-                              });
-                                //Navigator.push(context, MaterialPageRoute(builder:(context)=>addImageToColors(widget.request)));
-                            },
+                                  }
+
+                            });
+                        },
+                        child: Card(
+                          elevation: 10,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ListTile(
+                              title: Text(widget.request.multipleColorNames[index].colorName!=null?widget.request.multipleColorNames[index].colorName:''),
+                              leading: Container(width:50,height:50,color: Color(Utils.getColorFromHex(widget.request.multipleColorNames[index].colorCode)),),
+                            ),
                           ),
                         ),
                       ),
@@ -109,38 +125,6 @@ class _RequestColorsListState extends State<RequestColorsList> {
           ),
         ),
       ),
-    );
-  }
-  showAddColorDialog(int colorId,var base64Image,String colorName){
-    showDialog(
-        context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Add Image to Color"),
-          content: Text("are you sure you want to add Image to Color $colorName?"),
-          actions: [
-            TextButton(
-                child: Text("Add"),
-                onPressed: (){
-                  SharedPreferences.getInstance().then((prefs){
-                    Network_Operations.addRequestImages(context, prefs.getString("token"),colorId, base64Image).then((value){
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                      WidgetsBinding.instance
-                          .addPostFrameCallback((_) => refreshIndicatorKey.currentState.show());
-                    });
-                  });
-                },
-            ),
-            TextButton(
-                child: Text("Cancel"),
-                onPressed: (){
-                     Navigator.pop(context);
-                },
-            ),
-          ],
-        );
-      },
     );
   }
 }
