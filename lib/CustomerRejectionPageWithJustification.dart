@@ -39,10 +39,11 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
   var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
   @override
   void initState() {
+    super.initState();
     _searchQuery = TextEditingController();
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-    super.initState();
+
   }
   @override
   Widget build(BuildContext context) {

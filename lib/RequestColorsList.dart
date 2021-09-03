@@ -78,9 +78,25 @@ class _RequestColorsListState extends State<RequestColorsList> {
                                 position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
                                 items: [
                                   PopupMenuItem<String>(
-                                      child: const Text('Upload Images'), value: 'uploadImages'),
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(right:8.0),
+                                            child: Icon(Icons.add_photo_alternate,color: Color(0xFF004c4c),),
+                                          ),
+                                          Text("Add Images")
+                                        ],
+                                      ), value: 'uploadImages'),
                                   PopupMenuItem<String>(
-                                      child: const Text('View Images'), value: 'viewImages'),
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(right:8.0),
+                                            child: Icon(Icons.photo,color: Color(0xFF004c4c),),
+                                          ),
+                                          Text("View Images")
+                                        ],
+                                      ), value: 'viewImages'),
                                 ]
                             ).then((selectedMenuItem){
                                   if(selectedMenuItem=="uploadImages"){

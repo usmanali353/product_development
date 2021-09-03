@@ -22,6 +22,10 @@ class Utils{
     var image = await ImagePicker().pickImage(source: ImageSource.gallery);
     return image;
   }
+  static Future<List<XFile>> getMultipleImages() async {
+    var image = await ImagePicker().pickMultiImage();
+    return image;
+  }
   static Future<bool> check_connectivity () async{
     bool result = await InternetConnectionChecker().hasConnection;
     return result;
@@ -35,9 +39,10 @@ class Utils{
     return regExp.hasMatch(value);
   }
   static String getBaseUrl(){
-    //return "http://173.212.235.106:8900/api/";
-    return "http://productapi.arabian-ceramics.com/api/";
-    //return "http://192.168.137.240:45455/api/";
+    return "http://173.212.235.106:8900/api/";
+   // return "http://productapi.arabian-ceramics.com/api/";
+    //return "http://192.168.10.17:45455/api/";
+   // return "http://88.213.72.228:8900/api/";
   }
  static void showError(BuildContext context,String message) {
    Flushbar(

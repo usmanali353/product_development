@@ -12,6 +12,7 @@ import 'package:productdevelopment/Model/RemarksHistory.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:share/share.dart';
+import 'Model/RequestColorImages.dart';
 import 'RequestImagesGallery.dart';
 
 class DetailPage extends StatefulWidget {
@@ -38,11 +39,26 @@ class _DetailPageState extends State<DetailPage>{
      });
    }
    setState(() {
-     imageUrl.add(request.image);
-     for(int i=0;i<request.multipleImages.length;i++){
-       if(request.multipleImages[i]!=null){
-         imageUrl.add(request.multipleImages[i]);
+     if(request.multipleColorNames!=null&&request.multipleColorNames.length>0){
+       for(int i=0;i<request.multipleColorNames.length;i++){
+         if(request.multipleColorNames[i].colorimages!=null&&request.multipleColorNames[i].colorimages.length>0){
+           for(RequestColorImages img in request.multipleColorNames[i].colorimages) {
+            // colorNames.add(request.multipleColorNames[i].colorName);
+             imageUrl.add(img.colorImages);
+           }
+         }
        }
+       //print(colorNames.toString());
+     }else if(request.multipleColors!=null&&request.multipleColors.length>0){
+       for(int i=0;i<request.multipleColors.length;i++){
+         if(request.multipleColors[i].colorimages!=null&&request.multipleColors[i].colorimages.length>0){
+           for(RequestColorImages img in request.multipleColors[i].colorimages) {
+            // colorNames.add(request.multipleColors[i].colorName);
+             imageUrl.add(img.colorImages);
+           }
+         }
+       }
+      // print(colorNames.toString());
      }
    });
     super.initState();
@@ -341,7 +357,7 @@ class _DetailPageState extends State<DetailPage>{
                                 subtitle: Text(request.multipleSuitabilityNames.toString().replaceAll("[", "").replaceAll("]", "")),
                               ),
                               Divider(),
-                              request.statusName=='Approved By Customer'||request.statusName=='Model Approved'||request.statusName=='Rejected By Customer'||request.statusName=="Model Rejected"&&request.qrcodeImage!=null?Column(
+                              request.qrcodeImage!=null?Column(
                                 children: [
                                   ListTile(
                                     title: Text("Qr Code", style: TextStyle(

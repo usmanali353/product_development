@@ -353,7 +353,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                   Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
                                 });
                               }
-                            }else{
+                            }else if(requests[index].status=="Rejected By Customer"&&requests[index].currentAction!="Pending"){
                               await showMenu(
                                 context: context,
                                 position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
@@ -370,6 +370,18 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                       ),
                                       value: 'Details'
                                   ),
+                                  PopupMenuItem<String>(
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(right:8.0),
+                                            child: Icon(Icons.disabled_by_default,color: Color(0xFF004c4c),),
+                                          ),
+                                          Text("Rejection Reasons")
+                                        ],
+                                      ),
+                                      value: 'rejectionReasons'
+                                  )
                                 ],
                                 elevation: 8.0,
                               ).then((selectedItem){
@@ -380,7 +392,13 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                   SharedPreferences.getInstance().then((prefs){
                                     Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
                                   });
+                                }else if(selectedItem=="rejectionReasons"){
+                                  showReasonDialog(requests[index]);
                                 }
+                              });
+                            }else{
+                              SharedPreferences.getInstance().then((prefs){
+                                Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
                               });
                             }
                           },

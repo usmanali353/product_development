@@ -13,7 +13,6 @@ class RequestImageGallery extends StatefulWidget {
 }
 
 class _RequestImageGalleryState extends State<RequestImageGallery> {
-  var request;
   int num=0,count=1;
    List<String> imageUrl=[],colorNames=[];
   _RequestImageGalleryState();
@@ -24,22 +23,44 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
         for (var images in widget.images) {
           imageUrl.add(images.colorImages);
         }
+      }else if(widget.request.multipleColorNames!=null&&widget.request.multipleColorNames.length>0){
+        for(int i=0;i<widget.request.multipleColorNames.length;i++){
+          if(widget.request.multipleColorNames[i].colorimages!=null&&widget.request.multipleColorNames[i].colorimages.length>0){
+            for(RequestColorImages img in widget.request.multipleColorNames[i].colorimages) {
+              colorNames.add(widget.request.multipleColorNames[i].colorName);
+              imageUrl.add(img.colorImages);
+            }
+          }
+        }
+
+      }else if(widget.request.multipleColors!=null&&widget.request.multipleColors.length>0){
+        for(int i=0;i<widget.request.multipleColors.length;i++){
+          if(widget.request.multipleColors[i].colorimages!=null&&widget.request.multipleColors[i].colorimages.length>0){
+            for(RequestColorImages img in widget.request.multipleColors[i].colorimages) {
+              colorNames.add(widget.request.multipleColors[i].colorName);
+              imageUrl.add(img.colorImages);
+            }
+          }
+        }
+        print(colorNames.toString());
       }
-      // if(request.multipleColorNames!=null&&request.multipleColorNames.length>0){
-      //   for(int i=0;i<request.multipleColorNames.length;i++){
-      //     if(request.multipleColorNames[i].colorImage!=null){
-      //       colorNames.add(request.multipleColorNames[i].colorName);
-      //       imageUrl.add(request.multipleColorNames[i].colorImage);
-      //     }
-      //   }
-      // }else if(request.multipleColors!=null&&request.multipleColors.length>0){
-      //   for(int i=0;i<request.multipleColors.length;i++){
-      //     if(request.multipleColors[i].colorImage!=null){
-      //       colorNames.add(request.multipleColors[i].colorName);
-      //       imageUrl.add(request.multipleColors[i].colorImage);
-      //     }
-      //   }
-      // }
+      if(imageUrl.length==0||colorNames.length==0) {
+        if (widget.request.multipleColorNames != null && widget.request.multipleColorNames.length > 0) {
+          for (int i = 0; i < widget.request.multipleColorNames.length; i++) {
+             if(widget.request.multipleColorNames[i].colorImage!=null){
+               imageUrl.add(widget.request.multipleColorNames[i].colorImage);
+               colorNames.add(widget.request.multipleColorNames[i].colorName);
+             }
+          }
+        }else if (widget.request.multipleColors != null && widget.request.multipleColors.length > 0) {
+          for (int i = 0; i < widget.request.multipleColors.length; i++) {
+            if(widget.request.multipleColors[i].colorImage!=null){
+              imageUrl.add(widget.request.multipleColors[i].colorImage);
+              colorNames.add(widget.request.multipleColors[i].colorName);
+            }
+          }
+        }
+      }
 
     });
     super.initState();
@@ -50,8 +71,12 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
       backgroundColor: Colors.black,
       appBar: AppBar(
           title: Text((){
-            if(widget.colorName!=null){
+            if(widget.colorName!=null&&widget.images!=null){
               return widget.colorName + " "+"("+count.toString()+"/"+imageUrl.length.toString()+")";
+            }else if(widget.request.multipleColorNames!=null&&widget.request.multipleColorNames.length>0&&colorNames.length>0||widget.request.multipleColors!=null&&widget.request.multipleColors.length>0&&colorNames.length>0){
+              return colorNames[num]+" "+"("+count.toString()+"/"+imageUrl.length.toString()+")";
+            }else if(imageUrl.length==0){
+              return "Model Images";
             }
           }()),
            actions: [
@@ -61,7 +86,7 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
                  child: Text("Upload More"),
                )),
                onTap: (){
-                 Navigator.pushReplacement(context, MaterialPageRoute(builder:(context)=>RequestColorsList(request)));
+                 Navigator.pushReplacement(context, MaterialPageRoute(builder:(context)=>RequestColorsList(widget.request)));
                },
              ):Container()
            ],

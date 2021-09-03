@@ -367,16 +367,7 @@ class _ModelReState extends State<ModelRequests>{
                               children: <Widget>[
                                 InkWell(
                                   onTap: (){
-                                    setState(() {
-                                      List<String> imageUrl=[];
-                                      for(int i=0;i<products[index].multipleImages.length;i++){
-                                        if(products[index].multipleImages[i]!=null){
-                                          imageUrl.add(products[index].multipleImages[i]);
-                                        }
-                                      }
-                                      imageUrl.add(products[index].image);
-                                      Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
-                                    });
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
                                   },
                                   child:CachedNetworkImage(
                                     imageUrl: products[index].image!=null?products[index].image:"http://anokha.world/images/not-found.png",
