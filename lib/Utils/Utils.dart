@@ -39,9 +39,9 @@ class Utils{
     return regExp.hasMatch(value);
   }
   static String getBaseUrl(){
-    return "http://173.212.235.106:8900/api/";
-   // return "http://productapi.arabian-ceramics.com/api/";
-    //return "http://192.168.10.17:45455/api/";
+   //return "http://173.212.235.106:8900/api/";
+   return "http://productapi.arabian-ceramics.com/api/";
+    //return "http://192.168.10.17:45457/api/";
    // return "http://88.213.72.228:8900/api/";
   }
  static void showError(BuildContext context,String message) {

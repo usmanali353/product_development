@@ -80,7 +80,7 @@ class _AssumptionsState extends State<Assumptions> {
                 }
                 if(widget.request!=null) {
                   if (widget.request.multipleClientNames != null && widget.request.multipleClientNames.length > 0) {
-                    if (widget.request.statusName == "Local Exclusive") {
+                    if (widget.request.marketName == "Local Exclusive") {
                       selectedClient = widget.request.multipleClientNames[0];
                       clientId = clients[clientNames.indexOf(selectedClient)].stringId;
                     } else {

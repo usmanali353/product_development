@@ -331,13 +331,39 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                                  context: context,
                                  position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
                              items: [
-                             PopupMenuItem<String>(
-                             child: const Text('View Rejection Reason'), value: 'rejectionReason'),
+                               PopupMenuItem<String>(
+                                   child: Row(
+                                     children: [
+                                       Padding(
+                                         padding: EdgeInsets.only(right:8.0),
+                                         child: Icon(Icons.disabled_by_default,color: Color(0xFF004c4c),),
+                                       ),
+                                       Text("Rejection Reasons")
+                                     ],
+                                   ),
+                                   value: 'rejectionReason'
+                               ),
+                               PopupMenuItem<String>(
+                                   child: Row(
+                                     children: [
+                                       Padding(
+                                         padding: EdgeInsets.only(right:8.0),
+                                         child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                       ),
+                                       Text("See Deatils")
+                                     ],
+                                   ),
+                                   value: 'Details'
+                               ),
                              ],
                              elevation: 8.0,
                              ).then((selectedItem){
                                 if(selectedItem=='rejectionReason'){
                                   showReasonDialog(allRequests[index]);
+                                }else if(selectedItem=="Details"){
+                                  SharedPreferences.getInstance().then((prefs){
+                                    Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                  });
                                 }
                              });
                            },

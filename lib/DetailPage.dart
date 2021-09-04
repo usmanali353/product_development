@@ -41,6 +41,9 @@ class _DetailPageState extends State<DetailPage>{
    setState(() {
      if(request.multipleColorNames!=null&&request.multipleColorNames.length>0){
        for(int i=0;i<request.multipleColorNames.length;i++){
+         if(widget.request.multipleColorNames[i].colorImage!=null){
+           imageUrl.add(widget.request.multipleColorNames[i].colorImage);
+         }
          if(request.multipleColorNames[i].colorimages!=null&&request.multipleColorNames[i].colorimages.length>0){
            for(RequestColorImages img in request.multipleColorNames[i].colorimages) {
             // colorNames.add(request.multipleColorNames[i].colorName);
@@ -51,6 +54,9 @@ class _DetailPageState extends State<DetailPage>{
        //print(colorNames.toString());
      }else if(request.multipleColors!=null&&request.multipleColors.length>0){
        for(int i=0;i<request.multipleColors.length;i++){
+         if(widget.request.multipleColors[i].colorImage!=null){
+           imageUrl.add(widget.request.multipleColors[i].colorImage);
+         }
          if(request.multipleColors[i].colorimages!=null&&request.multipleColors[i].colorimages.length>0){
            for(RequestColorImages img in request.multipleColors[i].colorimages) {
             // colorNames.add(request.multipleColors[i].colorName);

@@ -29,15 +29,8 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
   @override
   void initState() {
     _searchQuery = TextEditingController();
-    Utils.check_connectivity().then((isConnected){
-      if(isConnected){
         WidgetsBinding.instance
             .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-      }else{
-        Utils.showError(context,"Network not Available");
-      }
-    });
-
     super.initState();
   }
   @override
@@ -299,9 +292,29 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                                   position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
                                   items: [
                                     PopupMenuItem<String>(
-                                        child: const Text('See Details'), value: 'Details'),
+                                        child: Row(
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.only(right:8.0),
+                                              child: Icon(Icons.disabled_by_default,color: Color(0xFF004c4c),),
+                                            ),
+                                            Text("Rejection Reasons")
+                                          ],
+                                        ),
+                                        value: 'rejectionReason'
+                                    ),
                                     PopupMenuItem<String>(
-                                        child: const Text('View Rejection Reason'), value: 'rejectionReason'),
+                                        child: Row(
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.only(right:8.0),
+                                              child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                            ),
+                                            Text("See Deatils")
+                                          ],
+                                        ),
+                                        value: 'Details'
+                                    ),
                                   ],
                                   elevation: 8.0,
                                 ).then((selectedItem){
@@ -321,11 +334,39 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                                   position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
                                   items: [
                                     PopupMenuItem<String>(
-                                        child: const Text('Change Status'), value: 'changeStatus'),
+                                        child: Row(
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.only(right:8.0),
+                                              child: Icon(Icons.update,color: Color(0xFF004c4c),),
+                                            ),
+                                            Text("Change Status")
+                                          ],
+                                        ), value: 'changeStatus'),
                                     PopupMenuItem<String>(
-                                        child: const Text('See Details'), value: 'Details'),
+                                        child: Row(
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.only(right:8.0),
+                                              child: Icon(Icons.disabled_by_default,color: Color(0xFF004c4c),),
+                                            ),
+                                            Text("Rejection Reasons")
+                                          ],
+                                        ),
+                                        value: 'rejectionReasons'
+                                    ),
                                     PopupMenuItem<String>(
-                                        child: const Text('View Rejection Reason'), value: 'rejectionReason'),
+                                        child: Row(
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.only(right:8.0),
+                                              child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                            ),
+                                            Text("See Deatils")
+                                          ],
+                                        ),
+                                        value: 'Details'
+                                    ),
                                   ],
                                   elevation: 8.0,
                                 ).then((selectedItem){
@@ -346,7 +387,7 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                                       Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
                                     });
                                   }
-                                  else if(selectedItem=="rejectionReason"){
+                                  else if(selectedItem=="rejectionReasons"){
                                     showReasonDialog(allRequests[index]);
                                   }
                                 });

@@ -1,6 +1,8 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
+import 'package:r_upgrade/r_upgrade.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailsPage.dart';
 import 'Network_Operations/DynamicLinkService.dart';
@@ -33,6 +35,18 @@ class _LoginState extends State<Login> {
     });
     username=TextEditingController();
     password=TextEditingController();
+    PackageInfo.fromPlatform().then((pkg){
+      print("App Version "+pkg.version);
+      print("App Package Name "+pkg.packageName);
+      print("App Name "+pkg.appName);
+      Network_Operations.checkUpdate().then((response){
+        if(response!=null){
+          if(response["version"]!=pkg.version){
+            showAlertDialog(context, response);
+          }
+        }
+      });
+    });
     Utils.setupQuickActions(context);
   }
 
@@ -179,6 +193,47 @@ class _LoginState extends State<Login> {
           ],
         ) /* add child content here */,
       ),
+    );
+  }
+  showAlertDialog(BuildContext context,dynamic response) {
+
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Cancel"),
+      onPressed:  () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = TextButton(
+      child: Text("Install"),
+      onPressed:  () async{
+        await RUpgrade.upgrade(
+            response["url"],
+            isAutoRequestInstall: true,
+            useDownloadManager: false
+        );
+        Navigator.pop(context);
+        //https://onedrive.live.com/download?cid=A82CB96BFF0FB925&resid=A82CB96BFF0FB925%211072&authkey=AEelcxW-Fldhvg4
+
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("ACMC Products"),
+      content: Text("New Version of ACMC Products is Available Would you Like to Install it. It will be Downloaded in the Background"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }
