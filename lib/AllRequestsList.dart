@@ -90,6 +90,11 @@ class _AllRequestListState extends State<AllRequestList> {
           });
         }
       });
+      if(widget.startDate!=null&&widget.endDate!=null){
+        setState(() {
+          isDateBarVisible=true;
+        });
+      }
       WidgetsBinding.instance
           .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
     });

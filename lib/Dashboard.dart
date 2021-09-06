@@ -256,6 +256,27 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                     ],
                   ):Container(),
                   ListTile(
+                    title: Text("Check for Updates"),
+                    leading: Icon(FontAwesomeIcons.sync),
+                    onTap: (){
+                      PackageInfo.fromPlatform().then((pkg){
+                        print("App Version "+pkg.version);
+                        print("App Package Name "+pkg.packageName);
+                        print("App Name "+pkg.appName);
+                        Network_Operations.checkUpdate(context).then((response){
+                          if(response!=null){
+                            if(response["version"]!=pkg.version){
+                              showAlertDialog(context, response);
+                            }else{
+                              Utils.showSuccess(context,"Your App is already up to date");
+                            }
+                          }
+                        });
+                      });
+                    },
+                  ),
+                  Divider(),
+                  ListTile(
                     title: Text("Sign Out"),
                     leading: Icon(FontAwesomeIcons.signOutAlt),
                     onTap: (){
@@ -380,18 +401,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                             }
 
                           });
-                          PackageInfo.fromPlatform().then((pkg){
-                            print("App Version "+pkg.version);
-                            print("App Package Name "+pkg.packageName);
-                            print("App Name "+pkg.appName);
-                            Network_Operations.checkUpdate().then((response){
-                              if(response!=null){
-                                if(response["version"]!=pkg.version){
-                                  showAlertDialog(context, response);
-                                }
-                              }
-                            });
-                          });
+
                         });
                       });
                     }else{
@@ -406,19 +416,6 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                                 FlutterAppBadger.updateBadgeCount(notificationCount['Unread Notifications Count']);
                               }
                             }
-
-                          });
-                          PackageInfo.fromPlatform().then((pkg){
-                            print("App Version "+pkg.version);
-                            print("App Package Name "+pkg.packageName);
-                            print("App Name "+pkg.appName);
-                            Network_Operations.checkUpdate().then((response){
-                              if(response!=null){
-                                if(response["version"]!=pkg.version){
-                                  showAlertDialog(context, response);
-                                }
-                              }
-                            });
                           });
                         });
                       });

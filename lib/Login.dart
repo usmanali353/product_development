@@ -39,7 +39,7 @@ class _LoginState extends State<Login> {
       print("App Version "+pkg.version);
       print("App Package Name "+pkg.packageName);
       print("App Name "+pkg.appName);
-      Network_Operations.checkUpdate().then((response){
+      Network_Operations.checkUpdate(context).then((response){
         if(response!=null){
           if(response["version"]!=pkg.version){
             showAlertDialog(context, response);
@@ -213,8 +213,6 @@ class _LoginState extends State<Login> {
             useDownloadManager: false
         );
         Navigator.pop(context);
-        //https://onedrive.live.com/download?cid=A82CB96BFF0FB925&resid=A82CB96BFF0FB925%211072&authkey=AEelcxW-Fldhvg4
-
       },
     );
 

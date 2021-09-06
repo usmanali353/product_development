@@ -89,7 +89,7 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
             }
           }()),
            actions: [
-             widget.colorName!=null?InkWell(
+             widget.colorName==null?InkWell(
                child: Center(child: Padding(
                  padding: const EdgeInsets.only(right:8.0),
                  child: Text("Upload More"),

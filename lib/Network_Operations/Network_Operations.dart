@@ -159,6 +159,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       final body = jsonEncode({
         "requestId": request.requestId,
         "date": DateTime.now(),
+        "IsActive":true,
         "marketId": request.marketId,
         "event": request.event,
         "userId": request.userId,
@@ -217,6 +218,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         "marketId": request.marketId,
         "event": request.event,
         "userId": request.userId,
+        "IsActive":true,
         "technicalConcentration": request.technicalConcentration,
         "statusId": request.statusId,
         "classificationId": request.classificationId,
@@ -286,7 +288,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       if(response.statusCode==200){
        pd.dismiss();
        Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
-       Utils.showSuccess(context, response.body.toString());
+       Utils.showSuccess(context,"Request is Approved By GM");
       }else{
         pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
@@ -322,7 +324,11 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         pd.dismiss();
 
         Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context)=>Dashboard()),(Route<dynamic> route) => false);
-        Utils.showSuccess(context, response.body.toString());
+        if(IsUpdateMode==null) {
+          Utils.showSuccess(context, "Request Schedule Added Successfully");
+        }else{
+          Utils.showSuccess(context, "Request Schedule Updated Successfully");
+        }
         // changeStatusWithRemarks(context, token, requestId, statusId,remarks).then((value){
         //
         // });
@@ -1538,21 +1544,31 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
     return null;
   }
-  static Future<dynamic> checkUpdate()async{
+  static Future<dynamic> checkUpdate(BuildContext context)async{
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
+    pd.show();
     try{
       var response= await http.get(Uri.parse("https://drive.google.com/uc?export=download&id=1z-tOeG4egZl6iFWj8BNmDN6CuyGDAfqz")).timeout(
         Duration(minutes: 1),
         onTimeout: () {
+          pd.dismiss();
           // Time has run out, do what you wanted to do.
           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
         },
       );
       if(response.statusCode==200){
+        pd.dismiss();
         print(response.body);
         return jsonDecode(response.body);
+      }else{
+        pd.dismiss();
+        Utils.showError(context,response.statusCode.toString());
       }
     }catch(e){
+      pd.dismiss();
       print(e.toString());
+    }finally{
+      pd.dismiss();
     }
     return null;
   }

@@ -97,6 +97,11 @@ class _ModelReState extends State<ModelRequests>{
             isClient = true;
           });
         }
+        if(widget.startDate!=null&&widget.endDate!=null){
+          setState(() {
+            isDateBarVisible=true;
+          });
+        }
         WidgetsBinding.instance
             .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
       });
@@ -1125,6 +1130,7 @@ class _ModelReState extends State<ModelRequests>{
           if(datePicked!=null&&datePicked.end!=null){
             picked.add(datePicked.end);
           }
+
           if(picked!=null&&picked.length==2){
             setState(() {
               this.initialStart=picked[0];
