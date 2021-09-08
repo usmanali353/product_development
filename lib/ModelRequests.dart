@@ -9,6 +9,7 @@ import 'package:productdevelopment/AddClientsForTrial.dart';
 import 'package:productdevelopment/ApproveForTrial.dart';
 import 'package:productdevelopment/Dashboard.dart';
 import 'package:productdevelopment/DetailsPage.dart';
+import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/Observations.dart';
@@ -40,7 +41,7 @@ class _ModelReState extends State<ModelRequests>{
   List<Request> products=[];
   var claims;
   GlobalKey<RefreshIndicatorState> refreshIndicatorKey=GlobalKey();
-  var selectedPreference,selectedStatus;
+  var selectedPreference,selectedStatus,selectedSearchPreference;
   int statusId;
   bool isDateBarVisible=false;
   List<DateTime> picked=[];
@@ -56,7 +57,9 @@ class _ModelReState extends State<ModelRequests>{
   _ModelReState(this.statusId,this.currentUserRoles);
  bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false,isListVisible=false;
  bool isColorsVisible=false;
- List<Request> requests=[];
+ List<Request> requests=[],requestsForSuggestions=[];
+ List<String> clientNames=[],modelNames=[],modelCodes=[],newModelNames=[],newModelCodes=[];
+ List<Dropdown> clientDropdown=[];
  var req;
   String token;
   @override
@@ -64,8 +67,41 @@ class _ModelReState extends State<ModelRequests>{
     _searchQuery = TextEditingController();
     SharedPreferences.getInstance().then((prefs) {
       setState(() {
+
         claims = Utils.parseJwt(prefs.getString("token"));
         token = prefs.getString("token");
+        if(statusId==1){
+          Network_Operations.getDropDowns(context, token,"Clients").then((value){
+            setState(() {
+              this.clientDropdown=value;
+              for(Dropdown d in clientDropdown){
+                clientNames.add(d.name);
+              }
+            });
+          });
+        }else{
+          Network_Operations.getRequestsForSearchSuggestions(context, token,statusId: statusId).then((req){
+            this.requestsForSuggestions=req;
+            if(requestsForSuggestions!=null){
+              if(requestsForSuggestions.length>0){
+                for(Request r in requestsForSuggestions){
+                  if(r.modelName!=null){
+                    modelNames.add(r.modelName);
+                  }
+                  if(r.modelCode!=null){
+                    modelCodes.add(r.modelCode);
+                  }
+                  if(r.newModelName!=null){
+                    newModelNames.add(r.newModelName);
+                  }
+                  if(r.newModelCode!=null){
+                    newModelCodes.add(r.newModelCode);
+                  }
+                }
+              }
+            }
+          });
+        }
         print(claims);
         //Checking Roles
         if (claims['role'].contains('General Manager')) {
@@ -941,6 +977,122 @@ class _ModelReState extends State<ModelRequests>{
       },
     );
   }
+  showSearchDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget approveRejectButton = TextButton(
+      child: Text("Set"),
+      onPressed: () {
+        print(selectedSearchPreference);
+         if(selectedSearchPreference=="searchByClient"){
+          clientNames.clear();
+          if(clientDropdown.length>0){
+            setState(() {
+              for(Dropdown d in clientDropdown){
+                clientNames.add(d.name);
+              }
+            });
+          }else{
+            Network_Operations.getDropDowns(context, token,"Clients").then((value){
+              setState(() {
+                this.clientDropdown=value;
+                for(Dropdown d in clientDropdown){
+                  clientNames.add(d.name);
+                }
+              });
+            });
+
+          }
+          _startSearch();
+          Navigator.pop(context);
+        }else{
+           _startSearch();
+           Navigator.pop(context);
+         }
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Search By"),
+      content: StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              RadioListTile(
+                title: Text("Samples Model Name"),
+                value: 'searchByModelName',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("Samples Model Code"),
+                value: 'searchByModelCode',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("Client"),
+                value: 'searchByClient',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+             statusId==5? RadioListTile(
+                title: Text("Production Model Name"),
+                value: 'searchByProductionModelName',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ):Container(),
+              statusId==5?RadioListTile(
+                title: Text("Production Model Code"),
+                value: 'searchByProductionModelCode',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ):Container(),
+            ],
+          );
+        },
+      ),
+      actions: [
+        cancelButton,
+        approveRejectButton
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
   void _startSearch() {
     ModalRoute
         .of(context)
@@ -951,143 +1103,171 @@ class _ModelReState extends State<ModelRequests>{
     });
   }
   Widget _buildSearchField() {
-    return  TextField(
-      controller: _searchQuery,
-      autofocus: true,
-      textInputAction: TextInputAction.search,
-      decoration: const InputDecoration(
-        hintText: 'Search...',
-        border: InputBorder.none,
-        hintStyle: const TextStyle(color: Colors.white30),
-      ),
-      style: const TextStyle(color: Colors.white, fontSize: 16.0),
-      onSubmitted:(query){
-        if(query.isNotEmpty){
-          if(!isClient){
-            Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,searchPageNum,10,query,startDate: widget.startDate,endDate: widget.endDate).then((response){
-              setState(() {
-                requests.clear();
-                req=jsonDecode(response);
-                for(int i=0;i<req["response"]['allRequests'].length;i++){
-                  requests.add(Request.fromMap(req["response"]['allRequests'][i]));
-                }
-                this.products = requests;
-                if (this.products.length > 0) {
-                  isListVisible = true;
-                }
-                if(req['hasNext']&&req['hasPrevious']){
-                  nextButtonVisible=true;
-                  previousButtonVisible=true;
-                }else if(req['hasPrevious']&&!req['hasNext']){
-                  previousButtonVisible=true;
-                  nextButtonVisible=false;
-                }else if(!req['hasPrevious']&&req['hasNext']){
-                  previousButtonVisible=false;
-                  nextButtonVisible=true;
-                }else{
-                  previousButtonVisible=false;
-                  nextButtonVisible=false;
-                }
-                if(products.length==0){
-                  Utils.showError(context,"No Request Found");
-                }
-              });
-            });
-          }else {
-            Network_Operations.getRequestByStatusIndividualUserSearchable(context, token, statusId,query,searchPageNum,10,startDate: widget.startDate,endDate: widget.endDate).then((response){
-              setState(() {
-                requests.clear();
-                for(int i=0;i<jsonDecode(response).length;i++){
-                  requests.add(Request.fromMap(jsonDecode(response)[i]));
-                }
-                this.products=requests;
-                if(products!=null&&products.length>0){
-                  isListVisible=true;
-                }
-                print(requests.length);
-                if(req['hasNext']&&req['hasPrevious']){
-                  nextButtonVisible=true;
-                  previousButtonVisible=true;
-                }else if(req['hasPrevious']&&!req['hasNext']){
-                  previousButtonVisible=true;
-                  nextButtonVisible=false;
-                }else if(!req['hasPrevious']&&req['hasNext']){
-                  previousButtonVisible=false;
-                  nextButtonVisible=true;
-                }else{
-                  previousButtonVisible=false;
-                  nextButtonVisible=false;
-                }
-                if(products.length==0){
-                  Utils.showError(context,"No Request Found");
-                }
-              });
-            });
-          }
-        }else{
-          if(!isClient){
-            Network_Operations.getRequestByStatusGM(context, token, statusId,pageNum,10).then((response){
-              setState(() {
-                requests.clear();
-                req=jsonDecode(response);
-                for(int i=0;i<req["response"]['allRequests'].length;i++){
-                  requests.add(Request.fromMap(req["response"]['allRequests'][i]));
-                }
-                this.products = requests;
-                if (this.products.length > 0) {
-                  isListVisible = true;
-                }
-                if(req['hasNext']&&req['hasPrevious']){
-                  nextButtonVisible=true;
-                  previousButtonVisible=true;
-                }else if(req['hasPrevious']&&!req['hasNext']){
-                  previousButtonVisible=true;
-                  nextButtonVisible=false;
-                }else if(!req['hasPrevious']&&req['hasNext']){
-                  previousButtonVisible=false;
-                  nextButtonVisible=true;
-                }else{
-                  previousButtonVisible=false;
-                  nextButtonVisible=false;
-                }
-                if(products.length==0){
-                  Utils.showError(context,"No Request Found");
-                }
-              });
-            });
-          }else {
-            Network_Operations.getRequestByStatusIndividualUser(context, token, statusId,pageNum,10,startDate: widget.startDate,endDate: widget.endDate).then((response){
-              setState(() {
-                requests.clear();
-                for(int i=0;i<jsonDecode(response).length;i++){
-                  requests.add(Request.fromMap(jsonDecode(response)[i]));
-                }
-                this.products=requests;
-                if(products!=null&&products.length>0){
-                  isListVisible=true;
-                }
-                print(requests.length);
-                if(req['hasNext']&&req['hasPrevious']){
-                  nextButtonVisible=true;
-                  previousButtonVisible=true;
-                }else if(req['hasPrevious']&&!req['hasNext']){
-                  previousButtonVisible=true;
-                  nextButtonVisible=false;
-                }else if(!req['hasPrevious']&&req['hasNext']){
-                  previousButtonVisible=false;
-                  nextButtonVisible=true;
-                }else{
-                  previousButtonVisible=false;
-                  nextButtonVisible=false;
-                }
-                if(products.length==0){
-                  Utils.showError(context,"No Request Found");
-                }
-              });
-            });
-          }
-        }
+    return  Autocomplete(
+      displayStringForOption: (String value){
+        return value;
       },
+        optionsBuilder: (TextEditingValue text){
+           if(statusId==1){
+             return clientNames.where((element) =>element.toLowerCase().contains(text.text));
+           }else if(statusId==5&&selectedSearchPreference=="searchByProductionModelName"){
+             return newModelNames.where((element) => element.toLowerCase().contains(text.text));
+           }else if(statusId==5&&selectedSearchPreference=="searchByProductionModelCode"){
+             return newModelCodes.where((element) => element.toLowerCase().contains(text.text));
+           }else if(statusId>1&&selectedSearchPreference=="searchByModelName"){
+             return modelNames.where((element) =>element.toLowerCase().contains(text.text));
+           }else if(statusId>1&&selectedSearchPreference=="searchByModelCode"){
+             return modelCodes.where((element) =>element.toLowerCase().contains(text.text));
+           }else if(statusId>1&&selectedSearchPreference=="searchByClient"){
+             return clientNames.where((element) =>element.toLowerCase().contains(text.text));
+           }else
+             return null;
+        },
+      fieldViewBuilder: (BuildContext context,TextEditingController controller,FocusNode focusmode,VoidCallback func){
+        return TextField(
+          controller: controller,
+          focusNode: focusmode,
+          autofocus: true,
+          textInputAction: TextInputAction.search,
+          decoration: const InputDecoration(
+            hintText: 'Search...',
+            border: InputBorder.none,
+            hintStyle: const TextStyle(color: Colors.white30),
+          ),
+          style: const TextStyle(color: Colors.white, fontSize: 16.0),
+          onSubmitted:(query){
+            setState(() {
+              this.searchQuery=query;
+            });
+            if(query.isNotEmpty){
+              if(!isClient){
+                Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,searchPageNum,10,query,startDate: widget.startDate,endDate: widget.endDate).then((response){
+                  setState(() {
+                    requests.clear();
+                    req=jsonDecode(response);
+                    for(int i=0;i<req["response"]['allRequests'].length;i++){
+                      requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                    }
+                    this.products = requests;
+                    if (this.products.length > 0) {
+                      isListVisible = true;
+                    }
+                    if(req['hasNext']&&req['hasPrevious']){
+                      nextButtonVisible=true;
+                      previousButtonVisible=true;
+                    }else if(req['hasPrevious']&&!req['hasNext']){
+                      previousButtonVisible=true;
+                      nextButtonVisible=false;
+                    }else if(!req['hasPrevious']&&req['hasNext']){
+                      previousButtonVisible=false;
+                      nextButtonVisible=true;
+                    }else{
+                      previousButtonVisible=false;
+                      nextButtonVisible=false;
+                    }
+                    if(products.length==0){
+                      Utils.showError(context,"No Request Found");
+                    }
+                  });
+                });
+              }else {
+                Network_Operations.getRequestByStatusIndividualUserSearchable(context, token, statusId,query,searchPageNum,10,startDate: widget.startDate,endDate: widget.endDate).then((response){
+                  setState(() {
+                    requests.clear();
+                    for(int i=0;i<jsonDecode(response).length;i++){
+                      requests.add(Request.fromMap(jsonDecode(response)[i]));
+                    }
+                    this.products=requests;
+                    if(products!=null&&products.length>0){
+                      isListVisible=true;
+                    }
+                    print(requests.length);
+                    if(req['hasNext']&&req['hasPrevious']){
+                      nextButtonVisible=true;
+                      previousButtonVisible=true;
+                    }else if(req['hasPrevious']&&!req['hasNext']){
+                      previousButtonVisible=true;
+                      nextButtonVisible=false;
+                    }else if(!req['hasPrevious']&&req['hasNext']){
+                      previousButtonVisible=false;
+                      nextButtonVisible=true;
+                    }else{
+                      previousButtonVisible=false;
+                      nextButtonVisible=false;
+                    }
+                    if(products.length==0){
+                      Utils.showError(context,"No Request Found");
+                    }
+                  });
+                });
+              }
+            }else{
+              if(!isClient){
+                Network_Operations.getRequestByStatusGM(context, token, statusId,pageNum,10).then((response){
+                  setState(() {
+                    requests.clear();
+                    req=jsonDecode(response);
+                    for(int i=0;i<req["response"]['allRequests'].length;i++){
+                      requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                    }
+                    this.products = requests;
+                    if (this.products.length > 0) {
+                      isListVisible = true;
+                    }
+                    if(req['hasNext']&&req['hasPrevious']){
+                      nextButtonVisible=true;
+                      previousButtonVisible=true;
+                    }else if(req['hasPrevious']&&!req['hasNext']){
+                      previousButtonVisible=true;
+                      nextButtonVisible=false;
+                    }else if(!req['hasPrevious']&&req['hasNext']){
+                      previousButtonVisible=false;
+                      nextButtonVisible=true;
+                    }else{
+                      previousButtonVisible=false;
+                      nextButtonVisible=false;
+                    }
+                    if(products.length==0){
+                      Utils.showError(context,"No Request Found");
+                    }
+                  });
+                });
+              }else {
+                Network_Operations.getRequestByStatusIndividualUser(context, token, statusId,pageNum,10,startDate: widget.startDate,endDate: widget.endDate).then((response){
+                  setState(() {
+                    requests.clear();
+                    for(int i=0;i<jsonDecode(response).length;i++){
+                      requests.add(Request.fromMap(jsonDecode(response)[i]));
+                    }
+                    this.products=requests;
+                    if(products!=null&&products.length>0){
+                      isListVisible=true;
+                    }
+                    print(requests.length);
+                    if(req['hasNext']&&req['hasPrevious']){
+                      nextButtonVisible=true;
+                      previousButtonVisible=true;
+                    }else if(req['hasPrevious']&&!req['hasNext']){
+                      previousButtonVisible=true;
+                      nextButtonVisible=false;
+                    }else if(!req['hasPrevious']&&req['hasNext']){
+                      previousButtonVisible=false;
+                      nextButtonVisible=true;
+                    }else{
+                      previousButtonVisible=false;
+                      nextButtonVisible=false;
+                    }
+                    if(products.length==0){
+                      Utils.showError(context,"No Request Found");
+                    }
+                  });
+                });
+              }
+            }
+          },
+        );
+      }
+
     );
   }
   void updateSearchQuery(String newQuery) {
@@ -1166,7 +1346,13 @@ class _ModelReState extends State<ModelRequests>{
       ),
        IconButton(
         icon: const Icon(Icons.search),
-        onPressed: _startSearch,
+        onPressed: (){
+           if(statusId>1){
+             showSearchDialog(context);
+           }else{
+             _startSearch();
+           }
+        },
       ),
      statusId==5?IconButton(
         icon: const Icon(Icons.person_add),
@@ -1189,6 +1375,7 @@ class _ModelReState extends State<ModelRequests>{
     print("close search box");
     setState(() {
       _searchQuery.clear();
+      searchQuery="";
       updateSearchQuery("Search query");
     });
   }

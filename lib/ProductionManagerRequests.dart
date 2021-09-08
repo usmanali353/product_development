@@ -262,12 +262,6 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                             InkWell(
                               onTap: (){
                                 setState(() {
-                                  List<String> imageUrl=[];
-                                  for(int i=0;i<requests[index].multipleImages.length;i++){
-                                    if(requests[index].multipleImages[i]!=null){
-                                      imageUrl.add(requests[index].multipleImages[i]);
-                                    }
-                                  }
                                   Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(requests[index])));
                                 });
 

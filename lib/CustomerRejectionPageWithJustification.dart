@@ -43,7 +43,11 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
     _searchQuery = TextEditingController();
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-
+    if(widget.startDate!=null&&widget.endDate!=null){
+      setState(() {
+        isDateBarVisible=true;
+      });
+    }
   }
   @override
   Widget build(BuildContext context) {

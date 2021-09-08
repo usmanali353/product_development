@@ -434,6 +434,7 @@ class _Suitability_State extends State<Suitability> {
 //                                  _myActivitiesResult = _myActivities.toString();
 //                                });
                                 if(widget.request!=null){
+
                                   SharedPreferences.getInstance().then((prefs){
                                     var claims=Utils.parseJwt(prefs.getString("token"));
                                     Network_Operations.updateRequest(context,prefs.getString("token") ,Request(
@@ -451,7 +452,7 @@ class _Suitability_State extends State<Suitability> {
                                       technologyId: technologyId,
                                       structureId: structureId,
                                       edgeId: edge,
-                                      image: base64EncodedImage,
+                                      image: base64EncodedImage!=null?base64EncodedImage:widget.request.image,
                                       multipleColors: colorsList,
                                       multipleSizes: sizesList,
                                       ImageSelectedForColor:colorID,

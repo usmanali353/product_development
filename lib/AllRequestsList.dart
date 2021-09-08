@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'ApproveForTrial.dart';
 import 'Dashboard.dart';
 import 'DetailsPage.dart';
+import 'Model/Dropdown.dart';
 import 'Observations.dart';
 import 'RequestImagesGallery.dart';
 import 'RequestsForTrial.dart';
@@ -38,7 +39,7 @@ class _AllRequestListState extends State<AllRequestList> {
   TextEditingController _searchQuery;
   bool _isSearching = false;
   var claims;
-  var selectedPreference,selectedStatus;
+  var selectedPreference,selectedStatus,selectedSearchPreference;
   String token;
   bool isDateBarVisible=false;
   List<DateTime> picked=[];
@@ -48,8 +49,10 @@ class _AllRequestListState extends State<AllRequestList> {
   bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false;
   bool isColorsVisible=false;
   int pageNum=1,searchPageNum=1;
-  List<Request> requests=[];
+  List<Request> requests=[],requestsForSuggestions=[];
   var req;
+  List<String> clientNames=[],modelNames=[],modelCodes=[],newModelNames=[],newModelCodes=[];
+  List<Dropdown> clientDropdown=[];
   var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
   @override
   void initState() {
@@ -58,6 +61,27 @@ class _AllRequestListState extends State<AllRequestList> {
       setState(() {
         claims = Utils.parseJwt(prefs.getString("token"));
         token = prefs.getString("token");
+        Network_Operations.getRequestsForSearchSuggestions(context, token).then((req){
+          this.requestsForSuggestions=req;
+          if(requestsForSuggestions!=null){
+            if(requestsForSuggestions.length>0){
+              for(Request r in requestsForSuggestions){
+                if(r.modelName!=null){
+                  modelNames.add(r.modelName);
+                }
+                if(r.modelCode!=null){
+                  modelCodes.add(r.modelCode);
+                }
+                if(r.newModelName!=null){
+                  newModelNames.add(r.newModelName);
+                }
+                if(r.newModelCode!=null){
+                  newModelCodes.add(r.newModelCode);
+                }
+              }
+            }
+          }
+        });
         print(claims);
         //Checking Roles
         if (claims['role'].contains('General Manager')) {
@@ -782,58 +806,83 @@ class _AllRequestListState extends State<AllRequestList> {
     });
   }
   Widget _buildSearchField() {
-    return  TextField(
-      controller: _searchQuery,
-      autofocus: true,
-      textInputAction: TextInputAction.search,
-      decoration: const InputDecoration(
-        hintText: 'Search...',
-        border: InputBorder.none,
-        hintStyle: const TextStyle(color: Colors.white30),
-      ),
-      style: const TextStyle(color: Colors.white, fontSize: 16.0),
-      onSubmitted:(query){
-        if(query.isNotEmpty){
-          this.searchQuery=query;
-          SharedPreferences.getInstance().then((prefs){
-            Network_Operations.getRequestForGMSearchable(context,prefs.getString("token"),10,searchPageNum,query,startDate: widget.startDate,
-              endDate: widget.endDate,).then((response){
-              setState(() {
-                requests.clear();
-                req=jsonDecode(response);
-                for(int i=0;i<req["response"]['allRequests'].length;i++){
-                  requests.add(Request.fromMap(req["response"]['allRequests'][i]));
-                }
-                this.allRequests = requests;
-
-                if (this.allRequests.length > 0) {
-                  isListVisible = true;
-                }
-                print(requests.length);
-                if(req['hasNext']&&req['hasPrevious']){
-                  nextButtonVisible=true;
-                  previousButtonVisible=true;
-                }else if(req['hasPrevious']&&!req['hasNext']){
-                  previousButtonVisible=true;
-                  nextButtonVisible=false;
-                }else if(!req['hasPrevious']&&req['hasNext']){
-                  previousButtonVisible=false;
-                  nextButtonVisible=true;
-                }else{
-                  previousButtonVisible=false;
-                  nextButtonVisible=false;
-                }
-                if(allRequests.length==0){
-                  Utils.showError(context,"No Requests Found");
-                }
-              });
-            });
-          });
-        }else{
-          WidgetsBinding.instance
-              .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-        }
+    return  Autocomplete(
+      displayStringForOption: (String value){
+        return value;
       },
+      optionsBuilder: (TextEditingValue text){
+        if(selectedSearchPreference=="searchByProductionModelName"){
+          return newModelNames.where((element) => element.toLowerCase().contains(text.text));
+        }else if(selectedSearchPreference=="searchByProductionModelCode"){
+          return newModelCodes.where((element) => element.toLowerCase().contains(text.text));
+        }else if(selectedSearchPreference=="searchByModelName"){
+          return modelNames.where((element) =>element.toLowerCase().contains(text.text));
+        }else if(selectedSearchPreference=="searchByModelCode"){
+          return modelCodes.where((element) =>element.toLowerCase().contains(text.text));
+        }else if(selectedSearchPreference=="searchByClient"){
+          return clientNames.where((element) =>element.toLowerCase().contains(text.text));
+        }else
+          return null;
+      },
+        fieldViewBuilder: (BuildContext context,TextEditingController controller,FocusNode focusmode,VoidCallback func) {
+          return TextField(
+            controller: controller,
+            focusNode: focusmode,
+            autofocus: true,
+            textInputAction: TextInputAction.search,
+            decoration: const InputDecoration(
+              hintText: 'Search...',
+              border: InputBorder.none,
+              hintStyle: const TextStyle(color: Colors.white30),
+            ),
+            style: const TextStyle(color: Colors.white, fontSize: 16.0),
+            onSubmitted:(query){
+              setState(() {
+                this.searchQuery=query;
+              });
+              if(query.isNotEmpty){
+                this.searchQuery=query;
+                SharedPreferences.getInstance().then((prefs){
+                  Network_Operations.getRequestForGMSearchable(context,prefs.getString("token"),10,searchPageNum,query,startDate: widget.startDate,
+                    endDate: widget.endDate,).then((response){
+                    setState(() {
+                      requests.clear();
+                      req=jsonDecode(response);
+                      for(int i=0;i<req["response"]['allRequests'].length;i++){
+                        requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                      }
+                      this.allRequests = requests;
+
+                      if (this.allRequests.length > 0) {
+                        isListVisible = true;
+                      }
+                      print(requests.length);
+                      if(req['hasNext']&&req['hasPrevious']){
+                        nextButtonVisible=true;
+                        previousButtonVisible=true;
+                      }else if(req['hasPrevious']&&!req['hasNext']){
+                        previousButtonVisible=true;
+                        nextButtonVisible=false;
+                      }else if(!req['hasPrevious']&&req['hasNext']){
+                        previousButtonVisible=false;
+                        nextButtonVisible=true;
+                      }else{
+                        previousButtonVisible=false;
+                        nextButtonVisible=false;
+                      }
+                      if(allRequests.length==0){
+                        Utils.showError(context,"No Requests Found");
+                      }
+                    });
+                  });
+                });
+              }else{
+                WidgetsBinding.instance
+                    .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+              }
+            },
+          );
+        }
     );
   }
   void updateSearchQuery(String newQuery) {
@@ -860,7 +909,9 @@ class _AllRequestListState extends State<AllRequestList> {
     return <Widget>[
       IconButton(
         icon: const Icon(Icons.search),
-        onPressed: _startSearch,
+        onPressed:(){
+         showSearchDialog(context);
+        },
       ),
       IconButton(
         onPressed: ()async{
@@ -1088,6 +1139,122 @@ class _AllRequestListState extends State<AllRequestList> {
       actions: [
         cancelButton,
         detailsPage,
+        approveRejectButton
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+  showSearchDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget approveRejectButton = TextButton(
+      child: Text("Set"),
+      onPressed: () {
+        print(selectedSearchPreference);
+        if(selectedSearchPreference=="searchByClient"){
+          clientNames.clear();
+          if(clientDropdown.length>0){
+            setState(() {
+              for(Dropdown d in clientDropdown){
+                clientNames.add(d.name);
+              }
+            });
+          }else{
+            Network_Operations.getDropDowns(context, token,"Clients").then((value){
+              setState(() {
+                this.clientDropdown=value;
+                for(Dropdown d in clientDropdown){
+                  clientNames.add(d.name);
+                }
+              });
+            });
+
+          }
+          _startSearch();
+          Navigator.pop(context);
+        }else{
+          _startSearch();
+          Navigator.pop(context);
+        }
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Search By"),
+      content: StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              RadioListTile(
+                title: Text("Samples Model Name"),
+                value: 'searchByModelName',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("Samples Model Code"),
+                value: 'searchByModelCode',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("Client"),
+                value: 'searchByClient',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+               RadioListTile(
+                title: Text("Production Model Name"),
+                value: 'searchByProductionModelName',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("Production Model Code"),
+                value: 'searchByProductionModelCode',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      ),
+      actions: [
+        cancelButton,
         approveRejectButton
       ],
     );

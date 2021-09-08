@@ -185,7 +185,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       }, toEncodable: Utils.myEncode);
        debugPrint(body);
        var response =await http.post(Uri.parse(Utils.getBaseUrl()+"Request/RequestSave"),body: body,headers:{"Content-Type": "application/json", "Authorization": "Bearer " + token}).timeout(
-         Duration(minutes: 1),
+         Duration(minutes: 5),
          onTimeout: () {
            pd.dismiss();
            // Time has run out, do what you wanted to do.
@@ -1661,5 +1661,27 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       pd.dismiss();
     }
     return null;
+  }
+
+  static Future<List<Request>> getRequestsForSearchSuggestions(BuildContext context,String token,{int statusId,String clientId})async{
+    String url;
+     if(statusId!=null){
+      url= Utils.getBaseUrl()+"Request/GetRequestsForSearchSuggestions?statusId=$statusId";
+    }else{
+      url= Utils.getBaseUrl()+"Request/GetRequestsForSearchSuggestions";
+    }
+    var response= await http.get(Uri.parse(url),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+      Duration(minutes: 1),
+      onTimeout: () {
+        // Time has run out, do what you wanted to do.
+        return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+      },
+    );
+    if(response.statusCode==200){
+      print(response.body.toString());
+      return Request.requestListFromJson(response.body.toString());
+    }else{
+      Utils.showError(context,response.statusCode.toString());
+    }
   }
  }
