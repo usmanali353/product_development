@@ -1024,7 +1024,7 @@ class _ModelReState extends State<ModelRequests>{
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              RadioListTile(
+            statusId==6||statusId<5? RadioListTile(
                 title: Text("Samples Model Name"),
                 value: 'searchByModelName',
                 groupValue: selectedSearchPreference,
@@ -1033,8 +1033,8 @@ class _ModelReState extends State<ModelRequests>{
                     this.selectedSearchPreference = choice;
                   });
                 },
-              ),
-              RadioListTile(
+              ):Container(),
+              statusId==6||statusId<5? RadioListTile(
                 title: Text("Samples Model Code"),
                 value: 'searchByModelCode',
                 groupValue: selectedSearchPreference,
@@ -1043,7 +1043,7 @@ class _ModelReState extends State<ModelRequests>{
                     this.selectedSearchPreference = choice;
                   });
                 },
-              ),
+              ):Container(),
               RadioListTile(
                 title: Text("Client"),
                 value: 'searchByClient',

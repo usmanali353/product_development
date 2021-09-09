@@ -10,6 +10,8 @@ import 'package:productdevelopment/Observations.dart';
 import 'package:productdevelopment/RequestImagesGallery.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'Model/Request.dart';
 class ProductionManagerRequests extends StatefulWidget {
   int statusId;
   String type,startDate,endDate;
@@ -25,7 +27,7 @@ class ProductionManagerRequests extends StatefulWidget {
 class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
   List<TrialRequests> requests=[];
   bool isVisible=false;
-  var selectedPreference;
+  var selectedPreference,selectedSearchPreference;
   int statusId;
   String type;
   var currentUserRole,req;
@@ -37,6 +39,9 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
   static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _searchQuery;
   bool _isSearching = false;
+  List<String> clientNames=[],newModelNames=[],newModelCodes=[];
+  List<Dropdown> clientDropdown=[];
+  List<Request>requestsForSuggestions=[];
   var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   _ProductionManagerRequestsState(this.statusId,this.type,this.currentUserRole);
@@ -44,6 +49,23 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
   @override
   void initState() {
     _searchQuery=TextEditingController();
+    SharedPreferences.getInstance().then((prefs){
+      Network_Operations.getRequestClientsForSuggestions(context, prefs.getString("token"),statusId: statusId).then((req){
+        this.requestsForSuggestions=req;
+        if(requestsForSuggestions!=null){
+          if(requestsForSuggestions.length>0){
+            for(Request r in requestsForSuggestions){
+              if(r.newModelName!=null){
+                newModelNames.add(r.newModelName);
+              }
+              if(r.newModelCode!=null){
+                newModelCodes.add(r.newModelCode);
+              }
+            }
+          }
+        }
+      });
+    });
     if(widget.startDate!=null&&widget.endDate!=null){
       setState(() {
         isDateBarVisible=true;
@@ -711,99 +733,117 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
     });
   }
   Widget _buildSearchField() {
-    return  TextField(
-      controller: _searchQuery,
-      autofocus: true,
-      textInputAction: TextInputAction.search,
-      decoration: const InputDecoration(
-        hintText: 'Search...',
-        border: InputBorder.none,
-        hintStyle: const TextStyle(color: Colors.white30),
-      ),
-      style: const TextStyle(color: Colors.white, fontSize: 16.0),
-      onSubmitted:(query){
-        if(query.isNotEmpty){
-          setState(() {
-            this.searchQuery=query;
-          });
+    return  Autocomplete(
+        displayStringForOption: (String value){
+          return value;
+        },
+        optionsBuilder: (TextEditingValue text){
+          if(selectedSearchPreference=="searchByProductionModelName"){
+            return newModelNames.where((element) => element.toLowerCase().contains(text.text));
+          }else if(selectedSearchPreference=="searchByProductionModelCode"){
+            return newModelCodes.where((element) => element.toLowerCase().contains(text.text));
+          }else if(selectedSearchPreference=="searchByClient"){
+            return clientNames.where((element) =>element.toLowerCase().contains(text.text));
+          }else
+            return null;
+        },
+        fieldViewBuilder: (BuildContext context,TextEditingController controller,FocusNode focusmode,VoidCallback func) {
+          return TextField(
+            controller: controller,
+            focusNode: focusmode,
+            autofocus: true,
+            textInputAction: TextInputAction.search,
+            decoration: const InputDecoration(
+              hintText: 'Search...',
+              border: InputBorder.none,
+              hintStyle: const TextStyle(color: Colors.white30),
+            ),
+            style: const TextStyle(color: Colors.white, fontSize: 16.0),
+            onSubmitted:(query){
+              if(query.isNotEmpty){
+                setState(() {
+                  this.searchQuery=query;
+                });
 
-          SharedPreferences.getInstance().then((prefs){
-            Network_Operations.getClientRequestsByStatusSearchable(
-                context,
-                prefs.getString("token"),
-                statusId,
-                searchPageNum,
-                10,
-                searchQuery,
-                startDate: widget.startDate,
-                endDate: widget.endDate).then((response){
-              setState(() {
-                req=jsonDecode(response);
-                requests.clear();
-                for(int i=0;i<jsonDecode(response)['response'].length;i++){
-                  this.requests.add(TrialRequests.fromJson(jsonDecode(response)['response'][i]));
-                }
-                if(requests.length>0){
-                  isVisible=true;
-                  if(req['hasNext']&&req['hasPrevious']){
-                    nextButtonVisible=true;
-                    previousButtonVisible=true;
-                  }else if(req['hasPrevious']&&!req['hasNext']){
-                    previousButtonVisible=true;
-                    nextButtonVisible=false;
-                  }else if(!req['hasPrevious']&&req['hasNext']){
-                    previousButtonVisible=false;
-                    nextButtonVisible=true;
-                  }else{
-                    previousButtonVisible=false;
-                    nextButtonVisible=false;
-                  }
-                }else{
-                  Utils.showError(context, "No Requests Found");
-                }
-              });
-            });
-          });
+                SharedPreferences.getInstance().then((prefs){
+                  Network_Operations.getClientRequestsByStatusSearchable(
+                      context,
+                      prefs.getString("token"),
+                      statusId,
+                      searchPageNum,
+                      10,
+                      searchQuery,
+                      startDate: widget.startDate,
+                      endDate: widget.endDate).then((response){
+                    setState(() {
+                      req=jsonDecode(response);
+                      requests.clear();
+                      for(int i=0;i<jsonDecode(response)['response'].length;i++){
+                        this.requests.add(TrialRequests.fromJson(jsonDecode(response)['response'][i]));
+                      }
+                      if(requests.length>0){
+                        isVisible=true;
+                        if(req['hasNext']&&req['hasPrevious']){
+                          nextButtonVisible=true;
+                          previousButtonVisible=true;
+                        }else if(req['hasPrevious']&&!req['hasNext']){
+                          previousButtonVisible=true;
+                          nextButtonVisible=false;
+                        }else if(!req['hasPrevious']&&req['hasNext']){
+                          previousButtonVisible=false;
+                          nextButtonVisible=true;
+                        }else{
+                          previousButtonVisible=false;
+                          nextButtonVisible=false;
+                        }
+                      }else{
+                        Utils.showError(context, "No Requests Found");
+                      }
+                    });
+                  });
+                });
+              }
+              else{
+                SharedPreferences.getInstance().then((prefs){
+                  Network_Operations.getClientRequestsByStatus(context,
+                      prefs.getString("token"),
+                      statusId,
+                      pageNum,
+                      10,
+                      startDate: widget.startDate,
+                      endDate: widget.endDate
+                  ).then((response){
+                    setState(() {
+                      req=jsonDecode(response);
+                      requests.clear();
+                      for(int i=0;i<jsonDecode(response)['response'].length;i++){
+                        this.requests.add(TrialRequests.fromJson(jsonDecode(response)['response'][i]));
+                      }
+                      if(requests.length>0){
+                        isVisible=true;
+                        if(req['hasNext']&&req['hasPrevious']){
+                          nextButtonVisible=true;
+                          previousButtonVisible=true;
+                        }else if(req['hasPrevious']&&!req['hasNext']){
+                          previousButtonVisible=true;
+                          nextButtonVisible=false;
+                        }else if(!req['hasPrevious']&&req['hasNext']){
+                          previousButtonVisible=false;
+                          nextButtonVisible=true;
+                        }else{
+                          previousButtonVisible=false;
+                          nextButtonVisible=false;
+                        }
+                      }else{
+                        Utils.showError(context, "No Requests Found");
+                      }
+                    });
+                  });
+                });
+              }
+            },
+          );
         }
-        else{
-          SharedPreferences.getInstance().then((prefs){
-            Network_Operations.getClientRequestsByStatus(context,
-                prefs.getString("token"),
-                statusId,
-                pageNum,
-                10,
-                startDate: widget.startDate,
-                endDate: widget.endDate
-            ).then((response){
-              setState(() {
-                req=jsonDecode(response);
-                requests.clear();
-                for(int i=0;i<jsonDecode(response)['response'].length;i++){
-                  this.requests.add(TrialRequests.fromJson(jsonDecode(response)['response'][i]));
-                }
-                if(requests.length>0){
-                  isVisible=true;
-                  if(req['hasNext']&&req['hasPrevious']){
-                    nextButtonVisible=true;
-                    previousButtonVisible=true;
-                  }else if(req['hasPrevious']&&!req['hasNext']){
-                    previousButtonVisible=true;
-                    nextButtonVisible=false;
-                  }else if(!req['hasPrevious']&&req['hasNext']){
-                    previousButtonVisible=false;
-                    nextButtonVisible=true;
-                  }else{
-                    previousButtonVisible=false;
-                    nextButtonVisible=false;
-                  }
-                }else{
-                  Utils.showError(context, "No Requests Found");
-                }
-              });
-            });
-          });
-        }
-      },
     );
   }
   void updateSearchQuery(String newQuery) {
@@ -881,7 +921,9 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
       ),
        IconButton(
         icon: const Icon(Icons.search),
-        onPressed: _startSearch,
+        onPressed:(){
+          showSearchDialog(context);
+        },
       ),
     ];
   }
@@ -898,6 +940,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
     print("close search box");
     setState(() {
       _searchQuery.clear();
+      searchQuery="";
       updateSearchQuery("Search query");
     });
   }
@@ -1061,6 +1104,103 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
             }, child: Text("Ok"))
           ],
         );
+      },
+    );
+  }
+  showSearchDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget approveRejectButton = TextButton(
+      child: Text("Set"),
+      onPressed: () {
+        print(selectedSearchPreference);
+        if(selectedSearchPreference=="searchByClient"){
+          clientNames.clear();
+          if(clientDropdown.length>0){
+            setState(() {
+              for(Dropdown d in clientDropdown){
+                clientNames.add(d.name);
+              }
+            });
+          }else{
+            SharedPreferences.getInstance().then((prefs){
+              Network_Operations.getDropDowns(context, prefs.getString("token"),"Clients").then((value){
+                setState(() {
+                  this.clientDropdown=value;
+                  for(Dropdown d in clientDropdown){
+                    clientNames.add(d.name);
+                  }
+                });
+              });
+            });
+          }
+          _startSearch();
+          Navigator.pop(context);
+        }else{
+          _startSearch();
+          Navigator.pop(context);
+        }
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Search By"),
+      content: StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              RadioListTile(
+                title: Text("Production Model Name"),
+                value: 'searchByProductionModelName',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("Production Model Code"),
+                value: 'searchByProductionModelCode',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("Client"),
+                value: 'searchByClient',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      ),
+      actions: [
+        cancelButton,
+        approveRejectButton
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
       },
     );
   }

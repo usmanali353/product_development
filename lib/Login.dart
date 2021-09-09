@@ -19,6 +19,41 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
+    FirebaseDynamicLinks.instance.getInitialLink().then((deeplink){
+      setState(() {
+        this.data=deeplink;
+        if(data!=null&&data.link!=null){
+          print(data.link);
+          SharedPreferences.getInstance().then((prefs){
+            if(prefs.getString("token")==null){
+              Network_Operations.getRequestByIdAnonymous(context,int.parse(data.link.toString().split("?")[1].replaceAll("RequestId=", ""))).then((req){
+                Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
+              });
+            }
+          });
+
+        }
+      });
+    });
+    FirebaseDynamicLinks.instance.onLink(
+        onSuccess: (PendingDynamicLinkData dynamicLink) async {
+          // 3a. handle link that has been retrieved
+          setState(() {
+            this.data=dynamicLink;
+            print(data.link);
+            if(data!=null&&data.link!=null){
+              SharedPreferences.getInstance().then((prefs){
+                if(prefs.getString("token")==null){
+                  Network_Operations.getRequestByIdAnonymous(context,int.parse(data.link.toString().split("?")[1].replaceAll("RequestId=", ""))).then((req){
+                    Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
+                  });
+                }
+              });
+            }
+          });
+        }, onError: (OnLinkErrorException e) async {
+      print('Link Failed: ${e.message}');
+    });
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       if(message.data!=null){
         print("Message Data "+message.data["RequestId"]);

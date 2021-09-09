@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/AssignedRejectedModels.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'Model/Dropdown.dart';
+import 'Model/Request.dart';
 import 'Network_Operations/Network_Operations.dart';
 import 'RequestImagesGallery.dart';
 import 'Utils/Utils.dart';
@@ -22,13 +24,33 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
   int pageNum=1,searchPageNum=1;
   TextEditingController _searchQuery;
   bool _isSearching = false;
-  var selectedPreference;
+  var selectedPreference,selectedSearchPreference;
   var req;
   bool isListVisible=false;
+  List<String> clientNames=[],newModelNames=[],newModelCodes=[];
+  List<Dropdown> clientDropdown=[];
+  List<Request>requestsForSuggestions=[];
   var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
   @override
   void initState() {
     _searchQuery = TextEditingController();
+    SharedPreferences.getInstance().then((prefs){
+      Network_Operations.getRequestClientsForSuggestions(context, prefs.getString("token"),forAssignedClientRejectionSuggestions: true).then((req){
+        this.requestsForSuggestions=req;
+        if(requestsForSuggestions!=null){
+          if(requestsForSuggestions.length>0){
+            for(Request r in requestsForSuggestions){
+              if(r.newModelName!=null){
+                newModelNames.add(r.newModelName);
+              }
+              if(r.newModelCode!=null){
+                newModelCodes.add(r.newModelCode);
+              }
+            }
+          }
+        }
+      });
+    });
         WidgetsBinding.instance
             .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
     super.initState();
@@ -535,57 +557,77 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
     });
   }
   Widget _buildSearchField() {
-    return  TextField(
-      controller: _searchQuery,
-      autofocus: true,
-      textInputAction: TextInputAction.search,
-      decoration: const InputDecoration(
-        hintText: 'Search...',
-        border: InputBorder.none,
-        hintStyle: const TextStyle(color: Colors.white30),
-      ),
-      style: const TextStyle(color: Colors.white, fontSize: 16.0),
-      onSubmitted:(query){
-        if(query.isNotEmpty){
-          this.searchQuery=query;
-          SharedPreferences.getInstance().then((prefs){
-            Network_Operations.getAssignedRejectedModelsSearchable(context,prefs.getString("token"),10,searchPageNum,query).then((response){
-              setState(() {
-                requests.clear();
-                req=jsonDecode(response);
-                for(int i=0;i<req["response"]['allAssignedRequest'].length;i++){
-                  requests.add(AssignedRejectedModels.fromJson(req["response"]['allAssignedRequest'][i]['requestClientDetails']));
-                }
-                this.allRequests = requests;
+    return  Autocomplete(
+        displayStringForOption: (String value){
+          return value;
+        },
+        optionsBuilder: (TextEditingValue text){
+          if(selectedSearchPreference=="searchByProductionModelName"){
+            return newModelNames.where((element) => element.toLowerCase().contains(text.text));
+          }else if(selectedSearchPreference=="searchByProductionModelCode"){
+            return newModelCodes.where((element) => element.toLowerCase().contains(text.text));
+          }else if(selectedSearchPreference=="searchByClient"){
+            return clientNames.where((element) =>element.toLowerCase().contains(text.text));
+          }else
+            return null;
+        },
+        fieldViewBuilder: (BuildContext context,TextEditingController controller,FocusNode focusmode,VoidCallback func) {
+          return TextField(
+            controller: controller,
+            focusNode: focusmode,
+            autofocus: true,
+            textInputAction: TextInputAction.search,
+            decoration: const InputDecoration(
+              hintText: 'Search...',
+              border: InputBorder.none,
+              hintStyle: const TextStyle(color: Colors.white30),
+            ),
+            style: const TextStyle(color: Colors.white, fontSize: 16.0),
+            onSubmitted:(query){
+              if(query.isNotEmpty){
+                setState(() {
+                  this.searchQuery=query;
+                });
+                SharedPreferences.getInstance().then((prefs){
+                  Network_Operations.getAssignedRejectedModelsSearchable(context,prefs.getString("token"),10,searchPageNum,query).then((response){
+                    setState(() {
+                      requests.clear();
+                      req=jsonDecode(response);
+                      for(int i=0;i<req["response"]['allAssignedRequest'].length;i++){
+                        requests.add(AssignedRejectedModels.fromJson(req["response"]['allAssignedRequest'][i]['requestClientDetails']));
+                      }
+                      this.allRequests = requests;
 
-                if (this.allRequests.length > 0) {
-                  isListVisible = true;
-                }
-                print(requests.length);
-                if(req['hasNext']&&req['hasPrevious']){
-                  nextButtonVisible=true;
-                  previousButtonVisible=true;
-                }else if(req['hasPrevious']&&!req['hasNext']){
-                  previousButtonVisible=true;
-                  nextButtonVisible=false;
-                }else if(!req['hasPrevious']&&req['hasNext']){
-                  previousButtonVisible=false;
-                  nextButtonVisible=true;
-                }else{
-                  previousButtonVisible=false;
-                  nextButtonVisible=false;
-                }
-                if(requests.length==0) {
-                  Utils.showError(context, "No Assigned Rejections Found");
-                }
-              });
-            });
-          });
-        }else{
-          WidgetsBinding.instance
-              .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                      if (this.allRequests.length > 0) {
+                        isListVisible = true;
+                      }
+                      print(requests.length);
+                      if(req['hasNext']&&req['hasPrevious']){
+                        nextButtonVisible=true;
+                        previousButtonVisible=true;
+                      }else if(req['hasPrevious']&&!req['hasNext']){
+                        previousButtonVisible=true;
+                        nextButtonVisible=false;
+                      }else if(!req['hasPrevious']&&req['hasNext']){
+                        previousButtonVisible=false;
+                        nextButtonVisible=true;
+                      }else{
+                        previousButtonVisible=false;
+                        nextButtonVisible=false;
+                      }
+                      if(requests.length==0) {
+                        Utils.showError(context, "No Assigned Rejections Found");
+                      }
+                    });
+                  });
+                });
+              }else{
+                WidgetsBinding.instance
+                    .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+              }
+            },
+          );
         }
-      },
     );
   }
   void updateSearchQuery(String newQuery) {
@@ -612,7 +654,9 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
     return <Widget>[
       new IconButton(
         icon: const Icon(Icons.search),
-        onPressed: _startSearch,
+        onPressed:(){
+          showSearchDialog(context);
+        },
       ),
     ];
   }
@@ -836,6 +880,103 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
             }, child: Text("Ok"))
           ],
         );
+      },
+    );
+  }
+  showSearchDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget approveRejectButton = TextButton(
+      child: Text("Set"),
+      onPressed: () {
+        print(selectedSearchPreference);
+        if(selectedSearchPreference=="searchByClient"){
+          clientNames.clear();
+          if(clientDropdown.length>0){
+            setState(() {
+              for(Dropdown d in clientDropdown){
+                clientNames.add(d.name);
+              }
+            });
+          }else{
+            SharedPreferences.getInstance().then((prefs){
+              Network_Operations.getDropDowns(context, prefs.getString("token"),"Clients").then((value){
+                setState(() {
+                  this.clientDropdown=value;
+                  for(Dropdown d in clientDropdown){
+                    clientNames.add(d.name);
+                  }
+                });
+              });
+            });
+          }
+          _startSearch();
+          Navigator.pop(context);
+        }else{
+          _startSearch();
+          Navigator.pop(context);
+        }
+      },
+    );
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Search By"),
+      content: StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              RadioListTile(
+                title: Text("Production Model Name"),
+                value: 'searchByProductionModelName',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("Production Model Code"),
+                value: 'searchByProductionModelCode',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+              RadioListTile(
+                title: Text("Client"),
+                value: 'searchByClient',
+                groupValue: selectedSearchPreference,
+                onChanged: (choice) {
+                  setState(() {
+                    this.selectedSearchPreference = choice;
+                  });
+                },
+              ),
+            ],
+          );
+        },
+      ),
+      actions: [
+        cancelButton,
+        approveRejectButton
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
       },
     );
   }

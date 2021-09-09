@@ -67,10 +67,8 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
         this.data=deeplink;
         if(data!=null&&data.link!=null){
           print(data.link);
-          SharedPreferences.getInstance().then((prefs){
-            Network_Operations.getRequestByIdNotifications(context,prefs.getString("token"),int.parse(data.link.toString().split("?")[1].replaceAll("RequestId=", ""))).then((req){
-              Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
-            });
+          Network_Operations.getRequestByIdAnonymous(context,int.parse(data.link.toString().split("?")[1].replaceAll("RequestId=", ""))).then((req){
+            Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
           });
         }
       });
@@ -82,10 +80,8 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
             this.data=dynamicLink;
             print(data.link);
             if(data!=null&&data.link!=null){
-              SharedPreferences.getInstance().then((prefs){
-                Network_Operations.getRequestByIdNotifications(context,prefs.getString("token"),int.parse(data.link.toString().split("?")[1].replaceAll("RequestId=", ""))).then((req){
-                  Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
-                });
+              Network_Operations.getRequestByIdAnonymous(context,int.parse(data.link.toString().split("?")[1].replaceAll("RequestId=", ""))).then((req){
+                Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder:(context)=>DetailsPage(req)), (route) => false);
               });
             }
           });

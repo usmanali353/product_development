@@ -1662,8 +1662,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
     return null;
   }
-
-  static Future<List<Request>> getRequestsForSearchSuggestions(BuildContext context,String token,{int statusId,String clientId})async{
+  static Future<List<Request>> getRequestsForSearchSuggestions(BuildContext context,String token,{int statusId})async{
     String url;
      if(statusId!=null){
       url= Utils.getBaseUrl()+"Request/GetRequestsForSearchSuggestions?statusId=$statusId";
@@ -1683,5 +1682,64 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }else{
       Utils.showError(context,response.statusCode.toString());
     }
+    return null;
+  }
+  static Future<List<Request>> getRequestClientsForSuggestions(BuildContext context,String token,{int statusId,int requestId,int just,bool forAssignedClientRejectionSuggestions})async{
+    String url;
+    if(statusId!=null){
+      url= Utils.getBaseUrl()+"Request/RequestClientsGetForSuggestions?statusId=$statusId";
+    }else if(requestId!=null){
+      url= Utils.getBaseUrl()+"Request/RequestClientsGetForSuggestions?requestId=$requestId";
+    }else if(just!=null){
+      url= Utils.getBaseUrl()+"Request/RequestClientsGetForSuggestions?just=$just";
+    }else if(forAssignedClientRejectionSuggestions!=null&&forAssignedClientRejectionSuggestions){
+     url=Utils.getBaseUrl()+"Request/RequestClientsGetForSuggestions?forAssignedClientRejectionSuggestions=$forAssignedClientRejectionSuggestions";
+    }else{
+      url= Utils.getBaseUrl()+"Request/RequestClientsGetForSuggestions";
+    }
+    var response= await http.get(Uri.parse(url),headers: {"Content-Type":"application/json","Authorization":"Bearer $token"}).timeout(
+      Duration(minutes: 1),
+      onTimeout: () {
+        // Time has run out, do what you wanted to do.
+        return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+      },
+    );
+    if(response.statusCode==200){
+      print(response.body.toString());
+      return Request.requestListFromJson(response.body.toString());
+    }else{
+      Utils.showError(context,response.statusCode.toString());
+    }
+    return null;
+  }
+  static Future<Request> getRequestByIdAnonymous(BuildContext context,int requestId) async{
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
+    pd.show();
+    try{
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Public/Request/GetRequestById/$requestId")).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          pd.dismiss();
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
+      if(response.statusCode==200){
+        pd.dismiss();
+        Request request;
+        request=Request.fromMap(jsonDecode(response.body));
+        // Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailsPage(request)));
+        return request;
+      }else{
+        pd.dismiss();
+        Utils.showError(context, "No Request Found against this Id");
+      }
+    }catch(e){
+      pd.dismiss();
+      print(e.toString());
+    }finally{
+      pd.dismiss();
+    }
+    return null;
   }
  }
