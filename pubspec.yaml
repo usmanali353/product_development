@@ -88,7 +88,7 @@ dependencies:
 
   http: ^0.13.3
 
-  share: ^2.0.4
+  share_plus: ^2.1.4
 
   path_provider: ^2.0.2
 
@@ -113,8 +113,6 @@ dependencies:
   quick_actions: ^0.6.0+3
 
   overlay_support: ^1.2.1
-
-  flutter_app_badger: ^1.2.0
 
   internet_connection_checker: ^0.0.1+2
 

@@ -35,7 +35,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
   bool isDateBarVisible=false;
   List<DateTime> picked=[];
   DateTime initialStart=DateTime.now(),initialEnd=DateTime.now().add(Duration(days: 0));
-  String searchQuery = "Search query";
+  String searchQuery = "";
   static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _searchQuery;
   bool _isSearching = false;
@@ -748,8 +748,9 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
             return null;
         },
         fieldViewBuilder: (BuildContext context,TextEditingController controller,FocusNode focusmode,VoidCallback func) {
+          this._searchQuery=controller;
           return TextField(
-            controller: controller,
+            controller: _searchQuery,
             focusNode: focusmode,
             autofocus: true,
             textInputAction: TextInputAction.search,
@@ -932,8 +933,11 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
     setState(() {
       _isSearching = false;
       searchPageNum=1;
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+      if(searchQuery.isNotEmpty){
+        _clearSearchQuery();
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+      }
     });
   }
   void _clearSearchQuery() {

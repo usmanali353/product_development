@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/RemarksHistory.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 import 'Model/RequestColorImages.dart';
 import 'RequestImagesGallery.dart';
 
@@ -384,7 +384,7 @@ class _DetailPageState extends State<DetailPage>{
                                             MaterialButton(
                                               onPressed: (){
                                                 Utils.urlToFile(context,request.qrcodeImage).then((file){
-                                                  Share.shareFiles([file.path], text:request.newModelName!=null?'Qr Code for Model '+request.newModelName:'Qr Code for Model '+request.modelName);
+                                                  Share.shareFiles([file.path], text:request.newModelName!=null?'Qr Code for Model '+request.newModelName:request.modelName!=null?'Qr Code for Model '+request.modelName:"Scan this QR Code to Get Details of the Model");
                                                 });
                                               },
                                               child: Text("Share",style: TextStyle(color: Colors.white),),

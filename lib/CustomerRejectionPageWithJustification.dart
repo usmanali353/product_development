@@ -30,7 +30,7 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
   TextEditingController _searchQuery;
   bool _isSearching = false;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-  String searchQuery = "Search query";
+  String searchQuery;
   bool isColorsVisible=false;
   int pageNum=1,searchPageNum=1;
   bool isDateBarVisible=false;
@@ -574,8 +574,9 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
             return null;
         },
         fieldViewBuilder: (BuildContext context,TextEditingController controller,FocusNode focusmode,VoidCallback func) {
+          this._searchQuery=controller;
            return TextField(
-             controller: controller,
+             controller: _searchQuery,
              focusNode: focusmode,
              autofocus: true,
              textInputAction: TextInputAction.search,
@@ -728,14 +729,18 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
     setState(() {
       _isSearching = false;
       searchPageNum=1;
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+      if(searchQuery.isNotEmpty){
+        _clearSearchQuery();
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+      }
     });
   }
   void _clearSearchQuery() {
     print("close search box");
     setState(() {
       _searchQuery.clear();
+      searchQuery="";
       updateSearchQuery("Search query");
     });
   }

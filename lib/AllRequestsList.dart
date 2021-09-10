@@ -651,7 +651,7 @@ class _AllRequestListState extends State<AllRequestList> {
                                     .of(context)
                                     .size
                                     .width * 0.62,
-                                height: 130,
+                                height: 140,
                                 color: Colors.white,
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -825,8 +825,9 @@ class _AllRequestListState extends State<AllRequestList> {
           return null;
       },
         fieldViewBuilder: (BuildContext context,TextEditingController controller,FocusNode focusmode,VoidCallback func) {
+        this._searchQuery=controller;
           return TextField(
-            controller: controller,
+            controller: _searchQuery,
             focusNode: focusmode,
             autofocus: true,
             textInputAction: TextInputAction.search,
@@ -967,12 +968,15 @@ class _AllRequestListState extends State<AllRequestList> {
     ];
   }
   void _stopSearching() {
-    _clearSearchQuery();
+
     setState(() {
       _isSearching = false;
       searchPageNum=1;
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+      if(_searchQuery.text.isNotEmpty){
+        _clearSearchQuery();
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+      }
     });
   }
   void _clearSearchQuery() {

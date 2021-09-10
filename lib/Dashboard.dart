@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:badges/badges.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:intl/intl.dart';
 import 'package:need_resume/need_resume.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -389,15 +388,6 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                           this.requestCount=requestCountMap['statuses'];
                           this.currentUserRoles=requestCountMap['currentLoggedInUserStatuses'];
                           this.notificationCount=requestCountMap['notificationsCount'];
-                          FlutterAppBadger.isAppBadgeSupported().then((isSupported){
-                            if(isSupported){
-                              if(notificationCount!=null&&notificationCount['Unread Notifications Count']!=null){
-                                FlutterAppBadger.updateBadgeCount(notificationCount['Unread Notifications Count']);
-                              }
-                            }
-
-                          });
-
                         });
                       });
                     }else{
@@ -406,13 +396,6 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                           this.requestCount=requestCountMap['statuses'];
                           this.currentUserRoles=requestCountMap['currentLoggedInUserStatuses'];
                           this.notificationCount=requestCountMap['notificationsCount'];
-                          FlutterAppBadger.isAppBadgeSupported().then((isSupported){
-                            if(isSupported){
-                              if(notificationCount!=null&&notificationCount['Unread Notifications Count']!=null){
-                                FlutterAppBadger.updateBadgeCount(notificationCount['Unread Notifications Count']);
-                              }
-                            }
-                          });
                         });
                       });
                     }
@@ -1361,7 +1344,7 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
           await RUpgrade.upgrade(
             response["url"],
             isAutoRequestInstall: true,
-            useDownloadManager: false
+            useDownloadManager: true
         );
           Navigator.pop(context);
         //https://onedrive.live.com/download?cid=A82CB96BFF0FB925&resid=A82CB96BFF0FB925%211072&authkey=AEelcxW-Fldhvg4

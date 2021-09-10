@@ -53,7 +53,7 @@ class _ModelReState extends State<ModelRequests>{
   bool _isSearching = false;
   static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-  String searchQuery = "Search query";
+  String searchQuery = "";
   _ModelReState(this.statusId,this.currentUserRoles);
  bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false,isListVisible=false;
  bool isColorsVisible=false;
@@ -1124,8 +1124,9 @@ class _ModelReState extends State<ModelRequests>{
              return null;
         },
       fieldViewBuilder: (BuildContext context,TextEditingController controller,FocusNode focusmode,VoidCallback func){
+        this._searchQuery=controller;
         return TextField(
-          controller: controller,
+          controller: _searchQuery,
           focusNode: focusmode,
           autofocus: true,
           textInputAction: TextInputAction.search,
@@ -1367,8 +1368,11 @@ class _ModelReState extends State<ModelRequests>{
     setState(() {
       _isSearching = false;
       searchPageNum=1;
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+      if(searchQuery.isNotEmpty){
+        _clearSearchQuery();
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+      }
     });
   }
   void _clearSearchQuery() {
