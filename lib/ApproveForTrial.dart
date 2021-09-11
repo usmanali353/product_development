@@ -1,9 +1,9 @@
 import 'dart:math';
 
+import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
-import 'package:multiselect_formfield/multiselect_formfield.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Model/Dropdown.dart';
@@ -22,10 +22,10 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
   GlobalKey<FormBuilderState> fbKey=GlobalKey();
   DateTime clientVisitDate = DateTime.now(),actualStartDate=DateTime.now(),actualEndDate=DateTime.now();
   TextEditingController remarks,modelName,modelCode;
-  List myClients=[];
-  List<dynamic> clients=[];
+  List<dynamic> selectedClientNames=[];
   List<Dropdown> clientsDropdown=[];
-  List<String> clientNames=[];
+  List<String> clientNames=[],selectedClientIds=[];
+  List<Widget> selectedClientOptions=[];
   Request request;
   String status;
   var clientId;
@@ -41,10 +41,6 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
           this.clientsDropdown=cli;
           for(var c in cli){
             clientNames.add(c.name);
-            clients.add({
-              "display":c.name,
-              "value": c.stringId
-            });
           }
         });
       });
@@ -55,7 +51,7 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Approve Model"),
+        title: Text(status=="Approve"?"Approve Model":"Reject Model"),
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
@@ -161,35 +157,68 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                        ),
                      ),
                    ),
-
                    Visibility(
-                     visible: status=="Approve"&&clientNames.length>0,
-                     child: Padding(
-                       padding: const EdgeInsets.only(left: 16,right: 16,bottom: 16),
-                       child: Card(
-                         elevation: 10,
-                         shape: RoundedRectangleBorder(
-                           borderRadius: BorderRadius.circular(15),
-                         ),
-                         child: MultiSelectFormField(
-                           autovalidate: false,
-                           title: Text("Select Clients"),
-                           hintWidget: Text("Select Clients for the Trial"),
-                           textField: 'display',
-                           valueField: 'value',
-                           okButtonLabel: 'OK',
-                           cancelButtonLabel: 'CANCEL',
-                           dataSource: clients,
-                           border: InputBorder.none,
-                           validator: (value) {
-                             return value == null || value.length == 0?'Please select one or more Clients':null;
-                           },
-                           onSaved: (value){
-                             if (value == null) return;
-                             setState(() {
-                               myClients = value;
-                             });
-                           },
+                     visible:status=="Approve"&&clientNames.length>0,
+                     child: InkWell(
+                       onTap: (){
+                         showSelectClientsDialog();
+                       },
+                       child: Padding(
+                         padding:EdgeInsets.only(left:16,right: 16,bottom: 16),
+                         child: Card(
+                           elevation: 10,
+                           shape: RoundedRectangleBorder(
+                             borderRadius: BorderRadius.circular(15),
+                           ),
+                           child: InputDecorator(
+                             decoration: InputDecoration(
+                               filled: true,
+                               errorMaxLines: 4,
+                               fillColor: Theme.of(context).canvasColor,
+                               border: InputBorder.none,
+                             ),
+
+                             child: Column(
+                               crossAxisAlignment: CrossAxisAlignment.start,
+                               children: [
+                                 Padding(
+                                   padding:EdgeInsets.fromLTRB(0, 2, 0, 0),
+                                   child: Row(
+                                     children: [
+                                       Expanded(
+                                         child: Text("Select Clients"),
+                                       ),
+                                       Padding(
+                                         padding: EdgeInsets.only(top: 5, right: 5),
+                                         child: Text(
+                                           ' *',
+                                           style: TextStyle(
+                                             color: Colors.red.shade700,
+                                             fontSize: 17.0,
+                                           ),
+                                         ),
+                                       ),
+                                       Icon(
+                                         Icons.arrow_drop_down,
+                                         color: Colors.black87,
+                                         size: 25.0,
+                                       ),
+                                     ],
+                                   ),
+                                 ),
+                                 selectedClientNames.length > 0
+                                     ? Wrap(
+                                   spacing: 8.0,
+                                   runSpacing: 0.0,
+                                   children: selectedClientOptions,
+                                 )
+                                     : new Container(
+                                   padding: EdgeInsets.only(top: 4),
+                                   child: Text("Select one or more Clients"),
+                                 )
+                               ],
+                             ),
+                           ),
                          ),
                        ),
                      ),
@@ -243,12 +272,15 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                            onPressed: (){
                              if(fbKey.currentState.validate()){
                                if(status=="Approve"){
+                                 if(selectedClientIds.length==0){
+                                   Utils.showError(context,"Select one or More Clients For Model Approval");
+                                 }else
                                  if(actualStartDate.isBefore(actualEndDate)&&actualEndDate.isAfter(actualStartDate)){
                                    if(actualStartDate.isBefore(DateTime.now())||actualEndDate.isBefore(DateTime.now())||clientVisitDate.isBefore(DateTime.now())){
                                      Utils.showError(context,"Actual Start and End Date and Client Visit Date Should not be in past");
                                    }else{
                                      SharedPreferences.getInstance().then((prefs){
-                                       Network_Operations.trialClient(context, prefs.getString("token"),myClients, request.requestId,remarks.text,clientVisitDate,actualStartDate,actualEndDate,modelName.text,modelCode.text);
+                                       Network_Operations.trialClient(context, prefs.getString("token"),selectedClientIds, request.requestId,remarks.text,clientVisitDate,actualStartDate,actualEndDate,modelName.text,modelCode.text);
                                      });
                                    }
                                  }else{
@@ -271,5 +303,57 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
         ),
       ),
     );
+  }
+  showSelectClientsDialog()async{
+    await FilterListDialog.display(
+        context,
+        height: 480,
+        listData: clientNames,
+        selectedListData: selectedClientNames,
+        headerTextColor: Color(0xFF004c4c),
+        choiceChipLabel: (item){
+          return item;
+        },
+        validateSelectedItem: (list, val) {
+          return list.contains(val);
+        },
+        onItemSearch: (list, text) {
+          if (list.any((element) =>
+              element.toLowerCase().contains(text.toLowerCase()))) {
+            return list
+                .where((element) =>
+                element.toLowerCase().contains(text.toLowerCase()))
+                .toList();
+          }
+          else{
+            return [];
+          }
+        },
+        borderRadius: 20,
+        selectedTextBackgroundColor: Color(0xFF004c4c),
+        // allResetButonColor: Color(0xFF004c4c),
+        applyButonTextBackgroundColor: Color(0xFF004c4c),
+        // headerTextColor: Color(0xFF004c4c),
+        closeIconColor: Color(0xFF004c4c),
+        headlineText: "Select Clients",
+        searchFieldHintText: "Search Clients",
+        onApplyButtonClick: (list) {
+          if (list != null) {
+            setState(() {
+              selectedClientNames.clear();
+              selectedClientOptions.clear();
+              selectedClientIds.clear();
+              this.selectedClientNames = list;
+              for(int i=0;i<selectedClientNames.length;i++){
+                selectedClientOptions.add(
+                    Chip(label: Text(selectedClientNames[i],overflow: TextOverflow.ellipsis,))
+                );
+                selectedClientIds.add(clientsDropdown[clientNames.indexOf(selectedClientNames[i])].stringId.toString());
+                print(selectedClientIds.toString());
+              }
+            });
+          }
+          Navigator.pop(context);
+        });
   }
 }

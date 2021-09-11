@@ -273,6 +273,7 @@ class _ObservationsState extends State<Observations> {
         context,
         height: 480,
         listData: rejectionReasonName,
+        selectedListData: selectedReasonNames,
         choiceChipLabel: (item){
           return item;
         },
