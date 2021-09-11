@@ -230,7 +230,7 @@ class _acmcApprovalState extends State<acmcApproval> {
                     color: Color(0xFF004c4c),
                     child: Text("Proceed",style: TextStyle(color: Colors.white),),
                     onPressed: (){
-                      if(fbKey.currentState.validate()&&formState.currentState.validate()){
+                      if(fbKey.currentState.validate()){
                         if(status=='Reject'){
                           Network_Operations.changeStatusWithRemarks(context, token, request.requestId, 3,remarks.text);
                         }else{

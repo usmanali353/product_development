@@ -141,7 +141,7 @@ class _AllRequestListState extends State<AllRequestList> {
               child:Center(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: Text(DateFormat("yyyy-MM-dd").format(initialStart)+" - "+DateFormat("yyyy-MM-dd").format(initialEnd),style: TextStyle(color: Colors.white),),
+                  child: Text(widget.startDate+" - "+widget.endDate,style: TextStyle(color: Colors.white),),
                 ),
               ),
             ),

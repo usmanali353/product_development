@@ -30,7 +30,7 @@ class _SchedulePageState extends State<SchedulePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Schedule Request"),
+        title: Text(request.statusId==4?"Update Schedule":"Add Schedule"),
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
@@ -129,13 +129,9 @@ class _SchedulePageState extends State<SchedulePage> {
                       if(fbKey.currentState.validate()){
                         fbKey.currentState.save();
                         if(targetStartDate.isBefore(targetEndDate)&&targetEndDate.isAfter(targetStartDate)){
-                          if(targetStartDate.isBefore(DateTime.now())||targetEndDate.isBefore(DateTime.now())){
-                            Utils.showError(context,"Target Start Date and End Date Should be should be Equal to or After the Current Date");
-                          }else{
                             SharedPreferences.getInstance().then((prefs){
                               Network_Operations.addRequestSchedule(context,prefs.getString("token"), request.requestId, targetStartDate, targetEndDate,request.statusId==4?true:null,remarks.text);
                             });
-                          }
                         }else{
                           Utils.showError(context,"Sample Production Target Start Date Should be before the End Date");
                         }

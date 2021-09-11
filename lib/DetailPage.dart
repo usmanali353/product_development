@@ -64,7 +64,6 @@ class _DetailPageState extends State<DetailPage>{
            }
          }
        }
-      // print(colorNames.toString());
      }
    });
     super.initState();

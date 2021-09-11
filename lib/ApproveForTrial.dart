@@ -276,13 +276,9 @@ class _ApproveForTrialState extends State<ApproveForTrial> {
                                    Utils.showError(context,"Select one or More Clients For Model Approval");
                                  }else
                                  if(actualStartDate.isBefore(actualEndDate)&&actualEndDate.isAfter(actualStartDate)){
-                                   if(actualStartDate.isBefore(DateTime.now())||actualEndDate.isBefore(DateTime.now())||clientVisitDate.isBefore(DateTime.now())){
-                                     Utils.showError(context,"Actual Start and End Date and Client Visit Date Should not be in past");
-                                   }else{
                                      SharedPreferences.getInstance().then((prefs){
                                        Network_Operations.trialClient(context, prefs.getString("token"),selectedClientIds, request.requestId,remarks.text,clientVisitDate,actualStartDate,actualEndDate,modelName.text,modelCode.text);
                                      });
-                                   }
                                  }else{
                                    Utils.showError(context,"Actual Start Date Should be before Actual End Date and ");
                                  }
