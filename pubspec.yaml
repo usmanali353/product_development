@@ -120,6 +120,8 @@ dependencies:
 
   flutter_app_badger: ^1.2.0
 
+  infinite_scroll_pagination: ^3.1.0
+
 dev_dependencies:
 
   flutter_test:

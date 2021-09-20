@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/Request.dart';
+import 'package:productdevelopment/Model/RequestSuggestions.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/RequestColorsList.dart';
 import 'package:productdevelopment/request_Model_form/Assumptions.dart';
@@ -17,6 +19,7 @@ import 'Observations.dart';
 import 'RequestImagesGallery.dart';
 import 'RequestsForTrial.dart';
 import 'SchedulePage.dart';
+import 'Search/RequestSearch.dart';
 import 'Utils/Utils.dart';
 import 'acmcapproval.dart';
 
@@ -34,10 +37,6 @@ class AllRequestList extends StatefulWidget{
 class _AllRequestListState extends State<AllRequestList> {
   List<Request> allRequests = [];
   var isListVisible = false;
-  static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<
-      ScaffoldState>();
-  TextEditingController _searchQuery;
-  bool _isSearching = false;
   var claims;
   var selectedPreference,selectedStatus,selectedSearchPreference;
   String token;
@@ -45,18 +44,19 @@ class _AllRequestListState extends State<AllRequestList> {
   List<DateTime> picked=[];
   DateTime initialStart=DateTime.now(),initialEnd=DateTime.now().add(Duration(days: 0));
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-  String searchQuery = "Search query";
-  bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false;
+  bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false,isFirstLoadRunning=false,_isLoadMoreRunning=false;
   bool isColorsVisible=false;
-  int pageNum=1,searchPageNum=1;
+  int pageNum=1;
   List<Request> requests=[],requestsForSuggestions=[];
   var req;
+  var isLastPage=false;
   List<String> clientNames=[],modelNames=[],modelCodes=[],newModelNames=[],newModelCodes=[];
   List<Dropdown> clientDropdown=[];
-  var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
+  List<RequestSuggestions> allSuggestionsList=[];
+  PagingController<int,Request> controller = PagingController<int,Request>(firstPageKey: 1);
   @override
   void initState() {
-    _searchQuery = TextEditingController();
+    isFirstLoadRunning=true;
     SharedPreferences.getInstance().then((prefs) {
       setState(() {
         claims = Utils.parseJwt(prefs.getString("token"));
@@ -81,6 +81,14 @@ class _AllRequestListState extends State<AllRequestList> {
               }
             }
           }
+        });
+        Network_Operations.getDropDowns(context, token,"Clients").then((value){
+          setState(() {
+            this.clientDropdown=value;
+            for(Dropdown d in clientDropdown){
+              clientNames.add(d.name);
+            }
+          });
         });
         print(claims);
         //Checking Roles
@@ -121,6 +129,41 @@ class _AllRequestListState extends State<AllRequestList> {
       }
       WidgetsBinding.instance
           .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+
+      controller.addPageRequestListener((pageKey){
+          if(!isLastPage){
+            SharedPreferences.getInstance().then((prefs) {
+              Network_Operations.getRequestForGM(
+                context,
+                prefs.getString("token"),
+                10,
+                pageKey,
+                startDate: widget.startDate,
+                endDate: widget.endDate,
+              ).then((response) {
+                  req=jsonDecode(response);
+                  for(int i=0;i<req["response"]['allRequests'].length;i++){
+                    requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                  }
+                  this.allRequests = requests;
+                  if (this.allRequests.length > 0) {
+                    pageNum=pageNum+1;
+                    pageKey=pageNum;
+                    isLastPage=allRequests.length==req["totalCount"];
+                    if(isLastPage){
+                      controller.appendLastPage(allRequests);
+                    }else{
+                      controller.appendPage(allRequests,pageKey);
+                    }
+                  }
+                  if(allRequests.length==0){
+                    Utils.showError(context,"No Requests Found");
+                  }
+              });
+
+            });
+          }
+      });
     });
     super.initState();
   }
@@ -128,10 +171,8 @@ class _AllRequestListState extends State<AllRequestList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: scaffoldKey,
       appBar: AppBar(
-        leading: _isSearching ? const BackButton() : null,
-        title: _isSearching ? _buildSearchField() : _buildTitle(context),
+        title: Text("All Requests"),
         actions: _buildActions(),
           bottom: isDateBarVisible? PreferredSize(
             preferredSize: Size.fromHeight(40),
@@ -147,68 +188,6 @@ class _AllRequestListState extends State<AllRequestList> {
             ),
           ):null
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton:
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Visibility(
-              visible: previousButtonVisible,
-              child: FloatingActionButton(
-                  backgroundColor: Colors.white12, //Color(0xFF004c4c),
-                  splashColor: Colors.red,
-                  mini: true,
-                  child: Icon(Icons.arrow_back, color: Colors.teal, size: 30,),heroTag: "btn2", onPressed: (){
-                    if(!_isSearching){
-                      setState(() {
-                        pageNum=pageNum-1;
-                      });
-                      print(pageNum);
-                      WidgetsBinding.instance
-                          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                    }else{
-                      setState(() {
-                        searchPageNum=searchPageNum-1;
-                      });
-                      print(searchPageNum);
-                      WidgetsBinding.instance
-                          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                    }
-
-              }
-              ),
-            ),
-            Visibility(
-              visible: nextButtonVisible,
-              child: FloatingActionButton(
-                  backgroundColor: Colors.white12,//Color(0xFF004c4c),
-                  splashColor: Colors.red,
-                  mini: true,
-                  child: Icon(Icons.arrow_forward, color: Colors.teal, size: 30,),heroTag: "btn1", onPressed: (){
-                    if(!_isSearching){
-                      setState(() {
-                        pageNum=pageNum+1;
-                      });
-                      print(pageNum);
-                      WidgetsBinding.instance
-                          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                    }else{
-                      setState(() {
-                        searchPageNum=searchPageNum+1;
-                      });
-                      print(searchPageNum);
-                      WidgetsBinding.instance
-                          .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                    }
-
-              }
-              ),
-            ),
-          ],
-        ),
-      ),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -222,10 +201,19 @@ class _AllRequestListState extends State<AllRequestList> {
         child: RefreshIndicator(
           key: _refreshIndicatorKey,
           onRefresh: (){
+            setState(() {
+              controller.refresh();
+            });
             return Utils.check_connectivity().then((isConnected){
               if(isConnected){
+                if(pageNum>1){
+                  setState(() {
+                    requests.clear();
+                    allRequests.clear();
+                    pageNum=1;
+                  });
+                }
                 SharedPreferences.getInstance().then((prefs) {
-                  if(!_isSearching){
                     Network_Operations.getRequestForGM(
                         context,
                         prefs.getString("token"),
@@ -235,7 +223,7 @@ class _AllRequestListState extends State<AllRequestList> {
                       endDate: widget.endDate,
                     ).then((response) {
                       setState(() {
-                        requests.clear();
+                        isFirstLoadRunning=false;
                         req=jsonDecode(response);
                         for(int i=0;i<req["response"]['allRequests'].length;i++){
                           requests.add(Request.fromMap(req["response"]['allRequests'][i]));
@@ -243,71 +231,30 @@ class _AllRequestListState extends State<AllRequestList> {
                         this.allRequests = requests;
 
                         if (this.allRequests.length > 0) {
-                          isListVisible = true;
-                        }
-                        if(req['hasNext']&&req['hasPrevious']){
-                          nextButtonVisible=true;
-                          previousButtonVisible=true;
-                        }else if(req['hasPrevious']&&!req['hasNext']){
-                          previousButtonVisible=true;
-                          nextButtonVisible=false;
-                        }else if(!req['hasPrevious']&&req['hasNext']){
-                          previousButtonVisible=false;
-                          nextButtonVisible=true;
-                        }else{
-                          previousButtonVisible=false;
-                          nextButtonVisible=false;
+                          pageNum=pageNum+1;
+                          isLastPage=allRequests.length==req["totalCount"];
+                          if(isLastPage){
+                            controller.appendLastPage(allRequests);
+                          }else{
+                            controller.appendPage(allRequests,pageNum);
+                          }
                         }
                         if(allRequests.length==0){
                           Utils.showError(context,"No Requests Found");
                         }
                       });
                     });
-                  }else{
-                    Network_Operations.getRequestForGMSearchable(context, prefs.getString("token"), 10, searchPageNum,searchQuery,startDate: widget.startDate,
-                      endDate: widget.endDate,).then((response) {
-                      setState(() {
-                        requests.clear();
-                        req=jsonDecode(response);
-                        for(int i=0;i<req["response"]['allRequests'].length;i++){
-                          requests.add(Request.fromMap(req["response"]['allRequests'][i]));
-                        }
-                        this.allRequests = requests;
 
-                        if (this.allRequests.length > 0) {
-                          isListVisible = true;
-                        }
-                        print(requests.length);
-                        if(req['hasNext']&&req['hasPrevious']){
-                          nextButtonVisible=true;
-                          previousButtonVisible=true;
-                        }else if(req['hasPrevious']&&!req['hasNext']){
-                          previousButtonVisible=true;
-                          nextButtonVisible=false;
-                        }else if(!req['hasPrevious']&&req['hasNext']){
-                          previousButtonVisible=false;
-                          nextButtonVisible=true;
-                        }else{
-                          previousButtonVisible=false;
-                          nextButtonVisible=false;
-                        }
-                        if(allRequests.length==0){
-                          Utils.showError(context,"No Requests Found");
-                        }
-                      });
-                    });
-                  }
                 });
               }else{
                 Utils.showError(context,"Network Not Available");
               }
             });
           },
-          child: Visibility(
-            visible: isListVisible,
-            child: ListView.builder(
-                itemCount: allRequests != null ? allRequests.length : 0,
-                itemBuilder: (context, int index) {
+          child: PagedListView<int,Request>(
+            pagingController:controller,
+            builderDelegate: PagedChildBuilderDelegate<Request>(
+                itemBuilder: (context,allRequests,int index) {
                   return Card(
                     elevation: 6,
                     child: Container(
@@ -333,22 +280,22 @@ class _AllRequestListState extends State<AllRequestList> {
                                     setState(() {
                                       List<String> imageUrl = [];
                                       for (int i = 0; i <
-                                          allRequests[index].multipleImages
+                                          allRequests.multipleImages
                                               .length; i++) {
-                                        if (allRequests[index].multipleImages[i] !=
+                                        if (allRequests.multipleImages[i] !=
                                             null) {
                                           imageUrl.add(
-                                              allRequests[index].multipleImages[i]);
+                                              allRequests.multipleImages[i]);
                                         }
                                       }
-                                      imageUrl.add(allRequests[index].image);
+                                      imageUrl.add(allRequests.image);
                                       Navigator.push(context, MaterialPageRoute(
                                           builder: (context) => RequestImageGallery(
-                                              allRequests[index])));
+                                              allRequests)));
                                     });
                                   },
                                   child: CachedNetworkImage(
-                                    imageUrl: allRequests[index].image!=null?allRequests[index].image:"http://anokha.world/images/not-found.png",
+                                    imageUrl: allRequests.image!=null?allRequests.image:"http://anokha.world/images/not-found.png",
                                     placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
                                     errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
                                     imageBuilder: (context, imageProvider){
@@ -367,18 +314,18 @@ class _AllRequestListState extends State<AllRequestList> {
                                   ),
                                 ),
                                 //Padding(padding: EdgeInsets.only(top:2),),
-                                allRequests[index].multipleColorNames != null &&
-                                    allRequests[index].multipleColorNames.length > 0
+                                allRequests.multipleColorNames != null &&
+                                    allRequests.multipleColorNames.length > 0
                                     ?Container(
                                   width: 55,
-                                      height:20,
-                                      child: ListView(
-                                        scrollDirection: Axis.horizontal,
-                                  children: [
+                                  height:20,
+                                  child: ListView(
+                                    scrollDirection: Axis.horizontal,
+                                    children: [
                                       Row(
                                         children: <Widget>[
                                           for(int i = 0; i <
-                                              allRequests[index].multipleColorNames
+                                              allRequests.multipleColorNames
                                                   .length; i++)
                                             Padding(
                                               padding: const EdgeInsets.only(top:8,left: 2,right: 2),
@@ -389,7 +336,7 @@ class _AllRequestListState extends State<AllRequestList> {
                                                       borderRadius: BorderRadius.circular(
                                                           2),
                                                       color: Color(Utils.getColorFromHex(
-                                                          allRequests[index]
+                                                          allRequests
                                                               .multipleColorNames[i]
                                                               .colorCode)),
                                                       //color: Colors.teal,
@@ -405,15 +352,15 @@ class _AllRequestListState extends State<AllRequestList> {
 
                                         ],
                                       )
-                                  ],
-                                ),
-                                    ) : Container(),
+                                    ],
+                                  ),
+                                ) : Container(),
                               ],
                             ),
                             VerticalDivider(color: Colors.grey,),
                             GestureDetector(
                               onTapDown: (details)async{
-                                if(allRequests[index].statusName=="New Request"){
+                                if(allRequests.statusName=="New Request"){
                                   if(widget.currentUserRoles["2"]!=null||widget.currentUserRoles["3"]!=null) {
                                     await showMenu(
                                       context: context,
@@ -473,23 +420,23 @@ class _AllRequestListState extends State<AllRequestList> {
                                       elevation: 8.0,
                                     ).then((selectedItem){
                                       if(selectedItem=="changeStatus"){
-                                        showAlertDialog(context,allRequests[index]);
+                                        showAlertDialog(context,allRequests);
                                       }else if(selectedItem=="Details"){
-                                        //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                        //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests)));
                                         SharedPreferences.getInstance().then((prefs){
-                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests.requestId);
                                         });
                                       }else if(selectedItem=="addImage"){
-                                        Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(allRequests[index])));
+                                        Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(allRequests)));
                                       }else if(selectedItem=='updateRequest'){
                                         SharedPreferences.getInstance().then((prefs){
-                                          Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"), allRequests[index].requestId).then((req){
+                                          Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"), allRequests.requestId).then((req){
                                             Navigator.push(context,MaterialPageRoute(builder:(context)=>Assumptions(request: req,)));
                                           });
                                         });
                                       }else if(selectedItem=="deleteRequest"){
                                         SharedPreferences.getInstance().then((prefs){
-                                          Network_Operations.deleteRequestById(context, prefs.getString("token"), allRequests[index].requestId).then((req){
+                                          Network_Operations.deleteRequestById(context, prefs.getString("token"), allRequests.requestId).then((req){
                                             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder:(context)=>Dashboard()), (route) => false);
                                             Utils.showSuccess(context,"Request Deleted Successfully");
                                           });
@@ -525,18 +472,18 @@ class _AllRequestListState extends State<AllRequestList> {
                                       elevation: 8.0,
                                     ).then((selectedItem){
                                       if(selectedItem=="Details"){
-                                        //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                        //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests)));
                                         SharedPreferences.getInstance().then((prefs){
-                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests.requestId);
                                         });
                                       }else if(selectedItem=="addImage"){
-                                        Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(allRequests[index])));
+                                        Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(allRequests)));
                                       }
                                     });
                                   }else{
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests)));
                                   }
-                                }else if(allRequests[index].statusName=="Approved By GM"){
+                                }else if(allRequests.statusName=="Approved By GM"){
                                   if(widget.currentUserRoles["4"]!=null){
                                     await showMenu(
                                       context: context,
@@ -566,19 +513,19 @@ class _AllRequestListState extends State<AllRequestList> {
                                       elevation: 8.0,
                                     ).then((selectedItem){
                                       if(selectedItem=="changeStatus"){
-                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(allRequests[index])));
+                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(allRequests)));
                                       }else if(selectedItem=="Details"){
-                                        //Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests[index])));
+                                        //Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests)));
                                         SharedPreferences.getInstance().then((prefs){
-                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests.requestId);
                                         });
                                       }
                                     });
                                   }else{
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests)));
                                   }
 
-                                }else if(allRequests[index].statusName=="Samples Scheduled"){
+                                }else if(allRequests.statusName=="Samples Scheduled"){
                                   if(widget.currentUserRoles["5"]!=null||widget.currentUserRoles["6"]!=null){
                                     await showMenu(
                                       context: context,
@@ -618,31 +565,31 @@ class _AllRequestListState extends State<AllRequestList> {
                                       elevation: 8.0,
                                     ).then((selectedItem){
                                       if(selectedItem=="changeStatus"){
-                                        showAlertChangeStatus(context,allRequests[index]);
+                                        showAlertChangeStatus(context,allRequests);
                                       }else if(selectedItem=="Details"){
-                                       // Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests[index])));
+                                        // Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(allRequests)));
                                         SharedPreferences.getInstance().then((prefs){
-                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests.requestId);
                                         });
                                       }else if(selectedItem=="updateschedule"){
-                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(allRequests[index])));
+                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(allRequests)));
                                       }
                                     });
 
                                   }else{
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests[index])));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(allRequests)));
                                   }
-                                }else if(allRequests[index].statusName=="Model Approved"){
+                                }else if(allRequests.statusName=="Model Approved"){
                                   if(widget.currentUserRoles["7"]!=null||widget.currentUserRoles["8"]!=null){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(allRequests[index].requestId,widget.currentUserRoles)));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(allRequests.requestId,widget.currentUserRoles)));
                                   }else{
                                     SharedPreferences.getInstance().then((prefs){
-                                      Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                      Network_Operations.getRequestById(context, prefs.getString("token"), allRequests.requestId);
                                     });
                                   }
                                 }else {
                                   SharedPreferences.getInstance().then((prefs){
-                                    Network_Operations.getRequestById(context, prefs.getString("token"), allRequests[index].requestId);
+                                    Network_Operations.getRequestById(context, prefs.getString("token"), allRequests.requestId);
                                   });
                                 }
                               },
@@ -660,10 +607,10 @@ class _AllRequestListState extends State<AllRequestList> {
                                     Padding(
                                       padding: const EdgeInsets.only(left: 6, top: 8, bottom: 2),
                                       child: Text((){
-                                        if(allRequests[index].newModelName!=null){
-                                          return allRequests[index].newModelName;
-                                        }else if(allRequests[index].modelName!=null){
-                                          return allRequests[index].modelName;
+                                        if(allRequests.newModelName!=null){
+                                          return allRequests.newModelName;
+                                        }else if(allRequests.modelName!=null){
+                                          return allRequests.modelName;
                                         }else{
                                           return '';
                                         }
@@ -686,7 +633,7 @@ class _AllRequestListState extends State<AllRequestList> {
                                             ),
                                             Text(DateFormat("yyyy-MM-dd").format(
                                                 DateTime.parse(
-                                                    allRequests[index].date)))
+                                                    allRequests.date)))
                                           ],
                                         ),
 
@@ -708,7 +655,7 @@ class _AllRequestListState extends State<AllRequestList> {
                                         //     width: 120,
                                         //     height: 30,
                                         //     child: Marquee(
-                                        //       text: allRequests[index].multipleSizeNames
+                                        //       text: allRequests.multipleSizeNames
                                         //             .toString()
                                         //             .replaceAll("[", "")
                                         //             .replaceAll("]", "")
@@ -729,13 +676,13 @@ class _AllRequestListState extends State<AllRequestList> {
                                         // ),
                                         Container(
                                           width: MediaQuery.of(context).size.width*0.4,
-                                          child: Text(allRequests[index].multipleSizeNames
+                                          child: Text(allRequests.multipleSizeNames
                                               .toString()
                                               .replaceAll("[", "")
                                               .replaceAll("]", "")
                                               .replaceAll(".00", ""),
-                                              maxLines: 3,
-                                             overflow: TextOverflow.visible,
+                                            maxLines: 3,
+                                            overflow: TextOverflow.visible,
                                           ),
                                         ),
                                       ],
@@ -751,8 +698,8 @@ class _AllRequestListState extends State<AllRequestList> {
                                               left: 2, right: 2),
                                         ),
                                         Container(
-                                          child: Text(allRequests[index].surfaceName !=
-                                              null ? allRequests[index]
+                                          child: Text(allRequests.surfaceName !=
+                                              null ? allRequests
                                               .surfaceName : '',overflow: TextOverflow.ellipsis,maxLines: 1,softWrap: true),
                                         )
                                       ],
@@ -772,8 +719,8 @@ class _AllRequestListState extends State<AllRequestList> {
                                             padding: EdgeInsets.only(
                                                 left: 3, right: 3),
                                           ),
-                                          Text(allRequests[index].statusName != null
-                                              ? allRequests[index].statusName
+                                          Text(allRequests.statusName != null
+                                              ? allRequests.statusName
                                               : '')
                                         ],
                                       ),
@@ -789,129 +736,53 @@ class _AllRequestListState extends State<AllRequestList> {
 
                     ),
                   );
-                }),
-          ),
+                },
+                noMoreItemsIndicatorBuilder: (context){
+                  return Center(child:Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text("No More Requests to Load"),
+                  ));
+                }
+            ),
+            
+            ),
         ),
       ),
     );
   }
-
-  void _startSearch() {
-    ModalRoute
-        .of(context)
-        .addLocalHistoryEntry(new LocalHistoryEntry(onRemove: _stopSearching));
-
-    setState(() {
-      _isSearching = true;
-    });
-  }
-  Widget _buildSearchField() {
-    return  Autocomplete(
-      displayStringForOption: (String value){
-        return value;
-      },
-      optionsBuilder: (TextEditingValue text){
-        if(selectedSearchPreference=="searchByProductionModelName"){
-          return newModelNames.where((element) => element.toLowerCase().contains(text.text));
-        }else if(selectedSearchPreference=="searchByProductionModelCode"){
-          return newModelCodes.where((element) => element.toLowerCase().contains(text.text));
-        }else if(selectedSearchPreference=="searchByModelName"){
-          return modelNames.where((element) =>element.toLowerCase().contains(text.text));
-        }else if(selectedSearchPreference=="searchByModelCode"){
-          return modelCodes.where((element) =>element.toLowerCase().contains(text.text));
-        }else if(selectedSearchPreference=="searchByClient"){
-          return clientNames.where((element) =>element.toLowerCase().contains(text.text));
-        }else
-          return null;
-      },
-        fieldViewBuilder: (BuildContext context,TextEditingController controller,FocusNode focusmode,VoidCallback func) {
-        this._searchQuery=controller;
-          return TextField(
-            controller: _searchQuery,
-            focusNode: focusmode,
-            autofocus: true,
-            textInputAction: TextInputAction.search,
-            decoration: const InputDecoration(
-              hintText: 'Search...',
-              border: InputBorder.none,
-              hintStyle: const TextStyle(color: Colors.white30),
-            ),
-            style: const TextStyle(color: Colors.white, fontSize: 16.0),
-            onSubmitted:(query){
-              setState(() {
-                this.searchQuery=query;
-              });
-              if(query.isNotEmpty){
-                this.searchQuery=query;
-                SharedPreferences.getInstance().then((prefs){
-                  Network_Operations.getRequestForGMSearchable(context,prefs.getString("token"),10,searchPageNum,query,startDate: widget.startDate,
-                    endDate: widget.endDate,).then((response){
-                    setState(() {
-                      requests.clear();
-                      req=jsonDecode(response);
-                      for(int i=0;i<req["response"]['allRequests'].length;i++){
-                        requests.add(Request.fromMap(req["response"]['allRequests'][i]));
-                      }
-                      this.allRequests = requests;
-
-                      if (this.allRequests.length > 0) {
-                        isListVisible = true;
-                      }
-                      print(requests.length);
-                      if(req['hasNext']&&req['hasPrevious']){
-                        nextButtonVisible=true;
-                        previousButtonVisible=true;
-                      }else if(req['hasPrevious']&&!req['hasNext']){
-                        previousButtonVisible=true;
-                        nextButtonVisible=false;
-                      }else if(!req['hasPrevious']&&req['hasNext']){
-                        previousButtonVisible=false;
-                        nextButtonVisible=true;
-                      }else{
-                        previousButtonVisible=false;
-                        nextButtonVisible=false;
-                      }
-                      if(allRequests.length==0){
-                        Utils.showError(context,"No Requests Found");
-                      }
-                    });
-                  });
-                });
-              }else{
-                WidgetsBinding.instance
-                    .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-              }
-            },
-          );
-        }
-    );
-  }
-  void updateSearchQuery(String newQuery) {
-    setState(() {
-      searchQuery = newQuery;
-    });
-    print("search query " + newQuery);
-  }
   List<Widget> _buildActions() {
-    if (_isSearching) {
-      return <Widget>[
-        new IconButton(
-          icon: const Icon(Icons.clear),
-          onPressed: () {
-            if (_searchQuery == null || _searchQuery.text.isEmpty) {
-              Navigator.pop(context);
-              return;
-            }
-            _clearSearchQuery();
-          },
-        ),
-      ];
-    }
     return <Widget>[
       IconButton(
         icon: const Icon(Icons.search),
-        onPressed:(){
-         showSearchDialog(context);
+        onPressed:()async{
+          allSuggestionsList.clear();
+          if(clientNames.length>0){
+            for(String c in clientNames){
+              allSuggestionsList.add(RequestSuggestions(c, "Client"));
+            }
+          }
+          if(newModelNames.length>0){
+            for(String c in newModelNames){
+              allSuggestionsList.add(RequestSuggestions(c, "Production Model Name"));
+            }
+          }
+          if(newModelCodes.length>0){
+            for(String c in newModelCodes){
+              allSuggestionsList.add(RequestSuggestions(c, "Production Model Code"));
+            }
+          }
+          if(modelNames.length>0){
+            for(String c in modelNames){
+              allSuggestionsList.add(RequestSuggestions(c, "Samples Model Name"));
+            }
+          }
+          if(modelCodes.length>0){
+            for(String c in modelCodes){
+              allSuggestionsList.add(RequestSuggestions(c, "Samples Model Code"));
+            }
+          }
+          allSuggestionsList.sort((a,b)=>a.suggestionText.toLowerCase().compareTo(b.suggestionText.toLowerCase()));
+          await showSearch<String>(context:context,delegate:RequestSearch(allSuggestionsList,isClient:isClient,statusId:0,currentUserRoles:widget.currentUserRoles,token: token));
         },
       ),
       IconButton(
@@ -966,43 +837,6 @@ class _AllRequestListState extends State<AllRequestList> {
         icon: Icon(Icons.filter_alt),
       ),
     ];
-  }
-  void _stopSearching() {
-
-    setState(() {
-      _isSearching = false;
-      searchPageNum=1;
-      if(_searchQuery.text.isNotEmpty){
-        _clearSearchQuery();
-        WidgetsBinding.instance
-            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-      }
-    });
-  }
-  void _clearSearchQuery() {
-    print("close search box");
-    setState(() {
-      _searchQuery.clear();
-      updateSearchQuery("Search query");
-    });
-  }
-  Widget _buildTitle(BuildContext context) {
-    var horizontalTitleAlignment =
-    Platform.isIOS ? CrossAxisAlignment.center : CrossAxisAlignment.start;
-
-    return new InkWell(
-      onTap: () => scaffoldKey.currentState.openDrawer(),
-      child: new Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: new Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: horizontalTitleAlignment,
-          children: <Widget>[
-            const Text('All Requests'),
-          ],
-        ),
-      ),
-    );
   }
   showAlertChangeStatus(BuildContext context,Request request){
     // set up the buttons
@@ -1156,120 +990,9 @@ class _AllRequestListState extends State<AllRequestList> {
       },
     );
   }
-  showSearchDialog(BuildContext context) {
-    // set up the buttons
-    Widget cancelButton = TextButton(
-      child: Text("Cancel"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    Widget approveRejectButton = TextButton(
-      child: Text("Set"),
-      onPressed: () {
-        print(selectedSearchPreference);
-        if(selectedSearchPreference=="searchByClient"){
-          clientNames.clear();
-          if(clientDropdown.length>0){
-            setState(() {
-              for(Dropdown d in clientDropdown){
-                clientNames.add(d.name);
-              }
-            });
-          }else{
-            Network_Operations.getDropDowns(context, token,"Clients").then((value){
-              setState(() {
-                this.clientDropdown=value;
-                for(Dropdown d in clientDropdown){
-                  clientNames.add(d.name);
-                }
-              });
-            });
-
-          }
-          _startSearch();
-          Navigator.pop(context);
-        }else{
-          _startSearch();
-          Navigator.pop(context);
-        }
-      },
-    );
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("Search By"),
-      content: StatefulBuilder(
-        builder: (context, setState) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              RadioListTile(
-                title: Text("Samples Model Name"),
-                value: 'searchByModelName',
-                groupValue: selectedSearchPreference,
-                onChanged: (choice) {
-                  setState(() {
-                    this.selectedSearchPreference = choice;
-                  });
-                },
-              ),
-              RadioListTile(
-                title: Text("Samples Model Code"),
-                value: 'searchByModelCode',
-                groupValue: selectedSearchPreference,
-                onChanged: (choice) {
-                  setState(() {
-                    this.selectedSearchPreference = choice;
-                  });
-                },
-              ),
-              RadioListTile(
-                title: Text("Client"),
-                value: 'searchByClient',
-                groupValue: selectedSearchPreference,
-                onChanged: (choice) {
-                  setState(() {
-                    this.selectedSearchPreference = choice;
-                  });
-                },
-              ),
-               RadioListTile(
-                title: Text("Production Model Name"),
-                value: 'searchByProductionModelName',
-                groupValue: selectedSearchPreference,
-                onChanged: (choice) {
-                  setState(() {
-                    this.selectedSearchPreference = choice;
-                  });
-                },
-              ),
-              RadioListTile(
-                title: Text("Production Model Code"),
-                value: 'searchByProductionModelCode',
-                groupValue: selectedSearchPreference,
-                onChanged: (choice) {
-                  setState(() {
-                    this.selectedSearchPreference = choice;
-                  });
-                },
-              ),
-            ],
-          );
-        },
-      ),
-      actions: [
-        cancelButton,
-        approveRejectButton
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
   }
 }

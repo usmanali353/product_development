@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
@@ -27,109 +28,70 @@ RequestsForTrial(this.requestId,this.currentUserRole);
    var selectedPreference;
    int requestId;
    var currentUserRole,req;
-   int pageNum=1,searchPageNum=1;
-   String searchQuery = "Search query";
-   static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-   TextEditingController _searchQuery;
-   bool _isSearching = false;
-   var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
+   int pageNum=1;
+   var isLastPage=false;
+   PagingController<int,TrialRequests> controller=PagingController<int,TrialRequests>(firstPageKey: 1);
    final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
    _RequestsForTrialState(this.requestId,this.currentUserRole);
 
   @override
   void initState() {
-    _searchQuery=TextEditingController();
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+    controller.addPageRequestListener((pageKey) { 
+      if(!isLastPage){
+          SharedPreferences.getInstance().then((prefs){
+            Network_Operations.getTrialRequests(context, prefs.getString("token"), requestId, pageKey, 10).then((response){
+                if(response!=null&&response.isNotEmpty) {
+                  req = jsonDecode(response);
+                  if(requests!=null) {
+                    this.requests.clear();
+                  }
+                  for (int i = 0; i < jsonDecode(response)['response'].length; i++) {
+                    this.requests.add(TrialRequests.fromJson(
+                        jsonDecode(response)['response'][i]));
+                  }
+                  if (requests.length > 0) {
+                    isVisible = true;
+                    pageNum=pageNum+1;
+                    pageKey=pageNum;
+                    isLastPage=requests.length==req["totalCount"];
+                    if(isLastPage){
+                      controller.appendLastPage(requests);
+                    }else{
+                      controller.appendPage(requests,pageKey);
+                    }
+                  } else {
+                    Utils.showError(context, "No Requests Found");
+                  }
+
+                }
+            });
+          });
+      }
+    });
     super.initState();
-    //  SharedPreferences.getInstance().then((prefs){
-    //    Network_Operations.getTrialRequests(context, prefs.getString("token"),requestId).then((trialRequests){
-    //      setState(() {
-    //        this.requests=trialRequests;
-    //        if(requests!=null){
-    //          isVisible=true;
-    //        }
-    //
-    //      });
-    //    });
-    //  });
-    // super.initState();
   }
    @override
    Widget build(BuildContext context) {
      return Scaffold(
        appBar: AppBar(
-         leading: _isSearching ? const BackButton() : null,
-         title: _isSearching ? _buildSearchField() : _buildTitle(context),
-         actions: _buildActions(),
-       ),
-       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-       floatingActionButton:
-       Padding(
-         padding: const EdgeInsets.all(8.0),
-         child: Row(
-           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-           children: [
-             Visibility(
-               visible: previousButtonVisible,
-               child: FloatingActionButton(
-                   backgroundColor: Colors.white12, //Color(0xFF004c4c),
-                   splashColor: Colors.red,
-                   mini: true,
-                   child: Icon(Icons.arrow_back, color: Colors.teal, size: 30,),heroTag: "btn2", onPressed: (){
-                 if(!_isSearching){
-                   setState(() {
-                     pageNum=pageNum-1;
-                   });
-                   print(pageNum);
-                   WidgetsBinding.instance
-                       .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                 }else{
-                   setState(() {
-                     searchPageNum=searchPageNum-1;
-                   });
-                   print(searchPageNum);
-                   WidgetsBinding.instance
-                       .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                 }
-               }
-               ),
-             ),
-             Visibility(
-               visible: nextButtonVisible,
-               child: FloatingActionButton(
-                   backgroundColor: Colors.white12,//Color(0xFF004c4c),
-                   splashColor: Colors.red,
-                   mini: true,
-                   child: Icon(Icons.arrow_forward, color: Colors.teal, size: 30,),heroTag: "btn1", onPressed: (){
-                 if(!_isSearching){
-                   setState(() {
-                     pageNum=pageNum+1;
-                   });
-                   print(pageNum);
-                   WidgetsBinding.instance
-                       .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                 }else{
-                   setState(() {
-                     searchPageNum=searchPageNum+1;
-                   });
-                   print(searchPageNum);
-                   WidgetsBinding.instance
-                       .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                 }
-
-               }
-               ),
-             ),
-           ],
-         ),
+         title: Text("Trial Requests"),
        ),
        body: RefreshIndicator(
          key: _refreshIndicatorKey,
          onRefresh: (){
+           setState(() {
+             controller.refresh();
+           });
            return Utils.check_connectivity().then((isConnected){
              if(isConnected){
-                 if(!_isSearching){
+               if(pageNum>1){
+                 setState(() {
+                   requests.clear();
+                   pageNum=1;
+                 });
+               }
                    SharedPreferences.getInstance().then((prefs){
                      Network_Operations.getTrialRequests(context, prefs.getString("token"), requestId, pageNum, 10).then((response){
                        setState(() {
@@ -144,18 +106,12 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                            }
                            if (requests.length > 0) {
                              isVisible = true;
-                             if(req['hasNext']&&req['hasPrevious']){
-                               nextButtonVisible=true;
-                               previousButtonVisible=true;
-                             }else if(req['hasPrevious']&&!req['hasNext']){
-                               previousButtonVisible=true;
-                               nextButtonVisible=false;
-                             }else if(!req['hasPrevious']&&req['hasNext']){
-                               previousButtonVisible=false;
-                               nextButtonVisible=true;
+                             pageNum=pageNum+1;
+                             isLastPage=requests.length==req["totalCount"];
+                             if(isLastPage){
+                               controller.appendLastPage(requests);
                              }else{
-                               previousButtonVisible=false;
-                               nextButtonVisible=false;
+                               controller.appendPage(requests,pageNum);
                              }
                            } else {
                              Utils.showError(context, "No Requests Found");
@@ -165,43 +121,6 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                        });
                      });
                    });
-                 }else{
-                   SharedPreferences.getInstance().then((prefs){
-                     Network_Operations.getTrialRequestsSearchable(context, prefs.getString("token"), requestId, searchPageNum, 10,searchQuery).then((response){
-                       setState(() {
-                         if(response!=null&&response.isNotEmpty) {
-                           req = jsonDecode(response);
-                           if(requests!=null) {
-                             this.requests.clear();
-                           }
-                           for (int i = 0; i < jsonDecode(response)['response'].length; i++) {
-                             this.requests.add(TrialRequests.fromJson(
-                                 jsonDecode(response)['response'][i]));
-                           }
-                           if (requests.length > 0) {
-                             isVisible = true;
-                             if(req['hasNext']&&req['hasPrevious']){
-                               nextButtonVisible=true;
-                               previousButtonVisible=true;
-                             }else if(req['hasPrevious']&&!req['hasNext']){
-                               previousButtonVisible=true;
-                               nextButtonVisible=false;
-                             }else if(!req['hasPrevious']&&req['hasNext']){
-                               previousButtonVisible=false;
-                               nextButtonVisible=true;
-                             }else{
-                               previousButtonVisible=false;
-                               nextButtonVisible=false;
-                             }
-                           } else {
-                             Utils.showError(context, "No Requests Found");
-                           }
-
-                         }
-                       });
-                     });
-                   });
-                 }
              }else{
                Utils.showError(context,"Network Not Available");
              }
@@ -219,314 +138,320 @@ RequestsForTrial(this.requestId,this.currentUserRole);
                    image: AssetImage('Assets/img/pattren.png'),
                  )
              ),
-             child: ListView.builder(itemCount:requests!=null?requests.length:0,itemBuilder:(context,int index){
-                 return Card(
-                   elevation: 6,
-                   child: Container(
-                     decoration: BoxDecoration(
-                       borderRadius: BorderRadius.circular(10),
-                       //color: Colors.teal,
-                     ),
-                     width: MediaQuery.of(context).size.width,
+             child: PagedListView(
+               pagingController: controller,
+                 builderDelegate: PagedChildBuilderDelegate<TrialRequests>(
+                     itemBuilder:(context,requests,int index){
+                       return Card(
+                         elevation: 6,
+                         child: Container(
+                           decoration: BoxDecoration(
+                             borderRadius: BorderRadius.circular(10),
+                             //color: Colors.teal,
+                           ),
+                           width: MediaQuery.of(context).size.width,
 
 
-                     child: Padding(
-                       padding: const EdgeInsets.all(13.0),
-                       child: Row(
-                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                         //crossAxisAlignment: CrossAxisAlignment.start,
-                         //mainAxisAlignment: MainAxisAlignment.start,
-                         children: <Widget>[
-                           Column(
-                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                             //crossAxisAlignment: CrossAxisAlignment.start,
-                             children: <Widget>[
-                               InkWell(
-                                 onTap: (){
-                                   setState(() {
-                                     List<String> imageUrl=[];
-                                     Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(requests[index])));
-                                   });
+                           child: Padding(
+                             padding: const EdgeInsets.all(13.0),
+                             child: Row(
+                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                               //crossAxisAlignment: CrossAxisAlignment.start,
+                               //mainAxisAlignment: MainAxisAlignment.start,
+                               children: <Widget>[
+                                 Column(
+                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                   //crossAxisAlignment: CrossAxisAlignment.start,
+                                   children: <Widget>[
+                                     InkWell(
+                                       onTap: (){
+                                         setState(() {
+                                           List<String> imageUrl=[];
+                                           Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(requests)));
+                                         });
 
-                                 },
-                                 child: CachedNetworkImage(
-                                   imageUrl: requests[index].image!=null?requests[index].image:"http://anokha.world/images/not-found.png",
-                                   placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
-                                   errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
-                                   imageBuilder: (context, imageProvider){
-                                     return Container(
-                                       height: 100,
-                                       width: 85,
-                                       decoration: BoxDecoration(
-                                           borderRadius: BorderRadius.circular(8),
-                                           image: DecorationImage(
-                                             image: imageProvider,
-                                             fit: BoxFit.cover,
-                                           )
+                                       },
+                                       child: CachedNetworkImage(
+                                         imageUrl: requests.image!=null?requests.image:"http://anokha.world/images/not-found.png",
+                                         placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
+                                         errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
+                                         imageBuilder: (context, imageProvider){
+                                           return Container(
+                                             height: 100,
+                                             width: 85,
+                                             decoration: BoxDecoration(
+                                                 borderRadius: BorderRadius.circular(8),
+                                                 image: DecorationImage(
+                                                   image: imageProvider,
+                                                   fit: BoxFit.cover,
+                                                 )
+                                             ),
+                                           );
+                                         },
                                        ),
-                                     );
-                                   },
+                                     ),
+                                     //Padding(padding: EdgeInsets.only(top:2),),
+                                     requests.multipleColors!=null&&requests.multipleColors.length>0
+                                         ?
+                                     Container(
+                                       width: 55,
+                                       height: 20,
+                                       child: ListView(
+                                         scrollDirection: Axis.horizontal,
+                                         children: [
+                                           Row(
+                                             children: <Widget>[
+                                               for(int i=0;i<requests.multipleColors.length;i++)
+                                                 Padding(
+                                                   padding: const EdgeInsets.only(top: 8,left: 2,right: 2),
+                                                   child: Wrap(
+                                                     children: [
+                                                       Container(
+                                                         decoration: BoxDecoration(
+                                                           borderRadius: BorderRadius.circular(2),
+                                                           color: Color(Utils.getColorFromHex(requests.multipleColors[i].colorCode)),
+                                                           //color: Colors.teal,
+                                                         ),
+                                                         height: 10,
+                                                         width: 15,
+                                                       ),
+                                                     ],
+                                                   ),
+                                                 ),
+                                             ],
+                                           )
+                                         ],
+                                       ),
+                                     ) :Container(),
+                                   ],
                                  ),
-                               ),
-                               //Padding(padding: EdgeInsets.only(top:2),),
-                               requests[index].multipleColors!=null&&requests[index].multipleColors.length>0
-                                   ?
-                                   Container(
-                                     width: 55,
-                                     height: 20,
-                                     child: ListView(
-                                       scrollDirection: Axis.horizontal,
-                                       children: [
+                                 VerticalDivider(color: Colors.grey,),
+                                 GestureDetector(
+                                   onTapDown: (details)async{
+                                     if(requests.status=="Approved By Customer"){
+                                       if(currentUserRole["9"]!=null||currentUserRole["10"]!=null){
+                                         showProductionApprovalDialog(context, requests);
+                                       }else{
+                                         SharedPreferences.getInstance().then((prefs){
+                                           Network_Operations.getRequestById(context, prefs.getString("token"), requests.requestId);
+                                         });
+                                       }
+                                     }else if(requests.status=="Not Approved Nor Rejected"){
+                                       if(currentUserRole["7"]!=null||currentUserRole["8"]!=null) {
+                                         showTrialApprovalDialog(context, requests);
+                                       }else{
+                                         SharedPreferences.getInstance().then((prefs){
+                                           Network_Operations.getRequestById(context, prefs.getString("token"), requests.requestId);
+                                         });
+                                       }
+                                     }else if(requests.status=="Rejected By Customer"&&requests.currentAction=="Pending"){
+                                       SharedPreferences.getInstance().then((prefs){
+                                         if(currentUserRole["12"]!=null) {
+                                           Network_Operations.getEmployeesDropDown(
+                                               context, prefs.getString("token")).then((userList) {
+                                             showAssignUserDialog(
+                                                 context, userList, requests);
+                                           });
+                                         }else{
+                                           SharedPreferences.getInstance().then((prefs){
+                                             Network_Operations.getRequestById(context, prefs.getString("token"), requests.requestId);
+                                           });
+                                         }
+                                       });
+                                     }else if(requests.status=="Rejected By Customer"){
+                                       await showMenu(
+                                         context: context,
+                                         position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                         items: [
+                                           PopupMenuItem<String>(
+                                               child: Row(
+                                                 children: [
+                                                   Padding(
+                                                     padding: EdgeInsets.only(right:8.0),
+                                                     child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                                   ),
+                                                   Text("See Details")
+                                                 ],
+                                               ), value: 'Details'),
+                                           PopupMenuItem<String>(
+                                               child: Row(
+                                                 children: [
+                                                   Padding(
+                                                     padding: EdgeInsets.only(right:8.0),
+                                                     child: Icon(Icons.disabled_by_default,color: Color(0xFF004c4c),),
+                                                   ),
+                                                   Text("Rejection Reason")
+                                                 ],
+                                               ), value: 'rejectionReason'),
+                                         ],
+                                         elevation: 8.0,
+                                       ).then((selectedItem){
+                                         if(selectedItem=="Details"){
+                                           SharedPreferences.getInstance().then((prefs){
+                                             Network_Operations.getRequestById(context, prefs.getString("token"), requests.requestId);
+                                           });
+                                         }
+                                         else if(selectedItem=="rejectionReason"){
+                                           showReasonDialog(requests);
+                                         }
+                                       });
+                                     }else{
+                                       await showMenu(
+                                         context: context,
+                                         position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                         items: [
+                                           PopupMenuItem<String>(
+                                               child: Row(
+                                                 children: [
+                                                   Padding(
+                                                     padding: EdgeInsets.only(right:8.0),
+                                                     child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                                   ),
+                                                   Text("See Details")
+                                                 ],
+                                               ), value: 'Details'),
+                                         ],
+                                         elevation: 8.0,
+                                       ).then((selectedItem){
+                                         if(selectedItem=="Details"){
+                                           SharedPreferences.getInstance().then((prefs){
+                                             Network_Operations.getRequestById(context, prefs.getString("token"), requests.requestId);
+                                           });
+                                         }
+                                       });
+                                     }
+                                   },
+                                   child: Container(
+                                     width: MediaQuery.of(context).size.width * 0.62,
+                                     height: 160,
+                                     color: Colors.white,
+                                     child: Column(
+                                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: <Widget>[
+                                         Padding(
+                                           padding: const EdgeInsets.only(left: 6, top: 8,bottom: 6),
+                                           child: Text(requests.modelName!=null?requests.modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                                         ),
+                                         Row(
+                                           crossAxisAlignment: CrossAxisAlignment.center,
+                                           //mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                           children: <Widget>[
+                                             Row(
+                                               //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                               children: <Widget>[
+                                                 Icon(
+                                                   Icons.date_range,
+                                                   color: Colors.teal,
+                                                 ),
+                                                 Padding(
+                                                   padding: EdgeInsets.only(left: 2, right: 2),
+                                                 ),
+                                                 Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(requests.date)))
+                                               ],
+                                             ),
+                                             Padding(
+                                               padding: EdgeInsets.only(left: 30),
+                                             ),
+
+                                           ],
+                                         ),
+                                         Row(
+                                           crossAxisAlignment: CrossAxisAlignment.center,
+                                           mainAxisSize: MainAxisSize.min,
+                                           // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                           children: <Widget>[
+                                             Row(
+                                               children: <Widget>[
+                                                 Icon(
+                                                   Icons.zoom_out_map,
+                                                   color: Colors.teal,
+                                                 ),
+                                                 Padding(
+                                                   padding: EdgeInsets.only(left: 2, right: 2),
+                                                 ),
+                                                 Container(
+                                                     width: MediaQuery.of(context).size.width*0.4,
+                                                     child: Text(requests.multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 3,overflow: TextOverflow.visible,)
+                                                 )
+                                               ],
+
+                                             ),
+                                             Padding(
+                                               padding: EdgeInsets.only(left: 27),
+                                             ),
+
+                                           ],
+                                         ),
+                                         Row(
+                                           crossAxisAlignment: CrossAxisAlignment.center,
+                                           // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                           children: <Widget>[
+                                             Row(
+                                               children: <Widget>[
+                                                 Icon(
+                                                   Icons.person,
+                                                   color: Colors.teal,
+                                                 ),
+                                                 Padding(
+                                                   padding: EdgeInsets.only(left: 2, right: 2),
+                                                 ),
+                                                 Text(requests.clientName)
+                                               ],
+
+                                             ),
+                                             Padding(
+                                               padding: EdgeInsets.only(left: 27),
+                                             ),
+
+                                           ],
+                                         ),
                                          Row(
                                            children: <Widget>[
-                                             for(int i=0;i<requests[index].multipleColors.length;i++)
-                                               Padding(
-                                                 padding: const EdgeInsets.only(top: 8,left: 2,right: 2),
-                                                 child: Wrap(
-                                                   children: [
-                                                     Container(
-                                                       decoration: BoxDecoration(
-                                                         borderRadius: BorderRadius.circular(2),
-                                                         color: Color(Utils.getColorFromHex(requests[index].multipleColors[i].colorCode)),
-                                                         //color: Colors.teal,
-                                                       ),
-                                                       height: 10,
-                                                       width: 15,
-                                                     ),
-                                                   ],
-                                                 ),
-                                               ),
-                                           ],
-                                         )
-                                       ],
-                                     ),
-                                   ) :Container(),
-                             ],
-                           ),
-                           VerticalDivider(color: Colors.grey,),
-                           GestureDetector(
-                             onTapDown: (details)async{
-                               if(requests[index].status=="Approved By Customer"){
-                                 if(currentUserRole["9"]!=null||currentUserRole["10"]!=null){
-                                   showProductionApprovalDialog(context, requests[index]);
-                                 }else{
-                                   SharedPreferences.getInstance().then((prefs){
-                                     Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
-                                   });
-                                 }
-                               }else if(requests[index].status=="Not Approved Nor Rejected"){
-                                 if(currentUserRole["7"]!=null||currentUserRole["8"]!=null) {
-                                   showTrialApprovalDialog(context, requests[index]);
-                                 }else{
-                                   SharedPreferences.getInstance().then((prefs){
-                                     Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
-                                   });
-                                 }
-                               }else if(requests[index].status=="Rejected By Customer"&&requests[index].currentAction=="Pending"){
-                                 SharedPreferences.getInstance().then((prefs){
-                                   if(currentUserRole["12"]!=null) {
-                                     Network_Operations.getEmployeesDropDown(
-                                         context, prefs.getString("token")).then((userList) {
-                                       showAssignUserDialog(
-                                           context, userList, requests[index]);
-                                     });
-                                   }else{
-                                     SharedPreferences.getInstance().then((prefs){
-                                       Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
-                                     });
-                                   }
-                                 });
-                               }else if(requests[index].status=="Rejected By Customer"){
-                                 await showMenu(
-                                   context: context,
-                                   position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                   items: [
-                                     PopupMenuItem<String>(
-                                         child: Row(
-                                           children: [
-                                             Padding(
-                                               padding: EdgeInsets.only(right:8.0),
-                                               child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                             Icon(
+                                               Icons.layers,
+                                               color: Colors.teal,
                                              ),
-                                             Text("See Details")
-                                           ],
-                                         ), value: 'Details'),
-                                     PopupMenuItem<String>(
-                                         child: Row(
-                                           children: [
                                              Padding(
-                                               padding: EdgeInsets.only(right:8.0),
-                                               child: Icon(Icons.disabled_by_default,color: Color(0xFF004c4c),),
+                                               padding: EdgeInsets.only(left: 2, right: 2),
                                              ),
-                                             Text("Rejection Reason")
+                                             Text(requests.surfaceName!=null?requests.surfaceName:'',overflow: TextOverflow.ellipsis,maxLines: 1,),
                                            ],
-                                         ), value: 'rejectionReason'),
-                                   ],
-                                   elevation: 8.0,
-                                 ).then((selectedItem){
-                                   if(selectedItem=="Details"){
-                                     SharedPreferences.getInstance().then((prefs){
-                                       Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
-                                     });
-                                   }
-                                   else if(selectedItem=="rejectionReason"){
-                                     showReasonDialog(requests[index]);
-                                   }
-                                 });
-                               }else{
-                                 await showMenu(
-                                   context: context,
-                                   position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                   items: [
-                                     PopupMenuItem<String>(
-                                         child: Row(
-                                           children: [
-                                             Padding(
-                                               padding: EdgeInsets.only(right:8.0),
-                                               child: Icon(Icons.info,color: Color(0xFF004c4c),),
-                                             ),
-                                             Text("See Details")
-                                           ],
-                                         ), value: 'Details'),
-                                   ],
-                                   elevation: 8.0,
-                                 ).then((selectedItem){
-                                   if(selectedItem=="Details"){
-                                     SharedPreferences.getInstance().then((prefs){
-                                       Network_Operations.getRequestById(context, prefs.getString("token"), requests[index].requestId);
-                                     });
-                                   }
-                                 });
-                               }
-                             },
-                             child: Container(
-                               width: MediaQuery.of(context).size.width * 0.62,
-                               height: 160,
-                               color: Colors.white,
-                               child: Column(
-                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                 children: <Widget>[
-                                   Padding(
-                                     padding: const EdgeInsets.only(left: 6, top: 8,bottom: 6),
-                                     child: Text(requests[index].modelName!=null?requests[index].modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-                                   ),
-                                   Row(
-                                     crossAxisAlignment: CrossAxisAlignment.center,
-                                     //mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                     children: <Widget>[
-                                       Row(
-                                         //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                         children: <Widget>[
-                                           Icon(
-                                             Icons.date_range,
-                                             color: Colors.teal,
-                                           ),
-                                           Padding(
-                                             padding: EdgeInsets.only(left: 2, right: 2),
-                                           ),
-                                           Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(requests[index].date)))
-                                         ],
-                                       ),
-                                       Padding(
-                                         padding: EdgeInsets.only(left: 30),
-                                       ),
-
-                                     ],
-                                   ),
-                                   Row(
-                                     crossAxisAlignment: CrossAxisAlignment.center,
-                                     mainAxisSize: MainAxisSize.min,
-                                     // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                     children: <Widget>[
-                                       Row(
-                                         children: <Widget>[
-                                           Icon(
-                                             Icons.zoom_out_map,
-                                             color: Colors.teal,
-                                           ),
-                                           Padding(
-                                             padding: EdgeInsets.only(left: 2, right: 2),
-                                           ),
-                                           Container(
-                                               width: MediaQuery.of(context).size.width*0.4,
-                                               child: Text(requests[index].multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 3,overflow: TextOverflow.visible,)
-                                           )
-                                         ],
-
-                                       ),
-                                       Padding(
-                                         padding: EdgeInsets.only(left: 27),
-                                       ),
-
-                                     ],
-                                   ),
-                                   Row(
-                                     crossAxisAlignment: CrossAxisAlignment.center,
-                                     // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                     children: <Widget>[
-                                       Row(
-                                         children: <Widget>[
-                                           Icon(
-                                             Icons.person,
-                                             color: Colors.teal,
-                                           ),
-                                           Padding(
-                                             padding: EdgeInsets.only(left: 2, right: 2),
-                                           ),
-                                           Text(requests[index].clientName)
-                                         ],
-
-                                       ),
-                                       Padding(
-                                         padding: EdgeInsets.only(left: 27),
-                                       ),
-
-                                     ],
-                                   ),
-                                   Row(
-                                     children: <Widget>[
-                                       Icon(
-                                         Icons.layers,
-                                         color: Colors.teal,
-                                       ),
-                                       Padding(
-                                         padding: EdgeInsets.only(left: 2, right: 2),
-                                       ),
-                                       Text(requests[index].surfaceName!=null?requests[index].surfaceName:'',overflow: TextOverflow.ellipsis,maxLines: 1,),
-                                     ],
 
 
-                                   ),
-                                   Padding(
-                                     padding: const EdgeInsets.only(left: 1),
-                                     child: Row(
-                                       //crossAxisAlignment: CrossAxisAlignment.start,
-                                       children: <Widget>[
-                                         Icon(
-                                           Icons.done_all,
-                                           //size: 14,
-                                           color: Colors.teal,
                                          ),
                                          Padding(
-                                           padding: EdgeInsets.only(left: 3, right: 3),
-                                         ),
-                                         Text(requests[index].status!=null?requests[index].status:'')
-                                       ],
+                                           padding: const EdgeInsets.only(left: 1),
+                                           child: Row(
+                                             //crossAxisAlignment: CrossAxisAlignment.start,
+                                             children: <Widget>[
+                                               Icon(
+                                                 Icons.done_all,
+                                                 //size: 14,
+                                                 color: Colors.teal,
+                                               ),
+                                               Padding(
+                                                 padding: EdgeInsets.only(left: 3, right: 3),
+                                               ),
+                                               Text(requests.status!=null?requests.status:'')
+                                             ],
 
+                                           ),
+                                         ),
+                                       ],
                                      ),
                                    ),
-                                 ],
-                               ),
+                                 ),
+                               ],
                              ),
                            ),
-                         ],
-                       ),
-                     ),
 
-                   ),
-                 );
-             }),
+                         ),
+                       );
+                     }
+                 ),
+                 
+             ),
            ),
          ),
        ),
@@ -824,167 +749,9 @@ RequestsForTrial(this.requestId,this.currentUserRole);
        },
      );
    }
-   void updateSearchQuery(String newQuery) {
-     setState(() {
-       searchQuery = newQuery;
-     });
-     print("search query " + newQuery);
-   }
-   List<Widget> _buildActions() {
-     if (_isSearching) {
-       return <Widget>[
-         new IconButton(
-           icon: const Icon(Icons.clear),
-           onPressed: () {
-             if (_searchQuery == null || _searchQuery.text.isEmpty) {
-               Navigator.pop(context);
-               return;
-             }
-             _clearSearchQuery();
-           },
-         ),
-       ];
-     }
-     return <Widget>[
-       new IconButton(
-         icon: const Icon(Icons.search),
-         onPressed: _startSearch,
-       ),
-     ];
-   }
-   void _stopSearching() {
-     _clearSearchQuery();
-     setState(() {
-       _isSearching = false;
-       searchPageNum=1;
-       WidgetsBinding.instance
-           .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-     });
-   }
-   void _clearSearchQuery() {
-     print("close search box");
-     setState(() {
-       _searchQuery.clear();
-       updateSearchQuery("Search query");
-     });
-   }
-   Widget _buildTitle(BuildContext context) {
-     var horizontalTitleAlignment =
-     Platform.isIOS ? CrossAxisAlignment.center : CrossAxisAlignment.start;
-
-     return new InkWell(
-       onTap: () => scaffoldKey.currentState.openDrawer(),
-       child: new Padding(
-         padding: const EdgeInsets.symmetric(horizontal: 12.0),
-         child: new Column(
-           mainAxisAlignment: MainAxisAlignment.center,
-           crossAxisAlignment: horizontalTitleAlignment,
-           children: <Widget>[
-             Text("Trial Requests"),
-           ],
-         ),
-       ),
-     );
-   }
-   void _startSearch() {
-     ModalRoute
-         .of(context)
-         .addLocalHistoryEntry(new LocalHistoryEntry(onRemove: _stopSearching));
-
-     setState(() {
-       _isSearching = true;
-     });
-   }
-   Widget _buildSearchField() {
-     return  TextField(
-       controller: _searchQuery,
-       autofocus: true,
-       textInputAction: TextInputAction.search,
-       decoration: const InputDecoration(
-         hintText: 'Search...',
-         border: InputBorder.none,
-         hintStyle: const TextStyle(color: Colors.white30),
-       ),
-       style: const TextStyle(color: Colors.white, fontSize: 16.0),
-       onSubmitted:(query){
-         if(query.isNotEmpty){
-           setState(() {
-             this.searchQuery=query;
-           });
-
-           SharedPreferences.getInstance().then((prefs){
-             Network_Operations.getTrialRequestsSearchable(context, prefs.getString("token"), widget.requestId,searchPageNum,10,searchQuery).then((response){
-               setState(() {
-                 if(response!=null&&response.isNotEmpty) {
-                   req = jsonDecode(response);
-
-                   requests.clear();
-                   for (int i = 0; i < jsonDecode(response)['response']
-                       .length; i++) {
-                     this.requests.add(TrialRequests.fromJson(
-                         jsonDecode(response)['response'][i]));
-                   }
-                   if (requests.length > 0) {
-                     isVisible = true;
-                     if(req['hasNext']&&req['hasPrevious']){
-                       nextButtonVisible=true;
-                       previousButtonVisible=true;
-                     }else if(req['hasPrevious']&&!req['hasNext']){
-                       previousButtonVisible=true;
-                       nextButtonVisible=false;
-                     }else if(!req['hasPrevious']&&req['hasNext']){
-                       previousButtonVisible=false;
-                       nextButtonVisible=true;
-                     }else{
-                       previousButtonVisible=false;
-                       nextButtonVisible=false;
-                     }
-                   } else {
-                     Utils.showError(context, "No Requests Found");
-                   }
-                 }
-               });
-             });
-           });
-         }
-         else{
-           SharedPreferences.getInstance().then((prefs){
-             Network_Operations.getTrialRequests(context, prefs.getString("token"), widget.requestId,pageNum,10).then((response){
-               setState(() {
-                 if(response!=null&&response.isNotEmpty) {
-                   req = jsonDecode(response);
-
-                   requests.clear();
-                   for (int i = 0; i < jsonDecode(response)['response']
-                       .length; i++) {
-                     this.requests.add(TrialRequests.fromJson(
-                         jsonDecode(response)['response'][i]));
-                   }
-                   if (requests.length > 0) {
-                     isVisible = true;
-                     if(req['hasNext']&&req['hasPrevious']){
-                       nextButtonVisible=true;
-                       previousButtonVisible=true;
-                     }else if(req['hasPrevious']&&!req['hasNext']){
-                       previousButtonVisible=true;
-                       nextButtonVisible=false;
-                     }else if(!req['hasPrevious']&&req['hasNext']){
-                       previousButtonVisible=false;
-                       nextButtonVisible=true;
-                     }else{
-                       previousButtonVisible=false;
-                       nextButtonVisible=false;
-                     }
-                   } else {
-                     Utils.showError(context, "No Requests Found");
-                   }
-                 }
-               });
-             });
-
-           });
-         }
-       },
-     );
+   @override
+   void dispose() {
+     super.dispose();
+     controller.dispose();
    }
  }

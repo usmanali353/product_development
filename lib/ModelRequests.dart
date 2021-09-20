@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:productdevelopment/AddClientsForTrial.dart';
 import 'package:productdevelopment/ApproveForTrial.dart';
@@ -20,7 +21,9 @@ import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:productdevelopment/request_Model_form/Assumptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'DetailsPage.dart';
+import 'Model/RequestSuggestions.dart';
 import 'RequestsForTrial.dart';
+import 'Search/RequestSearch.dart';
 import 'acmcapproval.dart';
 
 
@@ -38,6 +41,7 @@ class ModelRequests extends StatefulWidget {
 }
 
 class _ModelReState extends State<ModelRequests>{
+
   List<Request> products=[];
   var claims;
   GlobalKey<RefreshIndicatorState> refreshIndicatorKey=GlobalKey();
@@ -47,30 +51,27 @@ class _ModelReState extends State<ModelRequests>{
   List<DateTime> picked=[];
   DateTime initialStart=DateTime.now(),initialEnd=DateTime.now().add(Duration(days: 0));
   var currentUserRoles;
-  var hasMoreData=false,nextButtonVisible=false,previousButtonVisible=false;
-  int searchPageNum=1,pageNum=1;
-  TextEditingController _searchQuery;
-  bool _isSearching = false;
-  static final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  var isLastPage=false;
+  int pageNum=1;
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-  String searchQuery = "";
   _ModelReState(this.statusId,this.currentUserRoles);
- bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false,isListVisible=false;
+ bool isGm=false,isClient=false,isSaleManager= false,isFDesigner=false,isLabIncharge=false,isMarketingManager=false,isProductManager=false,isFirstLoadRunning=false,_isLoadMoreRunning=false;
  bool isColorsVisible=false;
  List<Request> requests=[],requestsForSuggestions=[];
  List<String> clientNames=[],modelNames=[],modelCodes=[],newModelNames=[],newModelCodes=[];
+ List<RequestSuggestions> allSuggestionsList=[];
  List<Dropdown> clientDropdown=[];
  var req;
   String token;
+  PagingController<int,Request> controller=PagingController<int,Request>(firstPageKey: 1);
   @override
   void initState() {
-    _searchQuery = TextEditingController();
+    isFirstLoadRunning=true;
     SharedPreferences.getInstance().then((prefs) {
       setState(() {
-
         claims = Utils.parseJwt(prefs.getString("token"));
         token = prefs.getString("token");
-        if(statusId==1){
+
           Network_Operations.getDropDowns(context, token,"Clients").then((value){
             setState(() {
               this.clientDropdown=value;
@@ -79,7 +80,6 @@ class _ModelReState extends State<ModelRequests>{
               }
             });
           });
-        }else{
           Network_Operations.getRequestsForSearchSuggestions(context, token,statusId: statusId).then((req){
             this.requestsForSuggestions=req;
             if(requestsForSuggestions!=null){
@@ -101,7 +101,7 @@ class _ModelReState extends State<ModelRequests>{
               }
             }
           });
-        }
+
         print(claims);
         //Checking Roles
         if (claims['role'].contains('General Manager')) {
@@ -142,14 +142,70 @@ class _ModelReState extends State<ModelRequests>{
             .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
       });
     });
+    controller.addPageRequestListener((pageKey){
+        if (!isLastPage) {
+          if(!isClient){
+            Network_Operations.getRequestByStatusGM(context,
+                token,
+                statusId,
+                pageKey,
+                10,
+                startDate: widget.startDate,
+                endDate: widget.endDate
+            ).then((response){
+                req=jsonDecode(response);
+                for(int i=0;i<req["response"]['allRequests'].length;i++){
+                  requests.add(Request.fromMap(req["response"]['allRequests'][i]));
+                }
+                this.products = requests;
+                if(products!=null&&products.length>0){
+                  pageNum=pageNum+1;
+                  pageKey=pageNum;
+                  isLastPage=products.length==req["totalCount"];
+                  if(isLastPage){
+                    controller.appendLastPage(products);
+                  }else{
+                    controller.appendPage(products,pageKey);
+                  }
+                }
+                if(products.length==0){
+                  Utils.showError(context,"No Request Found");
+                }
+
+            });
+          }
+          else {
+            Network_Operations.getRequestByStatusIndividualUser(context, token, statusId,pageKey,10,startDate: widget.startDate,endDate: widget.endDate).then((response){
+                _isLoadMoreRunning=false;
+                for(int i=0;i<jsonDecode(response).length;i++){
+                  requests.add(Request.fromMap(jsonDecode(response)[i]));
+                }
+                this.products=requests;
+                if(products!=null&&products.length>0){
+                  pageNum=pageNum+1;
+                  pageKey=pageNum;
+                  isLastPage=products.length==req["totalCount"];
+                  if(isLastPage){
+                    controller.appendLastPage(products);
+                  }else{
+                    controller.appendPage(products,pageKey);
+                  }
+                }
+                print(requests.length);
+                if(products.length==0){
+                  Utils.showError(context,"No Request Found");
+                }
+            });
+          }
+        }
+    });
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          leading: _isSearching ? const BackButton() : null,
-          title: _isSearching ? _buildSearchField() : _buildTitle(context),
+          title: Text(widget.name!=null?widget.name:"Model Requests"),
           actions: _buildActions(),
            bottom: isDateBarVisible? PreferredSize(
               preferredSize: Size.fromHeight(40),
@@ -165,68 +221,6 @@ class _ModelReState extends State<ModelRequests>{
               ),
             ):null
         ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton:
-      Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Visibility(
-              visible: previousButtonVisible,
-              child: FloatingActionButton(
-                  backgroundColor: Colors.white12, //Color(0xFF004c4c),
-                  splashColor: Colors.red,
-                  mini: true,
-                  child: Icon(Icons.arrow_back, color: Colors.teal, size: 30,),heroTag: "btn2", onPressed: (){
-                if(!_isSearching){
-                  setState(() {
-                    pageNum=pageNum-1;
-                  });
-                  print(pageNum);
-                  WidgetsBinding.instance
-                      .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                }else{
-                  setState(() {
-                    searchPageNum=searchPageNum-1;
-                  });
-                  print(searchPageNum);
-                  WidgetsBinding.instance
-                      .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                }
-
-              }
-              ),
-            ),
-            Visibility(
-              visible: nextButtonVisible,
-              child: FloatingActionButton(
-                  backgroundColor: Colors.white12,//Color(0xFF004c4c),
-                  splashColor: Colors.red,
-                  mini: true,
-                  child: Icon(Icons.arrow_forward, color: Colors.teal, size: 30,),heroTag: "btn1", onPressed: (){
-                if(!_isSearching){
-                  setState(() {
-                    pageNum=pageNum+1;
-                  });
-                  print(pageNum);
-                  WidgetsBinding.instance
-                      .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                }else{
-                  setState(() {
-                    searchPageNum=searchPageNum+1;
-                  });
-                  print(searchPageNum);
-                  WidgetsBinding.instance
-                      .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                }
-
-              }
-              ),
-            ),
-          ],
-        ),
-      ),
       body: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -240,9 +234,18 @@ class _ModelReState extends State<ModelRequests>{
         child: RefreshIndicator(
           key: _refreshIndicatorKey,
           onRefresh: (){
+            setState(() {
+             controller.refresh();
+            });
             return Utils.check_connectivity().then((isConnected){
               if(isConnected){
-                if(!_isSearching){
+                if(pageNum>1){
+                  setState(() {
+                    products.clear();
+                    requests.clear();
+                    pageNum=1;
+                  });
+                }
                   if(!isClient){
                     Network_Operations.getRequestByStatusGM(context,
                         token,
@@ -253,28 +256,19 @@ class _ModelReState extends State<ModelRequests>{
                         endDate: widget.endDate
                     ).then((response){
                       setState(() {
-                        requests.clear();
                         req=jsonDecode(response);
                         for(int i=0;i<req["response"]['allRequests'].length;i++){
                           requests.add(Request.fromMap(req["response"]['allRequests'][i]));
                         }
                         this.products = requests;
-                        if (this.products.length > 0) {
-                          isListVisible = true;
-                        }
-                        print(requests.length);
-                        if(req['hasNext']&&req['hasPrevious']){
-                          nextButtonVisible=true;
-                          previousButtonVisible=true;
-                        }else if(req['hasPrevious']&&!req['hasNext']){
-                          previousButtonVisible=true;
-                          nextButtonVisible=false;
-                        }else if(!req['hasPrevious']&&req['hasNext']){
-                          previousButtonVisible=false;
-                          nextButtonVisible=true;
-                        }else{
-                          previousButtonVisible=false;
-                          nextButtonVisible=false;
+                        if(products!=null&&products.length>0){
+                          pageNum=pageNum+1;
+                          isLastPage=products.length==req["totalCount"];
+                          if(isLastPage){
+                            controller.appendLastPage(products);
+                          }else{
+                            controller.appendPage(products,pageNum);
+                          }
                         }
                         if(products.length==0){
                           Utils.showError(context,"No Request Found");
@@ -285,110 +279,38 @@ class _ModelReState extends State<ModelRequests>{
                   else {
                     Network_Operations.getRequestByStatusIndividualUser(context, token, statusId,pageNum,10,startDate: widget.startDate,endDate: widget.endDate).then((response){
                       setState(() {
-                        requests.clear();
                         for(int i=0;i<jsonDecode(response).length;i++){
                           requests.add(Request.fromMap(jsonDecode(response)[i]));
                         }
                         this.products=requests;
                         if(products!=null&&products.length>0){
-                          isListVisible=true;
+                          pageNum=pageNum+1;
+                          isLastPage=products.length==req["totalCount"];
+                          if(isLastPage){
+                            controller.appendLastPage(products);
+                          }else{
+                            controller.appendPage(products,pageNum);
+                          }
                         }
                         print(requests.length);
-                        if(req['hasNext']&&req['hasPrevious']){
-                          nextButtonVisible=true;
-                          previousButtonVisible=true;
-                        }else if(req['hasPrevious']&&!req['hasNext']){
-                          previousButtonVisible=true;
-                          nextButtonVisible=false;
-                        }else if(!req['hasPrevious']&&req['hasNext']){
-                          previousButtonVisible=false;
-                          nextButtonVisible=true;
-                        }else{
-                          previousButtonVisible=false;
-                          nextButtonVisible=false;
-                        }
                         if(products.length==0){
                           Utils.showError(context,"No Request Found");
                         }
                       });
                     });
                   }
-                }else{
-                  if(!isClient){
-                    Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,pageNum,10,searchQuery,startDate: widget.startDate,endDate: widget.endDate).then((response){
-                      setState(() {
-                        requests.clear();
-                        req=jsonDecode(response);
-                        for(int i=0;i<req["response"]['allRequests'].length;i++){
-                          requests.add(Request.fromMap(req["response"]['allRequests'][i]));
-                        }
-                        this.products = requests;
-                        if (this.products.length > 0) {
-                          isListVisible = true;
-                        }
-                        print(requests.length);
-                        if(req['hasNext']&&req['hasPrevious']){
-                          nextButtonVisible=true;
-                          previousButtonVisible=true;
-                        }else if(req['hasPrevious']&&!req['hasNext']){
-                          previousButtonVisible=true;
-                          nextButtonVisible=false;
-                        }else if(!req['hasPrevious']&&req['hasNext']){
-                          previousButtonVisible=false;
-                          nextButtonVisible=true;
-                        }else{
-                          previousButtonVisible=false;
-                          nextButtonVisible=false;
-                        }
-                        if(products.length==0){
-                          Utils.showError(context,"No Request Found");
-                        }
-                      });
-                    });
-                  }
-                  else {
-                    Network_Operations.getRequestByStatusIndividualUserSearchable(context,token,statusId,searchQuery,searchPageNum,10,startDate: widget.startDate,endDate: widget.endDate).then((response){
-                      setState(() {
-                        requests.clear();
-                        for(int i=0;i<jsonDecode(response).length;i++){
-                          requests.add(Request.fromMap(jsonDecode(response)[i]));
-                        }
-                        this.products=requests;
-                        if(products!=null&&products.length>0){
-                          isListVisible=true;
-                        }
-                        print(requests.length);
-                        if(req['hasNext']&&req['hasPrevious']){
-                          nextButtonVisible=true;
-                          previousButtonVisible=true;
-                        }else if(req['hasPrevious']&&!req['hasNext']){
-                          previousButtonVisible=true;
-                          nextButtonVisible=false;
-                        }else if(!req['hasPrevious']&&req['hasNext']){
-                          previousButtonVisible=false;
-                          nextButtonVisible=true;
-                        }else{
-                          previousButtonVisible=false;
-                          nextButtonVisible=false;
-                        }
-                        if(products.length==0){
-                          Utils.showError(context,"No Request Found");
-                        }
-                      });
-                    });
-                  }
-                }
-
               }else{
+                setState(() {
+                  isFirstLoadRunning=false;
+                });
                 Utils.showError(context,"Network Not Available");
               }
             });
           },
-          child: Visibility(
-            visible: isListVisible,
-            child: ListView.builder(
-                    itemCount:products!=null?products.length:0, itemBuilder: (context,int index)
-                {
+          child:PagedListView<int,Request>(
+              pagingController:controller,
+              builderDelegate: PagedChildBuilderDelegate<Request>(
+                itemBuilder: (context,products,index){
                   return Card(
                     elevation: 6,
                     child: Container(
@@ -408,38 +330,38 @@ class _ModelReState extends State<ModelRequests>{
                               children: <Widget>[
                                 InkWell(
                                   onTap: (){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products[index])));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(products)));
                                   },
                                   child:CachedNetworkImage(
-                                    imageUrl: products[index].image!=null?products[index].image:"http://anokha.world/images/not-found.png",
+                                    imageUrl: products.image!=null?products.image:"http://anokha.world/images/not-found.png",
                                     placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
                                     errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
                                     imageBuilder: (context, imageProvider){
-                                       return Container(
-                                         height: 85,
-                                         width: 85,
-                                         decoration: BoxDecoration(
-                                             borderRadius: BorderRadius.circular(8),
-                                             image: DecorationImage(
-                                               image: imageProvider,
-                                               fit: BoxFit.cover,
-                                             )
-                                         ),
-                                       );
+                                      return Container(
+                                        height: 85,
+                                        width: 85,
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(8),
+                                            image: DecorationImage(
+                                              image: imageProvider,
+                                              fit: BoxFit.cover,
+                                            )
+                                        ),
+                                      );
                                     },
                                   ),
                                 ),
                                 //Padding(padding: EdgeInsets.only(top:2),),
-                                products[index].multipleColorNames!=null&&products[index].multipleColorNames.length>0
+                                products.multipleColorNames!=null&&products.multipleColorNames.length>0
                                     ?Container(
-                                     width: 55,
-                                      height: 20,
-                                      child: ListView(
-                                        scrollDirection: Axis.horizontal,
-                                  children: [
+                                  width: 55,
+                                  height: 20,
+                                  child: ListView(
+                                    scrollDirection: Axis.horizontal,
+                                    children: [
                                       Row(
                                         children: <Widget>[
-                                          for(int i=0;i<products[index].multipleColorNames.length;i++)
+                                          for(int i=0;i<products.multipleColorNames.length;i++)
                                             Padding(
                                               padding: const EdgeInsets.only(top: 8,left: 2,right: 2),
                                               child: Wrap(
@@ -447,7 +369,7 @@ class _ModelReState extends State<ModelRequests>{
                                                   Container(
                                                     decoration: BoxDecoration(
                                                       borderRadius: BorderRadius.circular(2),
-                                                      color: Color(Utils.getColorFromHex(products[index].multipleColorNames[i].colorCode)),
+                                                      color: Color(Utils.getColorFromHex(products.multipleColorNames[i].colorCode)),
                                                       //color: Colors.teal,
                                                     ),
                                                     height: 10,
@@ -458,15 +380,15 @@ class _ModelReState extends State<ModelRequests>{
                                             ),
                                         ],
                                       )
-                                  ],
-                                ),
-                                    ):Container(),
+                                    ],
+                                  ),
+                                ):Container(),
                               ],
                             ),
                             VerticalDivider(color: Colors.grey,),
                             GestureDetector(
                               onTapDown: (details)async{
-                                if(products[index].statusName=="New Request"){
+                                if(products.statusName=="New Request"){
                                   if(currentUserRoles["2"]!=null||currentUserRoles["3"]) {
                                     await showMenu(
                                       context: context,
@@ -526,23 +448,23 @@ class _ModelReState extends State<ModelRequests>{
                                       elevation: 8.0,
                                     ).then((selectedItem){
                                       if(selectedItem=="changeStatus"){
-                                        showAlertDialog(context,products[index]);
+                                        showAlertDialog(context,products);
                                       }else if(selectedItem=="Details"){
-                                        // Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                        // Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products)));
                                         SharedPreferences.getInstance().then((prefs){
-                                          Network_Operations.getRequestById(context, prefs.getString("token"), products[index].requestId);
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), products.requestId);
                                         });
                                       }else if(selectedItem=="addImage"){
-                                        Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(products[index])));
+                                        Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(products)));
                                       }else if(selectedItem=='updateRequest'){
                                         SharedPreferences.getInstance().then((prefs){
-                                          Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"), products[index].requestId).then((req){
+                                          Network_Operations.getRequestByIdNotifications(context, prefs.getString("token"), products.requestId).then((req){
                                             Navigator.push(context,MaterialPageRoute(builder:(context)=>Assumptions(request: req,)));
                                           });
                                         });
                                       }else if(selectedItem=="deleteRequest"){
                                         SharedPreferences.getInstance().then((prefs){
-                                          Network_Operations.deleteRequestById(context, prefs.getString("token"), products[index].requestId).then((req){
+                                          Network_Operations.deleteRequestById(context, prefs.getString("token"), products.requestId).then((req){
                                             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder:(context)=>Dashboard()), (route) => false);
                                             Utils.showSuccess(context,"Request Deleted Successfully");
                                           });
@@ -577,60 +499,60 @@ class _ModelReState extends State<ModelRequests>{
                                       ],
                                       elevation: 8.0,
                                     ).then((selectedItem){
-                                       if(selectedItem=="Details"){
-                                        //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
-                                         SharedPreferences.getInstance().then((prefs){
-                                           Network_Operations.getRequestById(context, prefs.getString("token"), products[index].requestId);
-                                         });
+                                      if(selectedItem=="Details"){
+                                        //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products)));
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), products.requestId);
+                                        });
                                       }else if(selectedItem=="addImage"){
-                                        Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(products[index])));
+                                        Navigator.push(context,MaterialPageRoute(builder: (context)=>RequestColorsList(products)));
                                       }
                                     });
                                   }else{
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products)));
                                   }
-                                }else if(products[index].statusName=="Approved By GM"){
-                                 if(currentUserRoles["4"]!=null){
-                                   await showMenu(
-                                     context: context,
-                                     position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                     items: [
-                                       PopupMenuItem<String>(
-                                           child: Row(
-                                             children: [
-                                               Padding(
-                                                 padding: EdgeInsets.only(right:8.0),
-                                                 child: Icon(Icons.update,color: Color(0xFF004c4c),),
-                                               ),
-                                               Text("Change Status")
-                                             ],
-                                           ), value: 'changeStatus'),
-                                       PopupMenuItem<String>(
-                                           child: Row(
-                                             children: [
-                                               Padding(
-                                                 padding: const EdgeInsets.only(right:8.0),
-                                                 child: Icon(Icons.info,color: Color(0xFF004c4c),),
-                                               ),
-                                               Text("See Details")
-                                             ],
-                                           ), value: 'Details'),
-                                     ],
-                                     elevation: 8.0,
-                                   ).then((selectedItem){
-                                     if(selectedItem=="changeStatus"){
-                                       Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products[index])));
-                                     }else if(selectedItem=="Details"){
-                                       //Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
-                                       SharedPreferences.getInstance().then((prefs){
-                                         Network_Operations.getRequestById(context, prefs.getString("token"), products[index].requestId);
-                                       });
-                                     }
-                                   });
-                                 }else{
-                                   Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
-                                 }
-                                }else if(products[index].statusName=="Samples Scheduled"){
+                                }else if(products.statusName=="Approved By GM"){
+                                  if(currentUserRoles["4"]!=null){
+                                    await showMenu(
+                                      context: context,
+                                      position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                      items: [
+                                        PopupMenuItem<String>(
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.update,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("Change Status")
+                                              ],
+                                            ), value: 'changeStatus'),
+                                        PopupMenuItem<String>(
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("See Details")
+                                              ],
+                                            ), value: 'Details'),
+                                      ],
+                                      elevation: 8.0,
+                                    ).then((selectedItem){
+                                      if(selectedItem=="changeStatus"){
+                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products)));
+                                      }else if(selectedItem=="Details"){
+                                        //Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products)));
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), products.requestId);
+                                        });
+                                      }
+                                    });
+                                  }else{
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products)));
+                                  }
+                                }else if(products.statusName=="Samples Scheduled"){
                                   if(currentUserRoles["5"]!=null||currentUserRoles["6"]!=null){
                                     await showMenu(
                                       context: context,
@@ -670,33 +592,33 @@ class _ModelReState extends State<ModelRequests>{
                                       elevation: 8.0,
                                     ).then((selectedItem){
                                       if(selectedItem=="changeStatus"){
-                                        showAlertChangeStatus(context,products[index]);
+                                        showAlertChangeStatus(context,products);
                                       }else if(selectedItem=="Details"){
-                                        //Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products[index])));
+                                        //Navigator.push(context,MaterialPageRoute(builder: (context)=>DetailsPage(products)));
                                         SharedPreferences.getInstance().then((prefs){
-                                          Network_Operations.getRequestById(context, prefs.getString("token"), products[index].requestId);
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), products.requestId);
                                         });
                                       }else if(selectedItem=="updateschedule"){
-                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products[index])));
+                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>SchedulePage(products)));
                                       }
                                     });
 
                                   }else{
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products)));
                                   }
-                                }else if(products[index].statusName=="Model Approved"){
+                                }else if(products.statusName=="Model Approved"){
                                   if(currentUserRoles["7"]!=null||currentUserRoles["8"]!=null){
-                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products[index].requestId,currentUserRoles)));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestsForTrial(products.requestId,currentUserRoles)));
                                   }else{
-                                    //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                    //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products)));
                                     SharedPreferences.getInstance().then((prefs){
-                                      Network_Operations.getRequestById(context, prefs.getString("token"), products[index].requestId);
+                                      Network_Operations.getRequestById(context, prefs.getString("token"), products.requestId);
                                     });
                                   }
                                 }else {
-                                  //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products[index])));
+                                  //Navigator.push(context, MaterialPageRoute(builder: (context) => DetailsPage(products)));
                                   SharedPreferences.getInstance().then((prefs){
-                                    Network_Operations.getRequestById(context, prefs.getString("token"), products[index].requestId);
+                                    Network_Operations.getRequestById(context, prefs.getString("token"), products.requestId);
                                   });
                                 }
                               },
@@ -711,10 +633,10 @@ class _ModelReState extends State<ModelRequests>{
                                     Padding(
                                       padding: const EdgeInsets.only(left: 6, top: 8),
                                       child: Text((){
-                                        if(products[index].newModelName!=null){
-                                          return products[index].newModelName;
-                                        }else if(products[index].modelName!=null){
-                                          return products[index].modelName;
+                                        if(products.newModelName!=null){
+                                          return products.newModelName;
+                                        }else if(products.modelName!=null){
+                                          return products.modelName;
                                         }else{
                                           return '';
                                         }
@@ -734,7 +656,7 @@ class _ModelReState extends State<ModelRequests>{
                                             Padding(
                                               padding: EdgeInsets.only(left: 2, right: 2),
                                             ),
-                                            Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(products[index].date)))
+                                            Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(products.date)))
                                           ],
                                         ),
 
@@ -756,7 +678,7 @@ class _ModelReState extends State<ModelRequests>{
                                         //     width: 120,
                                         //     height: 30,
                                         //     child: Marquee(
-                                        //       text: products[index].multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", ""),
+                                        //       text: products.multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", ""),
                                         //       //style: TextStyle(fontWeight: FontWeight.bold),
                                         //       scrollAxis: Axis.horizontal,
                                         //       crossAxisAlignment: CrossAxisAlignment.start,
@@ -771,10 +693,10 @@ class _ModelReState extends State<ModelRequests>{
                                         //     ),
                                         //   ),
                                         // ),
-                                         Container(
-                                             width: MediaQuery.of(context).size.width*0.4,
-                                             child: Text(products[index].multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", ""),maxLines: 3,overflow: TextOverflow.visible,)
-                                         ),
+                                        Container(
+                                            width: MediaQuery.of(context).size.width*0.4,
+                                            child: Text(products.multipleSizeNames.toString().replaceAll("[", "").replaceAll("]", "").replaceAll(".00", ""),maxLines: 3,overflow: TextOverflow.visible,)
+                                        ),
                                       ],
                                     ),
                                     Row(
@@ -786,7 +708,7 @@ class _ModelReState extends State<ModelRequests>{
                                         Padding(
                                           padding: EdgeInsets.only(left: 2, right: 2),
                                         ),
-                                        Text(products[index].surfaceName!=null?products[index].surfaceName:'',overflow: TextOverflow.ellipsis,maxLines: 2,softWrap: true)
+                                        Text(products.surfaceName!=null?products.surfaceName:'',overflow: TextOverflow.ellipsis,maxLines: 2,softWrap: true)
                                       ],
 
                                     ),
@@ -803,7 +725,7 @@ class _ModelReState extends State<ModelRequests>{
                                           Padding(
                                             padding: EdgeInsets.only(left: 3, right: 3),
                                           ),
-                                          Text(products[index].statusName!=null?products[index].statusName:'')
+                                          Text(products.statusName!=null?products.statusName:'')
                                         ],
                                       ),
                                     ),
@@ -817,8 +739,10 @@ class _ModelReState extends State<ModelRequests>{
 
                     ),
                   );
-                }),
-          ),
+                },
+              ),
+          )
+
         ),
       )
     );
@@ -977,321 +901,7 @@ class _ModelReState extends State<ModelRequests>{
       },
     );
   }
-  showSearchDialog(BuildContext context) {
-    // set up the buttons
-    Widget cancelButton = TextButton(
-      child: Text("Cancel"),
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    Widget approveRejectButton = TextButton(
-      child: Text("Set"),
-      onPressed: () {
-        print(selectedSearchPreference);
-         if(selectedSearchPreference=="searchByClient"){
-          clientNames.clear();
-          if(clientDropdown.length>0){
-            setState(() {
-              for(Dropdown d in clientDropdown){
-                clientNames.add(d.name);
-              }
-            });
-          }else{
-            Network_Operations.getDropDowns(context, token,"Clients").then((value){
-              setState(() {
-                this.clientDropdown=value;
-                for(Dropdown d in clientDropdown){
-                  clientNames.add(d.name);
-                }
-              });
-            });
-
-          }
-          _startSearch();
-          Navigator.pop(context);
-        }else{
-           _startSearch();
-           Navigator.pop(context);
-         }
-      },
-    );
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("Search By"),
-      content: StatefulBuilder(
-        builder: (context, setState) {
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-            statusId==6||statusId<5? RadioListTile(
-                title: Text("Samples Model Name"),
-                value: 'searchByModelName',
-                groupValue: selectedSearchPreference,
-                onChanged: (choice) {
-                  setState(() {
-                    this.selectedSearchPreference = choice;
-                  });
-                },
-              ):Container(),
-              statusId==6||statusId<5? RadioListTile(
-                title: Text("Samples Model Code"),
-                value: 'searchByModelCode',
-                groupValue: selectedSearchPreference,
-                onChanged: (choice) {
-                  setState(() {
-                    this.selectedSearchPreference = choice;
-                  });
-                },
-              ):Container(),
-              RadioListTile(
-                title: Text("Client"),
-                value: 'searchByClient',
-                groupValue: selectedSearchPreference,
-                onChanged: (choice) {
-                  setState(() {
-                    this.selectedSearchPreference = choice;
-                  });
-                },
-              ),
-             statusId==5? RadioListTile(
-                title: Text("Production Model Name"),
-                value: 'searchByProductionModelName',
-                groupValue: selectedSearchPreference,
-                onChanged: (choice) {
-                  setState(() {
-                    this.selectedSearchPreference = choice;
-                  });
-                },
-              ):Container(),
-              statusId==5?RadioListTile(
-                title: Text("Production Model Code"),
-                value: 'searchByProductionModelCode',
-                groupValue: selectedSearchPreference,
-                onChanged: (choice) {
-                  setState(() {
-                    this.selectedSearchPreference = choice;
-                  });
-                },
-              ):Container(),
-            ],
-          );
-        },
-      ),
-      actions: [
-        cancelButton,
-        approveRejectButton
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-  void _startSearch() {
-    ModalRoute
-        .of(context)
-        .addLocalHistoryEntry(new LocalHistoryEntry(onRemove: _stopSearching));
-
-    setState(() {
-      _isSearching = true;
-    });
-  }
-  Widget _buildSearchField() {
-    return  Autocomplete(
-      displayStringForOption: (String value){
-        return value;
-      },
-        optionsBuilder: (TextEditingValue text){
-           if(statusId==1){
-             return clientNames.where((element) =>element.toLowerCase().contains(text.text));
-           }else if(statusId==5&&selectedSearchPreference=="searchByProductionModelName"){
-             return newModelNames.where((element) => element.toLowerCase().contains(text.text));
-           }else if(statusId==5&&selectedSearchPreference=="searchByProductionModelCode"){
-             return newModelCodes.where((element) => element.toLowerCase().contains(text.text));
-           }else if(statusId>1&&selectedSearchPreference=="searchByModelName"){
-             return modelNames.where((element) =>element.toLowerCase().contains(text.text));
-           }else if(statusId>1&&selectedSearchPreference=="searchByModelCode"){
-             return modelCodes.where((element) =>element.toLowerCase().contains(text.text));
-           }else if(statusId>1&&selectedSearchPreference=="searchByClient"){
-             return clientNames.where((element) =>element.toLowerCase().contains(text.text));
-           }else
-             return null;
-        },
-      fieldViewBuilder: (BuildContext context,TextEditingController controller,FocusNode focusmode,VoidCallback func){
-        this._searchQuery=controller;
-        return TextField(
-          controller: _searchQuery,
-          focusNode: focusmode,
-          autofocus: true,
-          textInputAction: TextInputAction.search,
-          decoration: const InputDecoration(
-            hintText: 'Search...',
-            border: InputBorder.none,
-            hintStyle: const TextStyle(color: Colors.white30),
-          ),
-          style: const TextStyle(color: Colors.white, fontSize: 16.0),
-          onSubmitted:(query){
-            setState(() {
-              this.searchQuery=query;
-            });
-            if(query.isNotEmpty){
-              if(!isClient){
-                Network_Operations.getRequestByStatusGMSearchable(context, token, statusId,searchPageNum,10,query,startDate: widget.startDate,endDate: widget.endDate).then((response){
-                  setState(() {
-                    requests.clear();
-                    req=jsonDecode(response);
-                    for(int i=0;i<req["response"]['allRequests'].length;i++){
-                      requests.add(Request.fromMap(req["response"]['allRequests'][i]));
-                    }
-                    this.products = requests;
-                    if (this.products.length > 0) {
-                      isListVisible = true;
-                    }
-                    if(req['hasNext']&&req['hasPrevious']){
-                      nextButtonVisible=true;
-                      previousButtonVisible=true;
-                    }else if(req['hasPrevious']&&!req['hasNext']){
-                      previousButtonVisible=true;
-                      nextButtonVisible=false;
-                    }else if(!req['hasPrevious']&&req['hasNext']){
-                      previousButtonVisible=false;
-                      nextButtonVisible=true;
-                    }else{
-                      previousButtonVisible=false;
-                      nextButtonVisible=false;
-                    }
-                    if(products.length==0){
-                      Utils.showError(context,"No Request Found");
-                    }
-                  });
-                });
-              }else {
-                Network_Operations.getRequestByStatusIndividualUserSearchable(context, token, statusId,query,searchPageNum,10,startDate: widget.startDate,endDate: widget.endDate).then((response){
-                  setState(() {
-                    requests.clear();
-                    for(int i=0;i<jsonDecode(response).length;i++){
-                      requests.add(Request.fromMap(jsonDecode(response)[i]));
-                    }
-                    this.products=requests;
-                    if(products!=null&&products.length>0){
-                      isListVisible=true;
-                    }
-                    print(requests.length);
-                    if(req['hasNext']&&req['hasPrevious']){
-                      nextButtonVisible=true;
-                      previousButtonVisible=true;
-                    }else if(req['hasPrevious']&&!req['hasNext']){
-                      previousButtonVisible=true;
-                      nextButtonVisible=false;
-                    }else if(!req['hasPrevious']&&req['hasNext']){
-                      previousButtonVisible=false;
-                      nextButtonVisible=true;
-                    }else{
-                      previousButtonVisible=false;
-                      nextButtonVisible=false;
-                    }
-                    if(products.length==0){
-                      Utils.showError(context,"No Request Found");
-                    }
-                  });
-                });
-              }
-            }else{
-              if(!isClient){
-                Network_Operations.getRequestByStatusGM(context, token, statusId,pageNum,10).then((response){
-                  setState(() {
-                    requests.clear();
-                    req=jsonDecode(response);
-                    for(int i=0;i<req["response"]['allRequests'].length;i++){
-                      requests.add(Request.fromMap(req["response"]['allRequests'][i]));
-                    }
-                    this.products = requests;
-                    if (this.products.length > 0) {
-                      isListVisible = true;
-                    }
-                    if(req['hasNext']&&req['hasPrevious']){
-                      nextButtonVisible=true;
-                      previousButtonVisible=true;
-                    }else if(req['hasPrevious']&&!req['hasNext']){
-                      previousButtonVisible=true;
-                      nextButtonVisible=false;
-                    }else if(!req['hasPrevious']&&req['hasNext']){
-                      previousButtonVisible=false;
-                      nextButtonVisible=true;
-                    }else{
-                      previousButtonVisible=false;
-                      nextButtonVisible=false;
-                    }
-                    if(products.length==0){
-                      Utils.showError(context,"No Request Found");
-                    }
-                  });
-                });
-              }else {
-                Network_Operations.getRequestByStatusIndividualUser(context, token, statusId,pageNum,10,startDate: widget.startDate,endDate: widget.endDate).then((response){
-                  setState(() {
-                    requests.clear();
-                    for(int i=0;i<jsonDecode(response).length;i++){
-                      requests.add(Request.fromMap(jsonDecode(response)[i]));
-                    }
-                    this.products=requests;
-                    if(products!=null&&products.length>0){
-                      isListVisible=true;
-                    }
-                    print(requests.length);
-                    if(req['hasNext']&&req['hasPrevious']){
-                      nextButtonVisible=true;
-                      previousButtonVisible=true;
-                    }else if(req['hasPrevious']&&!req['hasNext']){
-                      previousButtonVisible=true;
-                      nextButtonVisible=false;
-                    }else if(!req['hasPrevious']&&req['hasNext']){
-                      previousButtonVisible=false;
-                      nextButtonVisible=true;
-                    }else{
-                      previousButtonVisible=false;
-                      nextButtonVisible=false;
-                    }
-                    if(products.length==0){
-                      Utils.showError(context,"No Request Found");
-                    }
-                  });
-                });
-              }
-            }
-          },
-        );
-      }
-
-    );
-  }
-  void updateSearchQuery(String newQuery) {
-    setState(() {
-      searchQuery = newQuery;
-    });
-    print("search query " + newQuery);
-  }
   List<Widget> _buildActions() {
-    if (_isSearching) {
-      return <Widget>[
-         IconButton(
-          icon: const Icon(Icons.clear),
-          onPressed: () {
-            if (_searchQuery == null || _searchQuery.text.isEmpty) {
-              Navigator.pop(context);
-              return;
-            }
-            _clearSearchQuery();
-          },
-        ),
-      ];
-    }
     return <Widget>[
       IconButton(
         onPressed: ()async{
@@ -1347,12 +957,60 @@ class _ModelReState extends State<ModelRequests>{
       ),
        IconButton(
         icon: const Icon(Icons.search),
-        onPressed: (){
-           if(statusId>1){
-             showSearchDialog(context);
-           }else{
-             _startSearch();
-           }
+        onPressed: ()async{
+          allSuggestionsList.clear();
+          if(statusId==1){
+            if(clientNames.length>0){
+              for(String c in clientNames){
+                allSuggestionsList.add(RequestSuggestions(c, "Client"));
+              }
+            }
+
+          }else if(statusId==5){
+            if(clientNames.length>0){
+              for(String c in clientNames){
+                allSuggestionsList.add(RequestSuggestions(c, "Client"));
+              }
+            }
+            if(newModelNames.length>0){
+              for(String c in newModelNames){
+                allSuggestionsList.add(RequestSuggestions(c, "Production Model Name"));
+              }
+            }
+            if(newModelCodes.length>0){
+              for(String c in newModelCodes){
+                allSuggestionsList.add(RequestSuggestions(c, "Production Model Code"));
+              }
+            }
+          }else{
+            if(clientNames.length>0){
+              for(String c in clientNames){
+                allSuggestionsList.add(RequestSuggestions(c, "Client"));
+              }
+            }
+            if(newModelNames.length>0){
+              for(String c in newModelNames){
+                allSuggestionsList.add(RequestSuggestions(c, "Production Model Name"));
+              }
+            }
+            if(newModelCodes.length>0){
+              for(String c in newModelCodes){
+                allSuggestionsList.add(RequestSuggestions(c, "Production Model Code"));
+              }
+            }
+            if(modelNames.length>0){
+              for(String c in modelNames){
+                allSuggestionsList.add(RequestSuggestions(c, "Samples Model Name"));
+              }
+            }
+            if(modelCodes.length>0){
+              for(String c in modelCodes){
+                allSuggestionsList.add(RequestSuggestions(c, "Samples Model Code"));
+              }
+            }
+          }
+          allSuggestionsList.sort((a,b)=>a.suggestionText.toLowerCase().compareTo(b.suggestionText.toLowerCase()));
+          await showSearch<String>(context: context,delegate: RequestSearch(allSuggestionsList,statusId: statusId,currentUserRoles: widget.currentUserRoles,isClient:isClient,token: token));
         },
       ),
      statusId==5?IconButton(
@@ -1363,43 +1021,11 @@ class _ModelReState extends State<ModelRequests>{
       ):Container(),
     ];
   }
-  void _stopSearching() {
-    _clearSearchQuery();
-    setState(() {
-      _isSearching = false;
-      searchPageNum=1;
-      if(searchQuery.isNotEmpty){
-        _clearSearchQuery();
-        WidgetsBinding.instance
-            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-      }
-    });
-  }
-  void _clearSearchQuery() {
-    print("close search box");
-    setState(() {
-      _searchQuery.clear();
-      searchQuery="";
-      updateSearchQuery("Search query");
-    });
-  }
-  Widget _buildTitle(BuildContext context) {
-    var horizontalTitleAlignment =
-    Platform.isIOS ? CrossAxisAlignment.center : CrossAxisAlignment.start;
 
-    return new InkWell(
-      onTap: () => scaffoldKey.currentState.openDrawer(),
-      child: new Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: new Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: horizontalTitleAlignment,
-          children: <Widget>[
-             Text(widget.name!=null?widget.name:"Model Requests"),
-          ],
-        ),
-      ),
-    );
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
   }
 }
 

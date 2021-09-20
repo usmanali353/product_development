@@ -371,8 +371,6 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
 
   }
   static Future<String> getRequestForGM(BuildContext context,String token,int PageSize,int PageNumber,{String startDate,String endDate})async{
-    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
-    pd.show();
     try{
       String url;
       if(startDate!=null&&endDate!=null){
@@ -383,30 +381,24 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
-          pd.dismiss();
           // Time has run out, do what you wanted to do.
           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
         },
       );
       if(response.statusCode==200){
-        pd.dismiss();
          return response.body;
       }else {
-        pd.dismiss();
         Utils.showError(context,"No Requests Found");
       }
     }catch(e){
-      pd.dismiss();
       print(e);
-      Utils.showError(context, e.toString());
     }finally{
-      pd.dismiss();
     }
     return null;
   }
   static Future<String> getRequestForGMSearchable(BuildContext context,String token,int PageSize,int PageNumber,String searchQuery,{String startDate,String endDate})async{
-    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
-    pd.show();
+    // ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
+    // pd.show();
     try{
       String url;
       if(startDate!=null&&endDate!=null){
@@ -417,30 +409,28 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
-          pd.dismiss();
+          //pd.dismiss();
           // Time has run out, do what you wanted to do.
           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
         },
       );
       if(response.statusCode==200){
-        pd.dismiss();
+        //pd.dismiss();
         return response.body;
       }else {
-        pd.dismiss();
+        //pd.dismiss();
         Utils.showError(context,"No Requests Found");
       }
     }catch(e){
-      pd.dismiss();
+      //pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.dismiss();
+      //pd.dismiss();
     }
     return null;
   }
   static Future<String> getRequestByStatusGM(BuildContext context,String token,int statusId,int pageNumber,int pageSize,{String startDate,String endDate}) async{
-    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
-    pd.show();
     try{
       String url;
       if(startDate!=null&&endDate!=null){
@@ -448,34 +438,30 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       }else{
         url=Utils.getBaseUrl()+"Request/GetAllRequestsForGM?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize";
       }
+      print(url);
       var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
-          pd.dismiss();
           // Time has run out, do what you wanted to do.
           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
         },
       );
       if(response.statusCode==200){
-        pd.dismiss();
         print(response.body);
          return response.body;
       }else{
-        pd.dismiss();
         Utils.showError(context,"No Requests Found");
       }
     }catch(e){
-      pd.dismiss();
       print(e);
-      Utils.showError(context, e.toString());
+      //Utils.showError(context, e.toString());
     }finally{
-      pd.dismiss();
     }
     return null;
   }
   static Future<String> getRequestByStatusGMSearchable(BuildContext context,String token,int statusId,int pageNumber,int pageSize,String query,{String startDate,String endDate}) async{
-    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
-    pd.show();
+    // ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
+    // pd.show();
     try{
       String url;
       if(startDate!=null&&endDate!=null){
@@ -491,17 +477,17 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
         },
       );
       if(response.statusCode==200){
-        pd.dismiss();
+        //pd.dismiss();
         return response.body;
       }else{
         Utils.showError(context,"No Requests Found");
       }
     }catch(e){
-      pd.dismiss();
+      //pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.dismiss();
+      //pd.dismiss();
     }
     return null;
   }
@@ -721,8 +707,6 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     return null;
   }
   static Future<String> getRequestByStatusIndividualUser(BuildContext context,String token,int statusId,int pageNumber,int pageSize,{String startDate,String endDate}) async{
-    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
-    pd.show();
     try{
       String url;
       if(startDate!=null&&endDate!=null){
@@ -733,24 +717,18 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
-          pd.dismiss();
           // Time has run out, do what you wanted to do.
           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
         },
       );
       if(response.statusCode==200){
-        pd.dismiss();
         return response.body;
       }else{
-       pd.dismiss();
        Utils.showError(context,"No Requests Found");
       }
     }catch(e){
-      pd.dismiss();
       print(e);
-      Utils.showError(context, e.toString());
     }finally{
-      pd.dismiss();
     }
     return null;
   }
@@ -860,8 +838,6 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
   }
   static Future<String> getClientRequestsByStatus(BuildContext context,String token,int statusId,int pageNumber,int pageSize,{String startDate,String endDate})async{
-    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
-    pd.show();
     try{
       String url;
       if(startDate!=null&&endDate!=null){
@@ -869,33 +845,27 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       }else{
         url=Utils.getBaseUrl()+"Request/RequestClientsGetAll?StatusId=$statusId&PageNumber=$pageNumber&PageSize=$pageSize";
       }
+      print(url);
       var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
-          pd.dismiss();
           // Time has run out, do what you wanted to do.
           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
         },
       );
       if(response.statusCode==200){
-        pd.dismiss();
         return response.body;
       }else{
-        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.dismiss();
     }
     return null;
   }
   static Future<String> getClientRequestsByStatusSearchable(BuildContext context,String token,int statusId,int pageNumber,int pageSize,String searchQuery,{String startDate,String endDate})async{
-    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
-    pd.show();
     try{
       String url;
       if(startDate!=null&&endDate!=null){
@@ -906,24 +876,19 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
-          pd.dismiss();
           // Time has run out, do what you wanted to do.
           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
         },
       );
       if(response.statusCode==200){
-        pd.dismiss();
         return response.body;
       }else{
-        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.dismiss();
     }
     return null;
   }
@@ -1331,61 +1296,47 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
   }
   static Future<String> getAssignedRejectedModels(BuildContext context,String token,int PageSize,int PageNumber)async{
-    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
-    pd.show();
     try{
       var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber"),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
-          pd.dismiss();
           // Time has run out, do what you wanted to do.
           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
         },
       );
 
       if(response.statusCode==200){
-        pd.dismiss();
         print(response.body);
         return response.body;
       }else {
-        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.dismiss();
     }
     return null;
   }
   static Future<String> getAssignedRejectedModelsSearchable(BuildContext context,String token,int PageSize,int PageNumber,String searchQuery)async{
-    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
-    pd.show();
     try{
       var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/AssignedClientRejectionGetAllByUserId?PageSize=$PageSize&PageNumber=$PageNumber&SearchString=$searchQuery"),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
-          pd.dismiss();
           // Time has run out, do what you wanted to do.
           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
         },
       );
 
       if(response.statusCode==200){
-        pd.dismiss();
         return response.body;
       }else {
-        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.dismiss();
     }
     return null;
   }
@@ -1444,8 +1395,6 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
   }
   static Future<String> getTrialRequestsWithJustification(BuildContext context,String token,int isJustified,int PageSize,int PageNumber,{String startDate,String endDate})async{
-    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
-    pd.show();
     try{
       String url;
       if(startDate!=null&&endDate!=null){
@@ -1457,31 +1406,24 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
-          pd.dismiss();
           // Time has run out, do what you wanted to do.
           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
         },
       );
       if(response.statusCode==200){
-        pd.dismiss();
         return response.body;
       }else{
-        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
         return null;
       }
     }catch(e){
-      pd.dismiss();
       print(e);
-      Utils.showError(context, e.toString());
+     // Utils.showError(context, e.toString());
     }finally{
-      pd.dismiss();
     }
     return null;
   }
   static Future<String> getTrialRequestsWithJustificationSearchable(BuildContext context,String token,int isJustified,int PageSize,int PageNumber,String searchQuery,{String startDate,String endDate})async{
-    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
-    pd.show();
     try{
       String url;
       if(startDate!=null&&endDate!=null){
@@ -1492,25 +1434,20 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
       var response=await http.get(Uri.parse(url),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
-          pd.dismiss();
           // Time has run out, do what you wanted to do.
           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
         },
       );
       if(response.statusCode==200){
-        pd.dismiss();
         return response.body;
       }else{
-        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
         return null;
       }
     }catch(e){
-      pd.dismiss();
       print(e);
       Utils.showError(context, e.toString());
     }finally{
-      pd.dismiss();
     }
     return null;
   }
@@ -1548,7 +1485,13 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
     try{
-      var response= await http.get(Uri.parse("https://drive.google.com/uc?export=download&id=1z-tOeG4egZl6iFWj8BNmDN6CuyGDAfqz")).timeout(
+      String url;
+      if(Utils.getBaseUrl()=="http://productapi.arabian-ceramics.com/api/"){
+        url="https://drive.google.com/uc?export=download&id=1C4r0yHOYeaCb3wFC21U8fNlqv1m-9yGQ";
+      }else{
+        url="https://drive.google.com/uc?export=download&id=1z-tOeG4egZl6iFWj8BNmDN6CuyGDAfqz";
+      }
+      var response= await http.get(Uri.parse(url)).timeout(
         Duration(minutes: 1),
         onTimeout: () {
           pd.dismiss();
