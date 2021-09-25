@@ -293,7 +293,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                                         Network_Operations.getRequestById(context, prefs.getString("token"), requests.requestId);
                                       });
                                     }
-                                  }else if(requests.status=="Not Approved Nor Rejected"){
+                                  }else if(requests.status=="No Status"){
                                     if(currentUserRole["7"]!=null||currentUserRole["8"]!=null){
                                       showTrialApprovalDialog(context, requests);
                                     }else{

@@ -88,7 +88,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                                   .toString()))
                           : ""),
                       trailing: Visibility(
-                        visible: request.allRequestClients[index]['status']=="Not Approved Nor Rejected",
+                        visible: request.allRequestClients[index]['status']=="No Status",
                         child: IconButton(
                           icon: Icon(Icons.edit),
                           onPressed: () {

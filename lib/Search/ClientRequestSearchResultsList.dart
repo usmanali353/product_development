@@ -67,7 +67,8 @@ class _ClientRequestSearchResultsListState extends State<ClientRequestSearchResu
           }
         });
       });
-    }else{
+    }
+    else{
       Network_Operations.getClientRequestsByStatusSearchable(
         context,
         widget.token,
@@ -255,7 +256,7 @@ class _ClientRequestSearchResultsListState extends State<ClientRequestSearchResu
                                       });
                                     });
                                   }
-                                }else if(requests[index].status=="Not Approved Nor Rejected"){
+                                }else if(requests[index].status=="No Status"){
                                   if(widget.currentUserRoles["7"]!=null||widget.currentUserRoles["8"]!=null){
                                     showTrialApprovalDialog(context, requests[index]);
                                   }else{
