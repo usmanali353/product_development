@@ -42,30 +42,33 @@ class _MyAppState extends State<MyApp> {
     SharedPreferences.getInstance().then((prefs){
 
       if(prefs.getString("token")!=null){
+        if(prefs.getBool("is_otp_verified")==null||prefs.getBool("is_otp_verified")==true){
+          var claims=Utils.parseJwt(prefs.getString("token"));
 
-        var claims=Utils.parseJwt(prefs.getString("token"));
+          if(DateTime.fromMillisecondsSinceEpoch(int.parse(claims['exp'].toString()+"000")).isAfter(DateTime.now())){
+            print(DateTime.fromMillisecondsSinceEpoch(int.parse(claims['exp'].toString()+"000")));
+            setState(() {
+              isLogin=true;
+            });
 
-        if(DateTime.fromMillisecondsSinceEpoch(int.parse(claims['exp'].toString()+"000")).isAfter(DateTime.now())){
-          print(DateTime.fromMillisecondsSinceEpoch(int.parse(claims['exp'].toString()+"000")));
-          setState(() {
-            isLogin=true;
-          });
-        }else{
-          if(Platform.isAndroid){
-            SharedPreferences.getInstance().then((prefs){
-              FirebaseMessaging.instance.getToken().then((fcmToken){
-                Network_Operations.deleteFCMToken(context, claims["nameid"],fcmToken, prefs.getString("token")).then((value){
-                  prefs.remove("token");
+          }else{
+            if(Platform.isAndroid){
+              SharedPreferences.getInstance().then((prefs){
+                FirebaseMessaging.instance.getToken().then((fcmToken){
+                  Network_Operations.deleteFCMToken(context, claims["nameid"],fcmToken, prefs.getString("token")).then((value){
+                    prefs.remove("token");
+                    prefs.remove("is_otp_verified");
+                  });
                 });
               });
-            });
-          }else{
-            SharedPreferences.getInstance().then((prefs){
-              prefs.remove("token");
-            });
+            }else{
+              SharedPreferences.getInstance().then((prefs){
+                prefs.remove("token");
+                prefs.remove("is_otp_verified");
+              });
+            }
           }
         }
-
       }
 
     });

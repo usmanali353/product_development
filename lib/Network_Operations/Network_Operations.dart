@@ -9,6 +9,7 @@ import 'package:productdevelopment/Login.dart';
 import 'package:productdevelopment/Model/Dropdown.dart';
 import 'package:productdevelopment/Model/Request.dart';
 import 'package:productdevelopment/Model/RequestColorImages.dart';
+import 'package:productdevelopment/OTPScreen.dart';
 import 'package:productdevelopment/Utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:productdevelopment/Model/TrialRequests.dart';
@@ -41,8 +42,10 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
          //Utils.showSuccess(context, "Login Successful");
          FirebaseMessaging.instance.getToken().then((token){
            pd.dismiss();
-           addFCMToken(context, claims['nameid'], token, jsonDecode(response.body)['result']).then((value){
-             Utils.showSuccess(context, "Login Successful");
+           print("OTP Message "+jsonDecode(response.body)["msgOTP"]);
+           print("OTP Status "+jsonDecode(response.body)["otpStatus"].toString());
+           addFCMToken(context, claims['nameid'], token, jsonDecode(response.body)['result'],jsonDecode(response.body)["otpStatus"],jsonDecode(response.body)["msgOTP"]).then((value){
+
            });
          });
        }else if(Platform.isIOS){
@@ -63,6 +66,25 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }finally{
       pd.dismiss();
     }
+  }
+  static Future<String> resendOTP(BuildContext context,String userId)async{
+    try{
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"account/SendSMS/$userId")).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
+      if(response.statusCode==200){
+       return response.body;
+      }else{
+        Utils.showError(context, response.statusCode.toString());
+      }
+    }catch(e){
+      Utils.showError(context, e.toString());
+    }
+    return null;
   }
   static void register(BuildContext context,String email,String password,String name) async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
@@ -979,7 +1001,7 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
     return null;
   }
-  static Future<void> addFCMToken(BuildContext context,String userId,String fcmToken,String token) async{
+  static Future<void> addFCMToken(BuildContext context,String userId,String fcmToken,String token,bool otpStatus,String otpMessage) async{
       try{
         final body=jsonEncode({
           "Token":fcmToken,
@@ -993,7 +1015,15 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
           },
         );
         if(response.statusCode==200){
-          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Dashboard()), (route) => false);
+          if(otpStatus!=null&&!otpStatus) {
+            Utils.showSuccess(context, "Login Successful");
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Dashboard()), (route) => false);
+          }else if(otpStatus!=null&&otpStatus){
+            SharedPreferences.getInstance().then((prefs){
+              prefs.setBool("is_otp_verified", false);
+            });
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => OTPScreen(otpMessage: otpMessage,)), (route) => false);
+          }
         }else{
           Utils.showError(context,"StatusCode Add FcM Token"+response.statusCode.toString());
         }

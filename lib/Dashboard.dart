@@ -281,12 +281,14 @@ class _CRMDashboardState extends ResumableState<Dashboard> {
                           messaging.getToken().then((fcmToken){
                             Network_Operations.deleteFCMToken(context, claims["nameid"],fcmToken, prefs.getString("token")).then((value){
                               prefs.remove("token");
+                              prefs.remove("is_otp_verified");
                             });
                           });
                         });
                       }else{
                         SharedPreferences.getInstance().then((prefs){
                           prefs.remove("token");
+                          prefs.remove("is_otp_verified");
                         });
                       }
 

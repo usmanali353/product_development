@@ -116,8 +116,9 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
            });
          });
        }
-
     });
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
     super.initState();
   }
   @override
@@ -385,8 +386,6 @@ class _CustomerRejectionPageWithJustificationState extends State<CustomerRejecti
                                                  ),
                                                  Text(allRequests.surfaceName!=null?requests[index].surfaceName:''),
                                                ],
-
-
                                              ),
                                            ],
                                          ),

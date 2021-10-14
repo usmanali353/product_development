@@ -88,7 +88,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
                                   .toString()))
                           : ""),
                       trailing: Visibility(
-                        visible: request.allRequestClients[index]['status']=="No Status",
+                        visible: request.allRequestClients[index]['status']=="No Status"&&request.allRequestClients[index]['actualClientVisitDate']==null,
                         child: IconButton(
                           icon: Icon(Icons.edit),
                           onPressed: () {
@@ -181,7 +181,7 @@ class _ScheduleListPageState extends State<ScheduleListPage> {
 
   showAlertChangeStatus(BuildContext context,var request) {
     // set up the buttons
-    Widget Save = FlatButton(
+    Widget Save = TextButton(
       child: Text("Set"),
       onPressed: () {
           SharedPreferences.getInstance().then((value) {

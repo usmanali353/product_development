@@ -16,6 +16,7 @@ import 'package:productdevelopment/Login.dart';
 import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:quick_actions/quick_actions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../DetailPage.dart';
 
 class Utils{
   static Future<XFile> getImage() async {
@@ -39,9 +40,9 @@ class Utils{
     return regExp.hasMatch(value);
   }
   static String getBaseUrl(){
-  //return "http://173.212.235.106:8900/api/";
+  return "http://173.212.235.106:8900/api/";
   // return "http://productapi.arabian-ceramics.com/api/";
-   return "http://192.168.10.4:45455/api/";
+   //return "http://192.168.10.4:45455/api/";
   }
  static void showError(BuildContext context,String message) {
    Flushbar(
@@ -146,7 +147,9 @@ class Utils{
       if (barcode != "" && barcode.length > 0) {
         SharedPreferences.getInstance().then((prefs) async{
           print(barcode.split("?")[1].replaceAll("RequestId=", ""));
-          Network_Operations.getRequestById(context, prefs.getString("token"),int.parse(barcode.split("?")[1].replaceAll("RequestId=", "")));
+          Network_Operations.getRequestByIdAnonymous(context, int.parse(barcode.split("?")[1].replaceAll("RequestId=", ""))).then((request) {
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => DetailPage(request)),(route) => false);          });
+          //Network_Operations.getRequestById(context, prefs.getString("token"),int.parse(barcode.split("?")[1].replaceAll("RequestId=", "")));
         });
       }
       } catch (e) {
