@@ -41,9 +41,9 @@ class _DetailPageState extends State<DetailPage>{
    setState(() {
      if(request.multipleColorNames!=null&&request.multipleColorNames.length>0){
        for(int i=0;i<request.multipleColorNames.length;i++){
-         if(widget.request.multipleColorNames[i].colorImage!=null){
-           imageUrl.add(widget.request.multipleColorNames[i].colorImage);
-         }
+         // if(widget.request.multipleColorNames[i].colorImage!=null){
+         //   imageUrl.add(widget.request.multipleColorNames[i].colorImage);
+         // }
          if(request.multipleColorNames[i].colorimages!=null&&request.multipleColorNames[i].colorimages.length>0){
            for(RequestColorImages img in request.multipleColorNames[i].colorimages) {
             // colorNames.add(request.multipleColorNames[i].colorName);

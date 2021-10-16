@@ -86,6 +86,29 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
     return null;
   }
+  static void showImageOnMain(BuildContext context,int requestColorId,int requestImageId,String token)async{
+    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
+    pd.show();
+    try{
+      var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/ColorImagesOnMain/$requestImageId/$requestColorId"),headers:{"Authorization":"Bearer "+token}).timeout(
+        Duration(minutes: 1),
+        onTimeout: () {
+          // Time has run out, do what you wanted to do.
+          return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
+        },
+      );
+      print(response.statusCode);
+      if(response.statusCode==200){
+        pd.dismiss();
+      }else{
+        pd.dismiss();
+      }
+    }catch(e){
+      pd.dismiss();
+    }finally{
+      pd.dismiss();
+    }
+  }
   static void register(BuildContext context,String email,String password,String name) async{
     ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
     pd.show();
@@ -555,30 +578,22 @@ import 'package:productdevelopment/Model/ClientVisitSchedule.dart';
     }
   }
   static Future<String> getTrialRequests(BuildContext context,String token,int requestId,int pageNumber,int pageSize)async{
-    ProgressDialog pd=ProgressDialog(context,message:Text( "Please Wait..."),dismissable: true);
-    pd.show();
     try{
       var response=await http.get(Uri.parse(Utils.getBaseUrl()+"Request/GetAllTrialRequests?RequestId=$requestId&PageNumber=$pageNumber&PageSize=$pageSize"),headers:{"Authorization":"Bearer "+token}).timeout(
         Duration(minutes: 1),
         onTimeout: () {
-          pd.dismiss();
           // Time has run out, do what you wanted to do.
           return http.Response('Error Request Timed Out', 500); // Replace 500 with your http code.
         },
       );
       if(response.statusCode==200){
-        pd.dismiss();
         return response.body;
       }else{
-        pd.dismiss();
         Utils.showError(context, response.statusCode.toString());
       }
     }catch(e){
-      pd.dismiss();
       print(e);
-      Utils.showError(context, e.toString());
-    }finally{
-      pd.dismiss();
+     // Utils.showError(context, e.toString());
     }
     return null;
   }

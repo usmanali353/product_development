@@ -42,7 +42,7 @@ class Utils{
   static String getBaseUrl(){
   return "http://173.212.235.106:8900/api/";
   // return "http://productapi.arabian-ceramics.com/api/";
-   //return "http://192.168.10.4:45455/api/";
+   //return "http://192.168.10.12:45455/api/";
   }
  static void showError(BuildContext context,String message) {
    Flushbar(

@@ -63,7 +63,7 @@ class _ModelReState extends State<ModelRequests>{
  List<Dropdown> clientDropdown=[];
  var req;
   String token;
-  PagingController<int,Request> controller=PagingController<int,Request>(firstPageKey: 1);
+  PagingController<int,Request> controller;
   @override
   void initState() {
     isFirstLoadRunning=true;
@@ -138,12 +138,14 @@ class _ModelReState extends State<ModelRequests>{
             isDateBarVisible=true;
           });
         }
-        WidgetsBinding.instance
-            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
       });
     });
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+    controller=PagingController<int,Request>(firstPageKey: 1);
     controller.addPageRequestListener((pageKey){
         if (!isLastPage) {
+          requests.clear();
           if(!isClient){
             Network_Operations.getRequestByStatusGM(context,
                 token,
@@ -157,21 +159,15 @@ class _ModelReState extends State<ModelRequests>{
                 for(int i=0;i<req["response"]['allRequests'].length;i++){
                   requests.add(Request.fromMap(req["response"]['allRequests'][i]));
                 }
-                this.products = requests;
-                if(products!=null&&products.length>0){
-                  pageNum=pageNum+1;
-                  pageKey=pageNum;
-                  isLastPage=products.length==req["totalCount"];
-                  if(isLastPage){
-                    controller.appendLastPage(products);
-                  }else{
-                    controller.appendPage(products,pageKey);
-                  }
+                this.products=requests;
+                pageNum=pageNum+1;
+                pageKey=pageNum;
+                isLastPage=pageNum>req["totalPages"];
+                if(isLastPage){
+                  controller.appendLastPage(products);
+                }else{
+                  controller.appendPage(products,pageKey);
                 }
-                if(products.length==0){
-                  Utils.showError(context,"No Request Found");
-                }
-
             });
           }
           else {
@@ -181,20 +177,15 @@ class _ModelReState extends State<ModelRequests>{
                   requests.add(Request.fromMap(jsonDecode(response)[i]));
                 }
                 this.products=requests;
-                if(products!=null&&products.length>0){
-                  pageNum=pageNum+1;
-                  pageKey=pageNum;
-                  isLastPage=products.length==req["totalCount"];
-                  if(isLastPage){
-                    controller.appendLastPage(products);
-                  }else{
-                    controller.appendPage(products,pageKey);
-                  }
+                pageNum=pageNum+1;
+                pageKey=pageNum;
+                isLastPage=pageNum>req["totalPages"];
+                if(isLastPage){
+                  controller.appendLastPage(products);
+                }else{
+                  controller.appendPage(products,pageKey);
                 }
                 print(requests.length);
-                if(products.length==0){
-                  Utils.showError(context,"No Request Found");
-                }
             });
           }
         }
@@ -235,6 +226,8 @@ class _ModelReState extends State<ModelRequests>{
           key: _refreshIndicatorKey,
           onRefresh: (){
             setState(() {
+              requests.clear();
+              products.clear();
              controller.refresh();
             });
             return Utils.check_connectivity().then((isConnected){
@@ -261,17 +254,12 @@ class _ModelReState extends State<ModelRequests>{
                           requests.add(Request.fromMap(req["response"]['allRequests'][i]));
                         }
                         this.products = requests;
-                        if(products!=null&&products.length>0){
-                          pageNum=pageNum+1;
-                          isLastPage=products.length==req["totalCount"];
-                          if(isLastPage){
-                            controller.appendLastPage(products);
-                          }else{
-                            controller.appendPage(products,pageNum);
-                          }
-                        }
-                        if(products.length==0){
-                          Utils.showError(context,"No Request Found");
+                        pageNum=pageNum+1;
+                        isLastPage=pageNum>req["totalPages"];
+                        if(isLastPage){
+                          controller.appendLastPage(products);
+                        }else{
+                          controller.appendPage(products,pageNum);
                         }
                       });
                     });
@@ -283,19 +271,14 @@ class _ModelReState extends State<ModelRequests>{
                           requests.add(Request.fromMap(jsonDecode(response)[i]));
                         }
                         this.products=requests;
-                        if(products!=null&&products.length>0){
-                          pageNum=pageNum+1;
-                          isLastPage=products.length==req["totalCount"];
-                          if(isLastPage){
-                            controller.appendLastPage(products);
-                          }else{
-                            controller.appendPage(products,pageNum);
-                          }
+                        pageNum=pageNum+1;
+                        isLastPage=pageNum>req["totalPages"];
+                        if(isLastPage){
+                          controller.appendLastPage(products);
+                        }else{
+                          controller.appendPage(products,pageNum);
                         }
                         print(requests.length);
-                        if(products.length==0){
-                          Utils.showError(context,"No Request Found");
-                        }
                       });
                     });
                   }
@@ -309,7 +292,9 @@ class _ModelReState extends State<ModelRequests>{
           },
           child:PagedListView<int,Request>(
               pagingController:controller,
+
               builderDelegate: PagedChildBuilderDelegate<Request>(
+
                 itemBuilder: (context,products,index){
                   return Card(
                     elevation: 6,

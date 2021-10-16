@@ -1,7 +1,9 @@
 import'package:flutter/material.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:productdevelopment/Model/RequestColorImages.dart';
+import 'package:productdevelopment/Network_Operations/Network_Operations.dart';
 import 'package:productdevelopment/RequestColorsList.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class RequestImageGallery extends StatefulWidget {
   List<RequestColorImages> images;
   String colorName;
@@ -15,22 +17,28 @@ class RequestImageGallery extends StatefulWidget {
 class _RequestImageGalleryState extends State<RequestImageGallery> {
   int num=0,count=1;
    List<String> imageUrl=[],colorNames=[];
+   List<int> requestColorIds=[],requestImageIds=[];
   _RequestImageGalleryState();
   @override
   void initState() {
     setState(() {
       if(widget.images!=null) {
         for (var images in widget.images) {
+          requestColorIds.add(images.requestColorId);
+          requestImageIds.add(images.id);
           imageUrl.add(images.colorImages);
         }
       }else if(widget.request.multipleColorNames!=null&&widget.request.multipleColorNames.length>0){
         for(int i=0;i<widget.request.multipleColorNames.length;i++){
-          if(widget.request.multipleColorNames[i].colorImage!=null){
-            imageUrl.add(widget.request.multipleColorNames[i].colorImage);
-            colorNames.add(widget.request.multipleColorNames[i].colorName);
-          }
+          // if(widget.request.multipleColorNames[i].colorImage!=null){
+          //   imageUrl.add(widget.request.multipleColorNames[i].colorImage);
+          //   colorNames.add(widget.request.multipleColorNames[i].colorName);
+          // }
           if(widget.request.multipleColorNames[i].colorimages!=null&&widget.request.multipleColorNames[i].colorimages.length>0){
+
             for(RequestColorImages img in widget.request.multipleColorNames[i].colorimages) {
+              requestColorIds.add(img.requestColorId);
+              requestImageIds.add(img.id);
               colorNames.add(widget.request.multipleColorNames[i].colorName);
               imageUrl.add(img.colorImages);
             }
@@ -39,12 +47,14 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
 
       }else if(widget.request.multipleColors!=null&&widget.request.multipleColors.length>0){
         for(int i=0;i<widget.request.multipleColors.length;i++){
-          if(widget.request.multipleColors[i].colorImage!=null){
-            imageUrl.add(widget.request.multipleColors[i].colorImage);
-            colorNames.add(widget.request.multipleColors[i].colorName);
-          }
+          // if(widget.request.multipleColors[i].colorImage!=null){
+          //   imageUrl.add(widget.request.multipleColors[i].colorImage);
+          //   colorNames.add(widget.request.multipleColors[i].colorName);
+          // }
           if(widget.request.multipleColors[i].colorimages!=null&&widget.request.multipleColors[i].colorimages.length>0){
             for(RequestColorImages img in widget.request.multipleColors[i].colorimages) {
+              requestColorIds.add(img.requestColorId);
+              requestImageIds.add(img.id);
               colorNames.add(widget.request.multipleColors[i].colorName);
               imageUrl.add(img.colorImages);
             }
@@ -52,24 +62,24 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
         }
         print(colorNames.toString());
       }
-      if(imageUrl.length==0||colorNames.length==0) {
-        if (widget.request.multipleColorNames != null && widget.request.multipleColorNames.length > 0) {
-
-          for (int i = 0; i < widget.request.multipleColorNames.length; i++) {
-             if(widget.request.multipleColorNames[i].colorImage!=null&&widget.colorName!=null&&widget.request.multipleColorNames[i].colorName==widget.colorName){
-               imageUrl.add(widget.request.multipleColorNames[i].colorImage);
-               colorNames.add(widget.request.multipleColorNames[i].colorName);
-             }
-          }
-        }else if (widget.request.multipleColors != null && widget.request.multipleColors.length > 0) {
-          for (int i = 0; i < widget.request.multipleColors.length; i++) {
-            if(widget.request.multipleColors[i].colorImage!=null&&widget.colorName!=null&&widget.request.multipleColorNames[i].colorName==widget.colorName){
-              imageUrl.add(widget.request.multipleColors[i].colorImage);
-              colorNames.add(widget.request.multipleColors[i].colorName);
-            }
-          }
-        }
-      }
+      // if(imageUrl.length==0||colorNames.length==0) {
+      //   if (widget.request.multipleColorNames != null && widget.request.multipleColorNames.length > 0) {
+      //
+      //     for (int i = 0; i < widget.request.multipleColorNames.length; i++) {
+      //        if(widget.request.multipleColorNames[i].colorImage!=null&&widget.colorName!=null&&widget.request.multipleColorNames[i].colorName==widget.colorName){
+      //          imageUrl.add(widget.request.multipleColorNames[i].colorImage);
+      //          colorNames.add(widget.request.multipleColorNames[i].colorName);
+      //        }
+      //     }
+      //   }else if (widget.request.multipleColors != null && widget.request.multipleColors.length > 0) {
+      //     for (int i = 0; i < widget.request.multipleColors.length; i++) {
+      //       if(widget.request.multipleColors[i].colorImage!=null&&widget.colorName!=null&&widget.request.multipleColorNames[i].colorName==widget.colorName){
+      //         imageUrl.add(widget.request.multipleColors[i].colorImage);
+      //         colorNames.add(widget.request.multipleColors[i].colorName);
+      //       }
+      //     }
+      //   }
+      // }
 
     });
     super.initState();
@@ -89,15 +99,20 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
             }
           }()),
            actions: [
-             widget.colorName==null?InkWell(
-               child: Center(child: Padding(
-                 padding: const EdgeInsets.only(right:8.0),
-                 child: Text("Upload More"),
-               )),
-               onTap: (){
+            num>0?IconButton(onPressed:(){
+               if(requestImageIds.length>num&&requestColorIds.length>num){
+                 SharedPreferences.getInstance().then((prefs){
+                   Network_Operations.showImageOnMain(context,requestColorIds[num], requestImageIds[num],prefs.getString("token"));
+                 });
+               }
+             }, icon:Icon(Icons.image)):Container(),
+             widget.colorName==null?IconButton(
+               icon: Icon(Icons.add_photo_alternate),
+               onPressed: (){
                  Navigator.pushReplacement(context, MaterialPageRoute(builder:(context)=>RequestColorsList(widget.request)));
                },
-             ):Container()
+             ):Container(),
+
            ],
       ),
       body: Center(

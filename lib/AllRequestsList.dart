@@ -132,6 +132,7 @@ class _AllRequestListState extends State<AllRequestList> {
 
       controller.addPageRequestListener((pageKey){
           if(!isLastPage){
+            requests.clear();
             SharedPreferences.getInstance().then((prefs) {
               Network_Operations.getRequestForGM(
                 context,
@@ -146,18 +147,13 @@ class _AllRequestListState extends State<AllRequestList> {
                     requests.add(Request.fromMap(req["response"]['allRequests'][i]));
                   }
                   this.allRequests = requests;
-                  if (this.allRequests.length > 0) {
-                    pageNum=pageNum+1;
-                    pageKey=pageNum;
-                    isLastPage=allRequests.length==req["totalCount"];
-                    if(isLastPage){
-                      controller.appendLastPage(allRequests);
-                    }else{
-                      controller.appendPage(allRequests,pageKey);
-                    }
-                  }
-                  if(allRequests.length==0){
-                    Utils.showError(context,"No Requests Found");
+                  pageNum=pageNum+1;
+                  pageKey=pageNum;
+                  isLastPage=pageNum>req["totalPages"];
+                  if(isLastPage){
+                    controller.appendLastPage(allRequests);
+                  }else{
+                    controller.appendPage(allRequests,pageKey);
                   }
               });
 
@@ -203,6 +199,8 @@ class _AllRequestListState extends State<AllRequestList> {
           onRefresh: (){
             setState(() {
               controller.refresh();
+              requests.clear();
+              allRequests.clear();
             });
             return Utils.check_connectivity().then((isConnected){
               if(isConnected){
@@ -229,18 +227,12 @@ class _AllRequestListState extends State<AllRequestList> {
                           requests.add(Request.fromMap(req["response"]['allRequests'][i]));
                         }
                         this.allRequests = requests;
-
-                        if (this.allRequests.length > 0) {
-                          pageNum=pageNum+1;
-                          isLastPage=allRequests.length==req["totalCount"];
-                          if(isLastPage){
-                            controller.appendLastPage(allRequests);
-                          }else{
-                            controller.appendPage(allRequests,pageNum);
-                          }
-                        }
-                        if(allRequests.length==0){
-                          Utils.showError(context,"No Requests Found");
+                        pageNum=pageNum+1;
+                        isLastPage=pageNum>req["totalPages"];
+                        if(isLastPage){
+                          controller.appendLastPage(allRequests);
+                        }else{
+                          controller.appendPage(allRequests,pageNum);
                         }
                       });
                     });

@@ -28,7 +28,7 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
   var req;
   String token;
   List<RequestSuggestions> allSuggestionsList=[];
-  bool isListVisible=false,isLastPage=false;
+  bool isLastPage=false;
   List<String> clientNames=[],newModelNames=[],newModelCodes=[];
   List<Dropdown> clientDropdown=[];
   List<Request>requestsForSuggestions=[];
@@ -61,33 +61,26 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
         });
       });
     });
-        WidgetsBinding.instance
-            .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+        // WidgetsBinding.instance
+        //     .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
   controller.addPageRequestListener((pageKey) {
     if(!isLastPage){
+      requests.clear();
         SharedPreferences.getInstance().then((prefs) {
           Network_Operations.getAssignedRejectedModels(
               context, prefs.getString("token"), 10, pageKey).then((response) {
               req=jsonDecode(response);
               for(int i=0;i<req["response"]['allAssignedRequest'].length;i++){
                 requests.add(AssignedRejectedModels.fromJson(req["response"]['allAssignedRequest'][i]['requestClientDetails']));
-                print(requests[i].currentAction);
               }
               this.allRequests = requests;
-
-              if (this.allRequests.length > 0) {
-                isListVisible = true;
-                pageNum=pageNum+1;
-                pageKey=pageNum;
-                isLastPage=allRequests.length==req["totalCount"];
-                if(isLastPage){
-                  controller.appendLastPage(allRequests);
-                }else{
-                  controller.appendPage(allRequests,pageKey);
-                }
-              }
-              if(requests.length==0) {
-                Utils.showError(context, "No Assigned Rejections Found");
+              pageNum=pageNum+1;
+              pageKey=pageNum;
+              isLastPage=pageNum>req["totalPages"];
+              if(isLastPage){
+                controller.appendLastPage(allRequests);
+              }else{
+                controller.appendPage(allRequests,pageKey);
               }
           });
 
@@ -117,6 +110,8 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
           key: _refreshIndicatorKey,
           onRefresh: (){
             setState(() {
+              requests.clear();
+              allRequests.clear();
               controller.refresh();
             });
             return Utils.check_connectivity().then((isConnected){
@@ -135,23 +130,14 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
                         req=jsonDecode(response);
                         for(int i=0;i<req["response"]['allAssignedRequest'].length;i++){
                           requests.add(AssignedRejectedModels.fromJson(req["response"]['allAssignedRequest'][i]['requestClientDetails']));
-                          print(requests[i].currentAction);
                         }
                         this.allRequests = requests;
-
-                        if (this.allRequests.length > 0) {
-                          isListVisible = true;
-                          pageNum=pageNum+1;
-                          isLastPage=allRequests.length==req["totalCount"];
-                          if(isLastPage){
-                            controller.appendLastPage(allRequests);
-                          }else{
-                            controller.appendPage(allRequests,pageNum);
-                          }
-                        }
-                        if(requests.length==0) {
-                          isListVisible = false;
-                          Utils.showError(context, "No Assigned Rejections Found");
+                        pageNum=pageNum+1;
+                        isLastPage=pageNum>req["totalPages"];
+                        if(isLastPage){
+                          controller.appendLastPage(allRequests);
+                        }else{
+                          controller.appendPage(allRequests,pageNum);
                         }
                       });
                     });
@@ -162,339 +148,334 @@ class _RejectedModelActionsState extends State<RejectedModelActions> {
               }
             });
           },
-          child: Visibility(
-              visible: isListVisible,
-              child: PagedListView<int,AssignedRejectedModels>(
-                pagingController: controller,
-                  builderDelegate: PagedChildBuilderDelegate<AssignedRejectedModels>(
-                      itemBuilder:(context,allRequests,int index){
-                        return Card(
-                          elevation: 6,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              //color: Colors.teal,
-                            ),
-                            width: MediaQuery.of(context).size.width,
-
-
-                            child: Padding(
-                              padding: const EdgeInsets.all(13.0),
-                              child: Row(
+          child: PagedListView<int,AssignedRejectedModels>(
+            pagingController: controller,
+              builderDelegate: PagedChildBuilderDelegate<AssignedRejectedModels>(
+                  itemBuilder:(context,allRequests,int index){
+                    return Card(
+                      elevation: 6,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          //color: Colors.teal,
+                        ),
+                        width: MediaQuery.of(context).size.width,
+                        child: Padding(
+                          padding: const EdgeInsets.all(13.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            //crossAxisAlignment: CrossAxisAlignment.start,
+                            //mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Column(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 //crossAxisAlignment: CrossAxisAlignment.start,
-                                //mainAxisAlignment: MainAxisAlignment.start,
                                 children: <Widget>[
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    //crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      InkWell(
-                                        onTap: (){
-                                          setState(() {
-                                            List<String> imageUrl=[];
-                                            for(int i=0;i<allRequests.multipleImages.length;i++){
-                                              if(allRequests.multipleImages[i]!=null){
-                                                imageUrl.add(allRequests.multipleImages[i]);
-                                              }
-                                            }
-                                            Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(allRequests)));
-                                          });
+                                  InkWell(
+                                    onTap: (){
+                                      setState(() {
+                                        List<String> imageUrl=[];
+                                        for(int i=0;i<allRequests.multipleImages.length;i++){
+                                          if(allRequests.multipleImages[i]!=null){
+                                            imageUrl.add(allRequests.multipleImages[i]);
+                                          }
+                                        }
+                                        Navigator.push(context, MaterialPageRoute(builder: (context)=>RequestImageGallery(allRequests)));
+                                      });
 
-                                        },
-                                        child: CachedNetworkImage(
-                                          imageUrl: allRequests.image!=null?allRequests.image:"http://anokha.world/images/not-found.png",
-                                          placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
-                                          errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
-                                          imageBuilder: (context, imageProvider){
-                                            return Container(
-                                              height: 100,
-                                              width: 85,
-                                              decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(8),
-                                                  image: DecorationImage(
-                                                    image: imageProvider,
-                                                    fit: BoxFit.cover,
-                                                  )
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      //Padding(padding: EdgeInsets.only(top:2),),
-                                      allRequests.multipleColors!=null&&allRequests.multipleColors.length>0
-                                          ?Container(
-                                        width: 55,
-                                        height: 20,
-                                        child: ListView(
-                                          scrollDirection: Axis.horizontal,
-                                          children: [
-                                            Row(
-                                              children: <Widget>[
-                                                for(int i=0;i<allRequests.multipleColors.length;i++)
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(top: 8,left: 2,right: 2),
-                                                    child: Wrap(
-                                                      children: [
-                                                        Container(
-                                                          decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.circular(2),
-                                                            color: Color(Utils.getColorFromHex(allRequests.multipleColors[i].colorCode)),
-                                                            //color: Colors.teal,
-                                                          ),
-                                                          height: 10,
-                                                          width: 15,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                              ],
-                                            )
-                                          ],
-                                        ),
-                                      ) :Container(),
-                                    ],
-                                  ),
-                                  VerticalDivider(color: Colors.grey,),
-                                  GestureDetector(
-                                    onTapDown: (details)async{
-                                      if(allRequests.currentAction=="Completed"||allRequests.currentAction=="Cancelled"){
-                                        await showMenu(
-                                          context: context,
-                                          position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                          items: [
-                                            PopupMenuItem<String>(
-                                                child: Row(
-                                                  children: [
-                                                    Padding(
-                                                      padding: EdgeInsets.only(right:8.0),
-                                                      child: Icon(Icons.disabled_by_default,color: Color(0xFF004c4c),),
-                                                    ),
-                                                    Text("Rejection Reasons")
-                                                  ],
-                                                ),
-                                                value: 'rejectionReason'
-                                            ),
-                                            PopupMenuItem<String>(
-                                                child: Row(
-                                                  children: [
-                                                    Padding(
-                                                      padding: EdgeInsets.only(right:8.0),
-                                                      child: Icon(Icons.info,color: Color(0xFF004c4c),),
-                                                    ),
-                                                    Text("See Deatils")
-                                                  ],
-                                                ),
-                                                value: 'Details'
-                                            ),
-                                          ],
-                                          elevation: 8.0,
-                                        ).then((selectedItem){
-                                          if(selectedItem=="Details"){
-                                            SharedPreferences.getInstance().then((prefs){
-                                              Network_Operations.getRequestById(context, prefs.getString("token"), allRequests.requestId);
-                                            });
-                                          }
-                                          else if(selectedItem=="rejectionReason"){
-                                            showReasonDialog(allRequests);
-                                          }
-                                        });
-                                      }
-                                      else{
-                                        await showMenu(
-                                          context: context,
-                                          position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
-                                          items: [
-                                            PopupMenuItem<String>(
-                                                child: Row(
-                                                  children: [
-                                                    Padding(
-                                                      padding: EdgeInsets.only(right:8.0),
-                                                      child: Icon(Icons.update,color: Color(0xFF004c4c),),
-                                                    ),
-                                                    Text("Change Status")
-                                                  ],
-                                                ), value: 'changeStatus'),
-                                            PopupMenuItem<String>(
-                                                child: Row(
-                                                  children: [
-                                                    Padding(
-                                                      padding: EdgeInsets.only(right:8.0),
-                                                      child: Icon(Icons.disabled_by_default,color: Color(0xFF004c4c),),
-                                                    ),
-                                                    Text("Rejection Reasons")
-                                                  ],
-                                                ),
-                                                value: 'rejectionReasons'
-                                            ),
-                                            PopupMenuItem<String>(
-                                                child: Row(
-                                                  children: [
-                                                    Padding(
-                                                      padding: EdgeInsets.only(right:8.0),
-                                                      child: Icon(Icons.info,color: Color(0xFF004c4c),),
-                                                    ),
-                                                    Text("See Deatils")
-                                                  ],
-                                                ),
-                                                value: 'Details'
-                                            ),
-                                          ],
-                                          elevation: 8.0,
-                                        ).then((selectedItem){
-                                          if(selectedItem=="changeStatus"){
-                                            if(allRequests.currentAction=="Assigned"){
-                                              SharedPreferences.getInstance().then((prefs){
-                                                Network_Operations.changeStatusOfAssignedModel(context, prefs.getString("token"),allRequests.id, 1).then((value){
-                                                  WidgetsBinding.instance
-                                                      .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
-                                                });
-                                              });
-                                            }else if(allRequests.currentAction=="In Progress"){
-                                              showAlertDialog(context,allRequests);
-                                            }
-                                          }
-                                          else if(selectedItem=="Details"){
-                                            SharedPreferences.getInstance().then((prefs){
-                                              Network_Operations.getRequestById(context, prefs.getString("token"), allRequests.requestId);
-                                            });
-                                          }
-                                          else if(selectedItem=="rejectionReasons"){
-                                            showReasonDialog(allRequests);
-                                          }
-                                        });
-                                      }
                                     },
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width * 0.62,
-                                      height: 160,
-                                      color: Colors.white,
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                    child: CachedNetworkImage(
+                                      imageUrl: allRequests.image!=null?allRequests.image:"http://anokha.world/images/not-found.png",
+                                      placeholder:(context, url)=> Container(width:60,height: 60,child: Center(child: CircularProgressIndicator())),
+                                      errorWidget: (context, url, error) => Icon(Icons.error,color: Colors.red,),
+                                      imageBuilder: (context, imageProvider){
+                                        return Container(
+                                          height: 100,
+                                          width: 85,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(8),
+                                              image: DecorationImage(
+                                                image: imageProvider,
+                                                fit: BoxFit.cover,
+                                              )
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  //Padding(padding: EdgeInsets.only(top:2),),
+                                  allRequests.multipleColors!=null&&allRequests.multipleColors.length>0
+                                      ?Container(
+                                    width: 55,
+                                    height: 20,
+                                    child: ListView(
+                                      scrollDirection: Axis.horizontal,
+                                      children: [
+                                        Row(
+                                          children: <Widget>[
+                                            for(int i=0;i<allRequests.multipleColors.length;i++)
+                                              Padding(
+                                                padding: const EdgeInsets.only(top: 8,left: 2,right: 2),
+                                                child: Wrap(
+                                                  children: [
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                        borderRadius: BorderRadius.circular(2),
+                                                        color: Color(Utils.getColorFromHex(allRequests.multipleColors[i].colorCode)),
+                                                        //color: Colors.teal,
+                                                      ),
+                                                      height: 10,
+                                                      width: 15,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ) :Container(),
+                                ],
+                              ),
+                              VerticalDivider(color: Colors.grey,),
+                              GestureDetector(
+                                onTapDown: (details)async{
+                                  if(allRequests.currentAction=="Completed"||allRequests.currentAction=="Cancelled"){
+                                    await showMenu(
+                                      context: context,
+                                      position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                      items: [
+                                        PopupMenuItem<String>(
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.disabled_by_default,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("Rejection Reasons")
+                                              ],
+                                            ),
+                                            value: 'rejectionReason'
+                                        ),
+                                        PopupMenuItem<String>(
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("See Deatils")
+                                              ],
+                                            ),
+                                            value: 'Details'
+                                        ),
+                                      ],
+                                      elevation: 8.0,
+                                    ).then((selectedItem){
+                                      if(selectedItem=="Details"){
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests.requestId);
+                                        });
+                                      }
+                                      else if(selectedItem=="rejectionReason"){
+                                        showReasonDialog(allRequests);
+                                      }
+                                    });
+                                  }
+                                  else{
+                                    await showMenu(
+                                      context: context,
+                                      position:  RelativeRect.fromLTRB(details.globalPosition.dx, details.globalPosition.dy, 0, 0),
+                                      items: [
+                                        PopupMenuItem<String>(
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.update,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("Change Status")
+                                              ],
+                                            ), value: 'changeStatus'),
+                                        PopupMenuItem<String>(
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.disabled_by_default,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("Rejection Reasons")
+                                              ],
+                                            ),
+                                            value: 'rejectionReasons'
+                                        ),
+                                        PopupMenuItem<String>(
+                                            child: Row(
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(right:8.0),
+                                                  child: Icon(Icons.info,color: Color(0xFF004c4c),),
+                                                ),
+                                                Text("See Deatils")
+                                              ],
+                                            ),
+                                            value: 'Details'
+                                        ),
+                                      ],
+                                      elevation: 8.0,
+                                    ).then((selectedItem){
+                                      if(selectedItem=="changeStatus"){
+                                        if(allRequests.currentAction=="Assigned"){
+                                          SharedPreferences.getInstance().then((prefs){
+                                            Network_Operations.changeStatusOfAssignedModel(context, prefs.getString("token"),allRequests.id, 1).then((value){
+                                              WidgetsBinding.instance
+                                                  .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
+                                            });
+                                          });
+                                        }else if(allRequests.currentAction=="In Progress"){
+                                          showAlertDialog(context,allRequests);
+                                        }
+                                      }
+                                      else if(selectedItem=="Details"){
+                                        SharedPreferences.getInstance().then((prefs){
+                                          Network_Operations.getRequestById(context, prefs.getString("token"), allRequests.requestId);
+                                        });
+                                      }
+                                      else if(selectedItem=="rejectionReasons"){
+                                        showReasonDialog(allRequests);
+                                      }
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width * 0.62,
+                                  height: 160,
+                                  color: Colors.white,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 6, top: 8,bottom: 6),
+                                        child: Text(allRequests.modelName!=null?allRequests.modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                                      ),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        //mainAxisAlignment: MainAxisAlignment.spaceAround,
                                         children: <Widget>[
-                                          Padding(
-                                            padding: const EdgeInsets.only(left: 6, top: 8,bottom: 6),
-                                            child: Text(allRequests.modelName!=null?allRequests.modelName:'', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-                                          ),
                                           Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            //mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                            children: <Widget>[
-                                              Row(
-                                                //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                children: <Widget>[
-                                                  Icon(
-                                                    Icons.date_range,
-                                                    color: Colors.teal,
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(left: 2, right: 2),
-                                                  ),
-                                                  Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(allRequests.requestDate!=null?allRequests.requestDate:DateTime.now().toString())))
-                                                ],
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.only(left: 30),
-                                              ),
-
-                                            ],
-                                          ),
-                                          Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                            children: <Widget>[
-                                              Row(
-                                                children: <Widget>[
-                                                  Icon(
-                                                    Icons.zoom_out_map,
-                                                    color: Colors.teal,
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(left: 2, right: 2),
-                                                  ),
-                                                  Container(
-                                                      width: MediaQuery.of(context).size.width*0.4,
-                                                      child: Text(allRequests.multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 3,overflow: TextOverflow.visible,)
-                                                  )
-                                                ],
-
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.only(left: 27),
-                                              ),
-
-                                            ],
-                                          ),
-                                          Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                            children: <Widget>[
-                                              Row(
-                                                children: <Widget>[
-                                                  Icon(
-                                                    Icons.person,
-                                                    color: Colors.teal,
-                                                  ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(left: 2, right: 2),
-                                                  ),
-                                                  Text(allRequests.clientName)
-                                                ],
-
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.only(left: 27),
-                                              ),
-
-                                            ],
-                                          ),
-                                          Row(
+                                            //mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                             children: <Widget>[
                                               Icon(
-                                                Icons.layers,
+                                                Icons.date_range,
                                                 color: Colors.teal,
                                               ),
                                               Padding(
                                                 padding: EdgeInsets.only(left: 2, right: 2),
                                               ),
-                                              Text(allRequests.surfaceName!=null?requests[index].surfaceName:'',overflow: TextOverflow.ellipsis,maxLines: 1,),
+                                              Text(DateFormat("yyyy-MM-dd").format(DateTime.parse(allRequests.requestDate!=null?allRequests.requestDate:DateTime.now().toString())))
                                             ],
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(left: 30),
+                                          ),
 
+                                        ],
+                                      ),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        children: <Widget>[
+                                          Row(
+                                            children: <Widget>[
+                                              Icon(
+                                                Icons.zoom_out_map,
+                                                color: Colors.teal,
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.only(left: 2, right: 2),
+                                              ),
+                                              Container(
+                                                  width: MediaQuery.of(context).size.width*0.4,
+                                                  child: Text(allRequests.multipleSizeNames.toString().replaceAll(".00", "").replaceAll("[","").replaceAll("]", ""),maxLines: 3,overflow: TextOverflow.visible,)
+                                              )
+                                            ],
 
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(left: 1),
-                                            child: Row(
-                                              //crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Icon(
-                                                  Icons.done_all,
-                                                  //size: 14,
-                                                  color: Colors.teal,
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.only(left: 3, right: 3),
-                                                ),
-                                                Text(allRequests.currentAction!=null?allRequests.currentAction:'')
-                                              ],
-
-                                            ),
+                                            padding: EdgeInsets.only(left: 27),
                                           ),
+
                                         ],
                                       ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                                      Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        children: <Widget>[
+                                          Row(
+                                            children: <Widget>[
+                                              Icon(
+                                                Icons.person,
+                                                color: Colors.teal,
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.only(left: 2, right: 2),
+                                              ),
+                                              Text(allRequests.clientName)
+                                            ],
 
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(left: 27),
+                                          ),
+
+                                        ],
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Icon(
+                                            Icons.layers,
+                                            color: Colors.teal,
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(left: 2, right: 2),
+                                          ),
+                                          Text(allRequests.surfaceName!=null?requests[index].surfaceName:'',overflow: TextOverflow.ellipsis,maxLines: 1,),
+                                        ],
+
+
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 1),
+                                        child: Row(
+                                          //crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Icon(
+                                              Icons.done_all,
+                                              //size: 14,
+                                              color: Colors.teal,
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(left: 3, right: 3),
+                                            ),
+                                            Text(allRequests.currentAction!=null?allRequests.currentAction:'')
+                                          ],
+
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                  ),
+                        ),
+
+                      ),
+                    );
+                  },
               ),
-            ),
+          ),
         ),
       ),
       );

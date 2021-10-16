@@ -102,7 +102,9 @@ class _RequestColorsListState extends State<RequestColorsList> {
                                   if(selectedMenuItem=="uploadImages"){
                                         Utils.getMultipleImages().then((images){
                                           SharedPreferences.getInstance().then((prefs){
-                                            Network_Operations.sendiamgestoserver(context,prefs.getString("token"), images,widget.request.multipleColorNames[index].id);
+                                            if(images!=null) {
+                                              Network_Operations.sendiamgestoserver(context, prefs.getString("token"), images, widget.request.multipleColorNames[index].id);
+                                            }
                                           });
                                         });
                                   }else if(selectedMenuItem=="viewImages"){

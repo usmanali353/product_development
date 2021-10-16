@@ -28,7 +28,7 @@ class ProductionManagerRequests extends StatefulWidget {
 }
 
 class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
-  List<TrialRequests> requests=[];
+  List<TrialRequests> requests=[],allRequests=[];
   bool isVisible=false;
   var selectedPreference,selectedSearchPreference;
   int statusId;
@@ -83,6 +83,7 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
     //     .addPostFrameCallback((_) => _refreshIndicatorKey.currentState.show());
     controller.addPageRequestListener((pageKey){
         if(!isLastPage){
+          allRequests.clear();
           SharedPreferences.getInstance().then((prefs){
             Network_Operations.getClientRequestsByStatus(
                 context,
@@ -95,12 +96,13 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
             ).then((response){
                 req=jsonDecode(response);
                 for(int i=0;i<jsonDecode(response)['response'].length;i++){
-                  this.requests.add(TrialRequests.fromJson(jsonDecode(response)['response'][i]));
+                  this.allRequests.add(TrialRequests.fromJson(jsonDecode(response)['response'][i]));
                 }
+                this.requests=allRequests;
                 if(requests.length>0){
                   pageNum=pageNum+1;
                   pageKey=pageNum;
-                  isLastPage=requests.length==req["totalCount"];
+                  isLastPage=pageNum>req["totalPages"];
                   if(isLastPage){
                     controller.appendLastPage(requests);
                   }else{
@@ -150,12 +152,15 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
           key: _refreshIndicatorKey,
           onRefresh: (){
             setState(() {
+              allRequests.clear();
+              requests.clear();
               controller.refresh();
             });
             return Utils.check_connectivity().then((isConnected){
               if(isConnected){
                 if(pageNum>1){
                   setState(() {
+                    allRequests.clear();
                     requests.clear();
                     pageNum=1;
                   });
@@ -173,11 +178,12 @@ class _ProductionManagerRequestsState extends State<ProductionManagerRequests> {
                       setState(() {
                         req=jsonDecode(response);
                         for(int i=0;i<jsonDecode(response)['response'].length;i++){
-                          this.requests.add(TrialRequests.fromJson(jsonDecode(response)['response'][i]));
+                          this.allRequests.add(TrialRequests.fromJson(jsonDecode(response)['response'][i]));
                         }
+                        this.requests=allRequests;
                         if(requests.length>0){
                           pageNum=pageNum+1;
-                          isLastPage=requests.length==req["totalCount"];
+                          isLastPage=pageNum>req["totalPages"];
                           if(isLastPage){
                             controller.appendLastPage(requests);
                           }else{
