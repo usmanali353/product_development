@@ -62,24 +62,25 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
         }
         print(colorNames.toString());
       }
-      // if(imageUrl.length==0||colorNames.length==0) {
-      //   if (widget.request.multipleColorNames != null && widget.request.multipleColorNames.length > 0) {
-      //
-      //     for (int i = 0; i < widget.request.multipleColorNames.length; i++) {
-      //        if(widget.request.multipleColorNames[i].colorImage!=null&&widget.colorName!=null&&widget.request.multipleColorNames[i].colorName==widget.colorName){
-      //          imageUrl.add(widget.request.multipleColorNames[i].colorImage);
-      //          colorNames.add(widget.request.multipleColorNames[i].colorName);
-      //        }
-      //     }
-      //   }else if (widget.request.multipleColors != null && widget.request.multipleColors.length > 0) {
-      //     for (int i = 0; i < widget.request.multipleColors.length; i++) {
-      //       if(widget.request.multipleColors[i].colorImage!=null&&widget.colorName!=null&&widget.request.multipleColorNames[i].colorName==widget.colorName){
-      //         imageUrl.add(widget.request.multipleColors[i].colorImage);
-      //         colorNames.add(widget.request.multipleColors[i].colorName);
-      //       }
-      //     }
-      //   }
-      // }
+      if(imageUrl.length==0||requestImageIds.length==0) {
+        if (widget.request.multipleColorNames != null && widget.request.multipleColorNames.length > 0) {
+
+          for (int i = 0; i < widget.request.multipleColorNames.length; i++) {
+             if(widget.request.multipleColorNames[i].colorImage!=null){
+               imageUrl.add(widget.request.multipleColorNames[i].colorImage);
+               colorNames.add(widget.request.multipleColorNames[i].colorName);
+             }
+          }
+        }else if (widget.request.multipleColors != null && widget.request.multipleColors.length > 0) {
+          for (int i = 0; i < widget.request.multipleColors.length; i++) {
+            if(widget.request.multipleColors[i].colorImage!=null){
+              imageUrl.add(widget.request.multipleColors[i].colorImage);
+              colorNames.add(widget.request.multipleColors[i].colorName);
+            }
+          }
+        }
+        print("Count when no bridge table available "+imageUrl.length.toString());
+      }
 
     });
     super.initState();
@@ -99,13 +100,14 @@ class _RequestImageGalleryState extends State<RequestImageGallery> {
             }
           }()),
            actions: [
-            num>0?IconButton(onPressed:(){
+            imageUrl.length>0&&imageUrl.length>1&&!(imageUrl.length==0||requestImageIds.length==0)?IconButton(onPressed:(){
                if(requestImageIds.length>num&&requestColorIds.length>num){
                  SharedPreferences.getInstance().then((prefs){
                    Network_Operations.showImageOnMain(context,requestColorIds[num], requestImageIds[num],prefs.getString("token"));
                  });
                }
              }, icon:Icon(Icons.image)):Container(),
+
              widget.colorName==null?IconButton(
                icon: Icon(Icons.add_photo_alternate),
                onPressed: (){

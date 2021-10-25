@@ -65,6 +65,22 @@ class _DetailPageState extends State<DetailPage>{
          }
        }
      }
+     if(imageUrl.length==0) {
+       if (widget.request.multipleColorNames != null && widget.request.multipleColorNames.length > 0) {
+
+         for (int i = 0; i < widget.request.multipleColorNames.length; i++) {
+           if(widget.request.multipleColorNames[i].colorImage!=null){
+             imageUrl.add(widget.request.multipleColorNames[i].colorImage);
+           }
+         }
+       }else if (widget.request.multipleColors != null && widget.request.multipleColors.length > 0) {
+         for (int i = 0; i < widget.request.multipleColors.length; i++) {
+           if(widget.request.multipleColors[i].colorImage!=null){
+             imageUrl.add(widget.request.multipleColors[i].colorImage);
+           }
+         }
+       }
+     }
    });
     super.initState();
   }
